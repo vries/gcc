@@ -5771,6 +5771,34 @@ if test x$enable_default_pie == xyes ; then
 fi
 AC_SUBST([enable_default_pie])
 
+# Check if -fno-PIE works.
+AC_CACHE_CHECK([for -fno-PIE option],
+  [gcc_cv_c_no_fpie],
+  [saved_CFLAGS="$CFLAGS"
+   CFLAGS="$CFLAGS -fno-PIE"
+   AC_COMPILE_IFELSE([int main(void) {return 0;}],
+     [gcc_cv_c_no_fpie=yes],
+     [gcc_cv_c_no_fpie=no])
+   CFLAGS="$saved_CFLAGS"])
+if test "$gcc_cv_c_no_fpie" = "yes"; then
+  NO_PIE_CFLAGS="-fno-PIE"
+fi
+AC_SUBST([NO_PIE_CFLAGS])
+
+# Check if -no-pie works.
+AC_CACHE_CHECK([for -no-pie option],
+  [gcc_cv_no_pie],
+  [saved_LDFLAGS="$LDFLAGS"
+   LDFLAGS="$LDFLAGS -no-pie"
+   AC_LINK_IFELSE([int main(void) {return 0;}],
+     [gcc_cv_no_pie=yes],
+     [gcc_cv_no_pie=no])
+   LDFLAGS="$saved_LDFLAGS"])
+if test "$gcc_cv_no_pie" = "yes"; then
+  NO_PIE_FLAG="-no-pie"
+fi
+AC_SUBST([NO_PIE_FLAG])
+
 # Configure the subdirectories
 # AC_CONFIG_SUBDIRS($subdirs)
 

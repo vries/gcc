@@ -252,6 +252,12 @@ LINKER = $(CC)
 LINKER_FLAGS = $(CFLAGS)
 endif
 
+# We don't want to compile the compiler with -fPIE, it make PCH fail.
+COMPILER += @NO_PIE_CFLAGS@
+
+# Link with -no-pie since we compile the compiler with -fno-PIE.
+LINKER += @NO_PIE_FLAG@
+
 # Like LINKER, but use a mutex for serializing front end links.
 ifeq (@DO_LINK_MUTEX@,true)
 LLINKER = $(SHELL) $(srcdir)/lock-and-run.sh linkfe.lck $(LINKER)
