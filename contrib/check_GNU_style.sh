@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Checks some of the GNU style formatting rules in a set of patches.
 # Copyright (C) 2010, 2012  Free Software Foundation, Inc.
@@ -68,19 +68,16 @@ tmp=check_GNU_style.tmp
 tmp2=check_GNU_style.2.tmp
 tmp3=check_GNU_style.3.tmp
 
-# Remove $tmp on exit and various signals.
-trap "rm -f $inp $tmp $tmp2 $tmp3 $stdin_tmp" 0
-trap "rm -f $inp $tmp $tmp2 $tmp3 $stdin_tmp; exit 1" 1 2 3 5 9 13 15
+declare -a warning_files
 
-if [ $nfiles -eq 1 ]; then
-    # There's no need for the file prefix if we're dealing only with one file.
-    format="-n"
-else
-    format="-nH"
-fi
-grep $format '^+' $files \
-    | grep -v ':+++' \
-    > $inp
+cleanup ()
+{
+    rm -f $inp $tmp $tmp2 $tmp3 $stdin_tmp ${warning_files[@]}
+}
+
+# Remove $tmp on exit and various signals.
+trap "cleanup" 0
+trap "cleanup; exit 1" 1 2 3 5 9 13 15
 
 cat_with_prefix ()
 {
@@ -93,10 +90,44 @@ cat_with_prefix ()
     fi
 }
 
+warnings_entry()
+{
+    warnings_index=$(($warnings_index + 1))
+}
+
+warnings_found()
+{
+    local msg="$1"
+    local tmp="$2"
+
+    local warning_file="${warning_files[$warnings_index]}"
+    if [ "$warning_file" = "" ]; then
+	warning_file=check_GNU_style-warnings.$warnings_index.tmp
+	warning_files[$warnings_index]="$warning_file"
+	printf "\n$msg\n" > "$warning_file"
+    fi
+    cat_with_prefix "$tmp" \
+	>> $warning_file
+}
+
+warnings_print()
+{
+    local i
+    for i in $(seq 1 $warnings_index); do
+	local warning_file="${warning_files[$i]}"
+	if [ "$warning_file" = "" ]; then
+	    continue
+	fi
+	cat "$warning_file"
+    done
+}
+
 # Grep
 g (){
     local msg="$1"
     local arg="$2"
+
+    warnings_entry
 
     local found=false
     cat $inp \
@@ -104,8 +135,7 @@ g (){
 	> "$tmp" && found=true
 
     if $found; then
-	printf "\n$msg\n"
-	cat "$tmp"
+	warnings_found "$msg" "$tmp"
     fi
 }
 
@@ -115,6 +145,8 @@ ag (){
     local arg1="$2"
     local arg2="$3"
 
+    warnings_entry
+
     local found=false
     cat $inp \
 	| egrep --color=always -- "$arg1" \
@@ -122,8 +154,7 @@ ag (){
 	> "$tmp" && found=true
 
     if $found; then
-	printf "\n$msg\n"
-	cat "$tmp"
+	warnings_found "$msg" "$tmp"
     fi
 }
 
@@ -133,6 +164,8 @@ vg (){
     local varg="$2"
     local arg="$3"
 
+    warnings_entry
+
     local found=false
     cat $inp \
 	| egrep -v -- "$varg" \
@@ -140,94 +173,103 @@ vg (){
 	> "$tmp" && found=true
 
     if $found; then
-	printf "\n$msg\n"
-	cat "$tmp"
+	warnings_found "$msg" "$tmp"
     fi
 }
 
 col (){
     local msg="$1"
 
-    local first=true
+    warnings_entry
+
+    # Keep only line number prefix and patch modifier '+'.
+    cat "$inp" \
+	| sed 's/\(^[0-9][0-9]*:+\).*/\1/' \
+	> "$tmp2"
+
+    # Remove line number prefix and patch modifier '+'.
+    # Expand tabs to spaces according to tab positions.
+    # Keep long lines, make short lines empty.  Print the part past 80 chars
+    # in red.
+    cat "$inp" \
+	| sed 's/^[0-9]*:+//' \
+	| expand \
+	| awk '{ \
+		 if (length($0) > 80) \
+		   printf "%s\033[1;31m%s\033[0m\n", \
+			  substr($0,1,80), \
+			  substr($0,81); \
+		 else \
+		   print "" \
+	       }' \
+	> "$tmp3"
+
+    # Combine prefix back with long lines.
+    # Filter out empty lines.
+    local found=false
+    paste -d '' "$tmp2" "$tmp3" \
+	| grep -v '^[0-9][0-9]*:+$' \
+	> "$tmp" && found=true
+
+    if $found; then
+	warnings_found "$msg" "$tmp"
+    fi
+}
+
+do_file()
+{
+    local f="$1"
+
+    grep -n '^+' "$f" \
+	| grep -v '^[0-9][0-9]*:+++ ' \
+	> $inp
+
+    warnings_index=0
+
+    col 'Lines should not exceed 80 characters.'
+
+    g 'Blocks of 8 spaces should be replaced with tabs.' \
+	' {8}'
+
+    g 'Trailing whitespace.' \
+	'[[:space:]]$'
+
+    g 'Space before dot.' \
+	'[[:alnum:]][[:blank:]]+\.'
+
+    g 'Dot, space, space, new sentence.' \
+	'[[:alnum:]]\.([[:blank:]]|[[:blank:]]{3,})[A-Z0-9]'
+
+    g 'Dot, space, space, end of comment.' \
+	'[[:alnum:]]\.([[:blank:]]{0,1}|[[:blank:]]{3,})\*/'
+
+    g 'Sentences should end with a dot.  Dot, space, space, end of the comment.' \
+	'[[:alnum:]][[:blank:]]*\*/'
+
+    vg 'There should be exactly one space between function name and parentheses.' \
+	'\#define' \
+	'[[:alnum:]]([[:blank:]]{2,})?\('
+
+    g 'There should be no space before closing parentheses.' \
+	'[[:graph:]][[:blank:]]+\)'
+
+    ag 'Braces should be on a separate line.' \
+	'\{' \
+	'if[[:blank:]]\(|while[[:blank:]]\(|switch[[:blank:]]\('
+}
+
+main()
+{
     local f
     for f in $files; do
 	prefix=""
 	if [ $nfiles -ne 1 ]; then
 	    prefix="$f:"
 	fi
-
-	# Don't reuse $inp, which may be generated using -H and thus contain a
-	# file prefix.
-	grep -n '^+' $f \
-	    | grep -v ':+++' \
-	    > $tmp
-
-	# Keep only line number prefix and patch modifier '+'.
-	cat "$tmp" \
-	    | sed 's/\(^[0-9][0-9]*:+\).*/\1/' \
-	    > "$tmp2"
-
-	# Remove line number prefix and patch modifier '+'.
-	# Expand tabs to spaces according to tab positions.
-	# Keep long lines, make short lines empty.  Print the part past 80 chars
-	# in red.
-	cat "$tmp" \
-	    | sed 's/^[0-9]*:+//' \
-	    | expand \
-	    | awk '{ \
-		     if (length($0) > 80) \
-		       printf "%s\033[1;31m%s\033[0m\n", \
-			      substr($0,1,80), \
-			      substr($0,81); \
-		     else \
-		       print "" \
-		   }' \
-	    > "$tmp3"
-
-	# Combine prefix back with long lines.
-	# Filter out empty lines.
-	local found=false
-	paste -d '' "$tmp2" "$tmp3" \
-	    | grep -v '^[0-9][0-9]*:+$' \
-	    > "$tmp" && found=true
-
-	if $found; then
-	    if $first; then
-		printf "\n$msg\n"
-		first=false
-	    fi
-	    cat_with_prefix "$tmp"
-	fi
+	do_file "$f"
     done
+
+    warnings_print
 }
 
-col 'Lines should not exceed 80 characters.'
-
-g 'Blocks of 8 spaces should be replaced with tabs.' \
-    ' {8}'
-
-g 'Trailing whitespace.' \
-    '[[:space:]]$'
-
-g 'Space before dot.' \
-    '[[:alnum:]][[:blank:]]+\.'
-
-g 'Dot, space, space, new sentence.' \
-    '[[:alnum:]]\.([[:blank:]]|[[:blank:]]{3,})[A-Z0-9]'
-
-g 'Dot, space, space, end of comment.' \
-    '[[:alnum:]]\.([[:blank:]]{0,1}|[[:blank:]]{3,})\*/'
-
-g 'Sentences should end with a dot.  Dot, space, space, end of the comment.' \
-    '[[:alnum:]][[:blank:]]*\*/'
-
-vg 'There should be exactly one space between function name and parentheses.' \
-    '\#define' \
-    '[[:alnum:]]([[:blank:]]{2,})?\('
-
-g 'There should be no space before closing parentheses.' \
-    '[[:graph:]][[:blank:]]+\)'
-
-ag 'Braces should be on a separate line.' \
-    '\{' \
-    'if[[:blank:]]\(|while[[:blank:]]\(|switch[[:blank:]]\('
+main
