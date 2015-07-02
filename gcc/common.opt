@@ -2384,7 +2384,7 @@ Common Report Var(flag_tree_loop_optimize) Init(1) Optimization
 Enable loop optimizations on tree level.
 
 ftree-parallelize-loops=
-Common Report Joined RejectNegative UInteger Var(flag_tree_parallelize_loops) Init(1) Optimization
+Common Report Joined RejectNegative UInteger Var(flag_tree_parallelize_loops) Init(2) Optimization
 Enable automatic parallelization of loops.
 
 ftree-phiprop
