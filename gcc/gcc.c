@@ -1019,8 +1019,9 @@ proper position among the other output files.  */
     %{s} %{t} %{u*} %{z} %{Z} %{!nostdlib:%{!nostartfiles:%S}} \
     %{static:} %{L*} %(mfwrap) %(link_libgcc) " \
     VTABLE_VERIFICATION_SPEC " " SANITIZER_EARLY_SPEC " %o " CHKP_SPEC " \
-    %{fopenacc|fopenmp|%:gt(%{ftree-parallelize-loops=*} 1):\
-	%:include(libgomp.spec)%(link_gomp)}\
+    %{fopenacc|fopenmp:%:include(libgomp.spec)%(link_gomp)}\
+    %{!ftree-parallelize-loops=0:%{!ftree-parallelize-loops=1:\
+	%:include(libgomp.spec)%(link_gomp)}}\
     %{fcilkplus:%:include(libcilkrts.spec)%(link_cilkrts)}\
     %{fgnu-tm:%:include(libitm.spec)%(link_itm)}\
     %(mflib) " STACK_SPLIT_SPEC "\
@@ -1183,8 +1184,10 @@ static const char *const multilib_defaults_raw[] = MULTILIB_DEFAULTS;
    for targets that use different start files and suchlike.  */
 #ifndef GOMP_SELF_SPECS
 #define GOMP_SELF_SPECS \
-  "%{fopenacc|fopenmp|%:gt(%{ftree-parallelize-loops=*} 1): " \
-  "-pthread}"
+  "%{fopenacc|fopenmp: " \
+  "-pthread}" \
+  "%{!ftree-parallelize-loops=0: %{!ftree-parallelize-loops=1: " \
+  "-pthread}}"
 #endif
 
 /* Likewise for -fgnu-tm.  */
