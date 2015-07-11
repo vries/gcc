@@ -245,8 +245,13 @@ static GTY ((cache)) hash_table<cl_option_hasher> *cl_option_hash_table;
 /* General tree->tree mapping  structure for use in hash tables.  */
 
 
+/* TODO: Figure out whether we can declare debug_expr_for_decl as:
 static GTY ((cache))
      hash_table<tree_decl_map_cache_hasher> *debug_expr_for_decl;
+*/
+
+static GTY (())
+     hash_table<tree_decl_map_hasher> *debug_expr_for_decl;
 
 static GTY ((cache))
      hash_table<tree_decl_map_cache_hasher> *value_expr_for_decl;
@@ -659,7 +664,7 @@ init_ttree (void)
     = hash_table<type_cache_hasher>::create_ggc (TYPE_HASH_INITIAL_SIZE);
 
   debug_expr_for_decl
-    = hash_table<tree_decl_map_cache_hasher>::create_ggc (512);
+    = hash_table<tree_decl_map_hasher>::create_ggc (512);
 
   value_expr_for_decl
     = hash_table<tree_decl_map_cache_hasher>::create_ggc (512);
