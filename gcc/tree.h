@@ -4642,6 +4642,16 @@ struct tree_decl_map_cache_hasher : ggc_cache_ptr_hash<tree_decl_map>
   }
 };
 
+struct tree_decl_map_hasher : ggc_ptr_hash<tree_decl_map>
+{
+  static hashval_t hash (tree_decl_map *m) { return tree_decl_map_hash (m); }
+  static bool
+  equal (tree_decl_map *a, tree_decl_map *b)
+  {
+    return tree_decl_map_eq (a, b);
+  }
+};
+
 #define tree_int_map_eq tree_map_base_eq
 #define tree_int_map_hash tree_map_base_hash
 #define tree_int_map_marked_p tree_map_base_marked_p
