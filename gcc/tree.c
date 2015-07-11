@@ -268,8 +268,25 @@ struct tree_vec_map_cache_hasher : ggc_cache_ptr_hash<tree_vec_map>
   }
 };
 
+struct tree_vec_map_hasher : ggc_ptr_hash<tree_vec_map>
+{
+  static hashval_t hash (tree_vec_map *m) { return DECL_UID (m->base.from); }
+
+  static bool
+  equal (tree_vec_map *a, tree_vec_map *b)
+  {
+    return a->base.from == b->base.from;
+  }
+};
+
+/* TODO: Figure out whether we can declare debug_args_for_decl as:
+
 static GTY ((cache))
      hash_table<tree_vec_map_cache_hasher> *debug_args_for_decl;
+*/
+
+static GTY (())
+     hash_table<tree_vec_map_hasher> *debug_args_for_decl;
 
 static void set_type_quals (tree, int);
 static void print_type_hash_statistics (void);
@@ -6870,7 +6887,7 @@ decl_debug_args_insert (tree from)
   if (DECL_HAS_DEBUG_ARGS_P (from))
     return decl_debug_args_lookup (from);
   if (debug_args_for_decl == NULL)
-    debug_args_for_decl = hash_table<tree_vec_map_cache_hasher>::create_ggc (64);
+    debug_args_for_decl = hash_table<tree_vec_map_hasher>::create_ggc (64);
   h = ggc_alloc<tree_vec_map> ();
   h->base.from = from;
   h->to = NULL;
