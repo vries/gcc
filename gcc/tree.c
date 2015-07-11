@@ -253,8 +253,13 @@ static GTY ((cache))
 static GTY (())
      hash_table<tree_decl_map_hasher> *debug_expr_for_decl;
 
+/* TODO: Figure out whether we can declare value_expr_for_decl as:
 static GTY ((cache))
      hash_table<tree_decl_map_cache_hasher> *value_expr_for_decl;
+*/
+
+static GTY (())
+     hash_table<tree_decl_map_hasher> *value_expr_for_decl;
 
 struct tree_vec_map_cache_hasher : ggc_cache_ptr_hash<tree_vec_map>
 {
@@ -667,7 +672,7 @@ init_ttree (void)
     = hash_table<tree_decl_map_hasher>::create_ggc (512);
 
   value_expr_for_decl
-    = hash_table<tree_decl_map_cache_hasher>::create_ggc (512);
+    = hash_table<tree_decl_map_hasher>::create_ggc (512);
 
   int_cst_hash_table = hash_table<int_cst_hasher>::create_ggc (1024);
 
