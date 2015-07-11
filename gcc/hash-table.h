@@ -1046,14 +1046,74 @@ gt_cleare_cache (hash_table<H> *h)
   if (!h)
     return;
 
+  /* There are roughly 2 types of cache entries.
+
+     I.
+
+     The simple one, that uses ggc_cache_remove::keep_cache_entry.
+
+       int keep_cache_entry (T &e) { return ggc_marked_p (e) ? -1 : 0; }
+
+     The function returns either live (-1) or dead (0), dependent on whether the
+     entry was marked during the marking phase.
+
+     If the entry is dead, we clear the slot holding the entry.  The slot can be
+     now be reused, and the entry will be freed during the sweeping phase.
+
+     If the entry is live we're done.  The entry itself, and anything reachable
+     from the entry have been marked during the marking phase.
+
+
+     II.
+
+     The complex one, with a non-standard keep_cache_entry.
+
+     Say we have a cache entry E with key field to and non-key field from:
+
+       struct sE {
+	 type1 from;
+	 type2 to;
+       };
+       typedef struct sE *E;
+
+     and a keep_cache_entry function:
+
+       int keep_cache_entry (E &e) { return ggc_marked_p (e->from); }
+
+     The function returns either live (1) or dead (0), dependent on whether the
+     from field of the entry was marked during the marking phase.
+
+     If the from field is dead, we clear the slot holding the entry.  The slot
+     can be now be reused, and the from field will be freed during the sweeping
+     phase.  The to field will be freed during the sweeping phase dependent on
+     whether it was marked live during the marking phase.  Furthermore, we check
+     that the entry was not marked.  If that that check fails, it means that
+     we ended up with a live entry with a dead from field.
+
+     If the from field is live, we mark the entry non-recursively live, since
+     the cache may hold the only reference to the entry.
+     However, we check that anything reachable from the entry has already been
+     marked during the marking phase.  If that that check fails, it means that
+     we ended up with a live entry with a dead to field.  */
+
   for (typename table::iterator iter = h->begin (); iter != h->end (); ++iter)
     if (!table::is_empty (*iter) && !table::is_deleted (*iter))
       {
 	int res = H::keep_cache_entry (*iter);
 	if (res == 0)
-	  h->clear_slot (&*iter);
+	  {
+#ifdef ENABLE_CHECKING
+	    gcc_assert (!ggc_marked_p (*iter));
+#endif
+	    h->clear_slot (&*iter);
+	  }
 	else if (res != -1)
-	  gt_ggc_mx (*iter);
+	  {
+	    ggc_set_mark (*iter);
+#ifdef ENABLE_CHECKING
+	    gcc_assert (H::ggc_marked_nonkey_p (*iter));
+#endif
+	  }
       }
 }
 

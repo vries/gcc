@@ -241,6 +241,10 @@ struct ggc_cache_remove : ggc_remove<T>
   /* Entries are weakly held because this is for caches.  */
   static void ggc_mx (T &) {}
 
+#ifdef ENABLE_CHECKING
+  static int ggc_marked_nonkey_p (T &) { return 1; }
+#endif
+
   static int
   keep_cache_entry (T &e)
   {

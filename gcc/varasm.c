@@ -5793,6 +5793,12 @@ struct tm_clone_hasher : ggc_cache_ptr_hash<tree_map>
   static hashval_t hash (tree_map *m) { return tree_map_hash (m); }
   static bool equal (tree_map *a, tree_map *b) { return tree_map_eq (a, b); }
 
+#ifdef ENABLE_CHECKING
+  static int ggc_marked_nonkey_p (tree_map *&m) {
+    return ggc_marked_p (m->to);
+  }
+#endif
+
   static int
   keep_cache_entry (tree_map *&e)
   {

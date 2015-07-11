@@ -478,6 +478,12 @@ struct tm_wrapper_hasher : ggc_cache_ptr_hash<tree_map>
     return a->base.from == b->base.from;
   }
 
+#ifdef ENABLE_CHECKING
+  static int ggc_marked_nonkey_p (tree_map *&m) {
+    return ggc_marked_p (m->to);
+  }
+#endif
+
   static int
   keep_cache_entry (tree_map *&m)
   {
