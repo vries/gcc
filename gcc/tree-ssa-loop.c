@@ -373,9 +373,29 @@ public:
 
   /* opt_pass methods: */
   virtual bool gate (function *) { return flag_tree_scev_cprop; }
-  virtual unsigned int execute (function *) { return scev_const_prop (); }
+  virtual unsigned int execute (function *);
+  opt_pass * clone () { return new pass_scev_cprop (m_ctxt); }
 
 }; // class pass_scev_cprop
+
+unsigned int
+pass_scev_cprop::execute (function *)
+{
+  if (!loops_state_satisfies_p (LOOPS_NORMAL
+				| LOOPS_HAVE_RECORDED_EXITS
+				| LOOP_CLOSED_SSA))
+    {
+      loop_optimizer_init (LOOPS_NORMAL
+			   | LOOPS_HAVE_RECORDED_EXITS);
+      rewrite_into_loop_closed_ssa (NULL, TODO_update_ssa);
+
+      /* We might discover new loops, e.g. when turning irreducible
+	 regions into reducible.  */
+      scev_initialize ();
+    }
+
+  return scev_const_prop (); 
+}
 
 } // anon namespace
 

@@ -43,6 +43,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "tree-ssa-propagate.h"
 #include "trans-mem.h"
 #include "gimple-fold.h"
+#include "tree-scalar-evolution.h"
 
 /* TODO:  Support for predicated code motion.  I.e.
 
@@ -2500,6 +2501,19 @@ unsigned int
 tree_ssa_lim (void)
 {
   unsigned int todo;
+
+  if (!loops_state_satisfies_p (LOOPS_NORMAL
+				| LOOPS_HAVE_RECORDED_EXITS
+				| LOOP_CLOSED_SSA))
+    {
+      loop_optimizer_init (LOOPS_NORMAL
+			   | LOOPS_HAVE_RECORDED_EXITS);
+      rewrite_into_loop_closed_ssa (NULL, TODO_update_ssa);
+
+      /* We might discover new loops, e.g. when turning irreducible
+	 regions into reducible.  */
+      scev_initialize ();
+    }
 
   tree_ssa_lim_initialize ();
 
