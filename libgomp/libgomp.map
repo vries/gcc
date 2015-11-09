@@ -162,6 +162,7 @@ OMP_4.5 {
 	omp_target_memcpy_rect;
 	omp_target_associate_ptr;
 	omp_target_disassociate_ptr;
+	GOMP_enable_offload_targets;
 } OMP_4.0;
 
 GOMP_1.0 {
