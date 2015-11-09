@@ -15236,10 +15236,8 @@ if test x"$enable_offload_targets" != x; then
     tgt=`echo $tgt | sed 's/=.*//'`
     case $tgt in
       *-intelmic-* | *-intelmicemul-*)
-	tgt_name=intelmic
 	;;
       nvptx*)
-        tgt_name=nvptx
 	PLUGIN_NVPTX=$tgt
 	PLUGIN_NVPTX_CPPFLAGS=$CUDA_DRIVER_CPPFLAGS
 	PLUGIN_NVPTX_LDFLAGS=$CUDA_DRIVER_LDFLAGS
@@ -15282,9 +15280,9 @@ rm -f core conftest.err conftest.$ac_objext \
 	;;
     esac
     if test x"$offload_targets" = x; then
-      offload_targets=$tgt_name
+      offload_targets=$tgt
     else
-      offload_targets=$offload_targets,$tgt_name
+      offload_targets=$offload_targets:$tgt
     fi
     if test x"$tgt_dir" != x; then
       offload_additional_options="$offload_additional_options -B$tgt_dir/libexec/gcc/\$(target_alias)/\$(gcc_version) -B$tgt_dir/bin"
