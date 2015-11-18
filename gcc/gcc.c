@@ -9760,10 +9760,10 @@ static const char *
 add_omp_infile_spec_func (int argc, const char **)
 {
   gcc_assert (argc == 0);
-  gcc_assert (offload_targets != NULL);
 
   /* Nothing to do if we're not actually linking.  */
-  if (have_c)
+  if (have_c
+      || offload_targets == NULL)
     return NULL;
 
   int err;
