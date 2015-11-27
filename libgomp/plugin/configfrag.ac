@@ -154,10 +154,8 @@ if test x"$enable_offload_targets" != x; then
     tgt_name=
     case $tgt in
       *-intelmic-* | *-intelmicemul-*)
-	tgt_name=intelmic
 	;;
       nvptx*)
-        tgt_name=nvptx
 	PLUGIN_NVPTX=$tgt
 	PLUGIN_NVPTX_CPPFLAGS=$CUDA_DRIVER_CPPFLAGS
 	PLUGIN_NVPTX_LDFLAGS=$CUDA_DRIVER_LDFLAGS
@@ -192,7 +190,6 @@ if test x"$enable_offload_targets" != x; then
 	        PLUGIN_HSA=0
 		;;
 	      *)
-	        tgt_name=hsa
 	        PLUGIN_HSA=$tgt
 	        PLUGIN_HSA_CPPFLAGS=$HSA_RUNTIME_CPPFLAGS
 	        PLUGIN_HSA_LDFLAGS="$HSA_RUNTIME_LDFLAGS $HSA_KMT_LDFLAGS"
@@ -231,14 +228,14 @@ if test x"$enable_offload_targets" != x; then
 	AC_MSG_ERROR([unknown offload target specified])
 	;;
     esac
-    if test x"$tgt_name" = x; then
+    if test x"$tgt" = x; then
       # Don't configure libgomp for this offloading target if we don't build
       # the corresponding plugin.
       continue
     elif test x"$offload_targets" = x; then
-      offload_targets=$tgt_name
+      offload_targets=$tgt
     else
-      offload_targets=$offload_targets,$tgt_name
+      offload_targets=$offload_targets:$tgt
     fi
     if test "$tgt_name" = hsa; then
       # Offloading compilation is all handled by the target compiler.
@@ -253,7 +250,7 @@ if test x"$enable_offload_targets" != x; then
   done
 fi
 AC_DEFINE_UNQUOTED(OFFLOAD_TARGETS, "$offload_targets",
-  [Define to offload targets, separated by commas.])
+  [Define to offload targets, separated by colons.])
 AM_CONDITIONAL([PLUGIN_NVPTX], [test $PLUGIN_NVPTX = 1])
 AC_DEFINE_UNQUOTED([PLUGIN_NVPTX], [$PLUGIN_NVPTX],
   [Define to 1 if the NVIDIA plugin is built, 0 if not.])
