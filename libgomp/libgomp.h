@@ -776,6 +776,7 @@ extern void gomp_free_thread (void *);
 
 extern void gomp_init_targets_once (void);
 extern int gomp_get_num_devices (void);
+extern bool gomp_offload_target_enabled_p (enum offload_target_type);
 extern bool gomp_target_task_fn (void *);
 
 /* Splay tree definitions.  */

@@ -72,6 +72,9 @@ static int num_offload_images;
 /* Array of descriptors for all available devices.  */
 static struct gomp_device_descr *devices;
 
+/* Set of enabled devices.  */
+static bool devices_enabled[OFFLOAD_TARGET_TYPE_HWM];
+
 /* Total number of available devices.  */
 static int num_devices;
 
@@ -106,15 +109,25 @@ gomp_get_num_devices (void)
 }
 
 static struct gomp_device_descr *
-resolve_device (int device_id)
+resolve_device (int device)
 {
-  if (device_id == GOMP_DEVICE_ICV)
+  int device_id;
+  if (device == GOMP_DEVICE_ICV)
     {
       struct gomp_task_icv *icv = gomp_icv (false);
       device_id = icv->default_device_var;
     }
+  else
+    device_id = device;
 
   if (device_id < 0 || device_id >= gomp_get_num_devices ())
+    return NULL;
+
+  /* If the device specified by the device-var ICV is not actually enabled,
+     don't try use it (which will fail if it doesn't have offload data
+     available), and use host fallback instead.  */
+  if (device == GOMP_DEVICE_ICV
+      && !gomp_offload_target_enabled_p (devices[device_id].type))
     return NULL;
 
   gomp_mutex_lock (&devices[device_id].lock);
@@ -1171,6 +1184,8 @@ void
 GOMP_offload_register_ver (unsigned version, const void *host_table,
 			   int target_type, const void *target_data)
 {
+  gomp_debug (0, "%s (%#x, %d)\n", __FUNCTION__, version, target_type);
+
   int i;
 
   if (GOMP_VERSION_LIB (version) > GOMP_VERSION)
@@ -1209,6 +1224,18 @@ void
 GOMP_offload_register (const void *host_table, int target_type,
 		       const void *target_data)
 {
+  gomp_debug (0, "%s (%d)\n", __FUNCTION__, target_type);
+
+  gomp_mutex_lock (&register_lock);
+  /* If we're seeing this function called, then default to the old behavior of
+     enabling all offload targets: this is what old executables and shared
+     libraries expect.  */
+  for (enum offload_target_type type = 0;
+       type < OFFLOAD_TARGET_TYPE_HWM;
+       ++type)
+    devices_enabled[type] = true;
+  gomp_mutex_unlock (&register_lock);
+
   GOMP_offload_register_ver (0, host_table, target_type, target_data);
 }
 
@@ -1220,6 +1247,8 @@ void
 GOMP_offload_unregister_ver (unsigned version, const void *host_table,
 			     int target_type, const void *target_data)
 {
+  gomp_debug (0, "%s (%#x, %d)\n", __FUNCTION__, version, target_type);
+
   int i;
 
   gomp_mutex_lock (&register_lock);
@@ -1251,6 +1280,8 @@ void
 GOMP_offload_unregister (const void *host_table, int target_type,
 			 const void *target_data)
 {
+  gomp_debug (0, "%s (%d)\n", __FUNCTION__, target_type);
+
   GOMP_offload_unregister_ver (0, host_table, target_type, target_data);
 }
 
@@ -1309,6 +1340,24 @@ gomp_free_memmap (struct splay_tree_s *mem_map)
       free (tgt->array);
       free (tgt);
     }
+}
+
+/* Has the offload target type TYPE been enabled?
+
+   We cannot verify that *all* offload data is available that could possibly be
+   required, so if we later find any offload data missing for this offload
+   target, then that's user error.  */
+
+attribute_hidden bool
+gomp_offload_target_enabled_p (enum offload_target_type type)
+{
+  bool ret;
+
+  gomp_mutex_lock (&register_lock);
+  ret = devices_enabled[type];
+  gomp_mutex_unlock (&register_lock);
+
+  return ret;
 }
 
 /* Host fallback for GOMP_target{,_ext} routines.  */
@@ -2362,6 +2411,8 @@ static bool
 gomp_load_plugin_for_device (struct gomp_device_descr *device,
 			     const char *plugin_name)
 {
+  gomp_debug (0, "%s (\"%s\")\n", __FUNCTION__, plugin_name);
+
   const char *err = NULL, *last_missing = NULL;
 
   void *plugin_handle = dlopen (plugin_name, RTLD_LAZY);
@@ -2481,6 +2532,78 @@ gomp_target_fini (void)
     }
 }
 
+/* Return the corresponding offload target type for the offload target name
+   OFFLOAD_TARGET, or 0 if unknown.  */
+
+static enum offload_target_type
+offload_target_to_type (const char *offload_target)
+{
+  if (strstr (offload_target, "-intelmic") != NULL)
+    return OFFLOAD_TARGET_TYPE_INTEL_MIC;
+  else if (strncmp (offload_target, "nvptx", 5) == 0)
+    return OFFLOAD_TARGET_TYPE_NVIDIA_PTX;
+  else
+    return 0;
+}
+
+/* Return the corresponding plugin name for the offload target type TYPE, or
+   NULL if unknown.  */
+
+static const char *
+offload_target_type_to_plugin_name (enum offload_target_type type)
+{
+  switch (type)
+    {
+    case OFFLOAD_TARGET_TYPE_INTEL_MIC:
+      return "intelmic";
+    case OFFLOAD_TARGET_TYPE_NVIDIA_PTX:
+      return "nvptx";
+    default:
+      return NULL;
+    }
+}
+
+/* Enable the specified OFFLOAD_TARGETS, the set passed to the compiler at link
+   time.  */
+
+void
+GOMP_enable_offload_targets (const char *offload_targets)
+{
+  gomp_debug (0, "%s (\"%s\")\n", __FUNCTION__, offload_targets);
+
+  char *offload_targets_dup = strdup (offload_targets);
+  if (offload_targets_dup == NULL)
+    gomp_fatal ("Out of memory");
+
+  gomp_mutex_lock (&register_lock);
+
+  char *cur = offload_targets_dup;
+  while (cur)
+    {
+      char *next = strchr (cur, ':');
+      if (next != NULL)
+	{
+	  *next = '\0';
+	  ++next;
+	}
+      enum offload_target_type type = offload_target_to_type (cur);
+      if (type == 0)
+	{
+	  /* An unknown offload target has been requested; ignore it.  This
+	     makes us (future-)proof if offload targets are requested that
+	     are not supported in this build of libgomp.  */
+	}
+      else
+	devices_enabled[type] = true;
+
+      cur = next;
+    }
+
+  gomp_mutex_unlock (&register_lock);
+
+  free (offload_targets_dup);
+}
+
 /* This function initializes the runtime needed for offloading.
    It parses the list of offload targets and tries to load the plugins for
    these targets.  On return, the variables NUM_DEVICES and NUM_DEVICES_OPENMP
@@ -2488,13 +2611,13 @@ gomp_target_fini (void)
    corresponding devices, first the GOMP_OFFLOAD_CAP_OPENMP_400 ones, follows
    by the others.  */
 
+static const char *gomp_plugin_prefix ="libgomp-plugin-";
+static const char *gomp_plugin_suffix = SONAME_SUFFIX (1);
+
 static void
 gomp_target_init (void)
 {
-  const char *prefix ="libgomp-plugin-";
-  const char *suffix = SONAME_SUFFIX (1);
   const char *cur, *next;
-  char *plugin_name;
   int i, new_num_devices;
 
   num_devices = 0;
@@ -2504,44 +2627,58 @@ gomp_target_init (void)
   if (*cur)
     do
       {
+	next = strchr (cur, ':');
+	/* If no other offload target following...  */
+	if (next == NULL)
+	  /* ..., point to the terminating NUL character.  */
+	  next = strchr (cur, '\0');
+
+	size_t gomp_plugin_prefix_len = strlen (gomp_plugin_prefix);
+	size_t cur_len = next - cur;
+	size_t gomp_plugin_suffix_len = strlen (gomp_plugin_suffix);
+	char *plugin_name
+	  = gomp_realloc_unlock (NULL, (gomp_plugin_prefix_len
+					+ cur_len
+					+ gomp_plugin_suffix_len
+					+ 1));
+	memcpy (plugin_name, gomp_plugin_prefix, gomp_plugin_prefix_len);
+	memcpy (plugin_name + gomp_plugin_prefix_len, cur, cur_len);
+	/* NUL-terminate the string here...  */
+	plugin_name[gomp_plugin_prefix_len + cur_len] = '\0';
+	/* ..., so that we can then use it to translate the offload target to
+	   the plugin name...  */
+	enum offload_target_type type
+	  = offload_target_to_type (plugin_name + gomp_plugin_prefix_len);
+	const char *cur_plugin_name
+	  = offload_target_type_to_plugin_name (type);
+	size_t cur_plugin_name_len = strlen (cur_plugin_name);
+	assert (cur_plugin_name_len <= cur_len);
+	/* ..., and then rewrite it.  */
+	memcpy (plugin_name + gomp_plugin_prefix_len,
+		cur_plugin_name, cur_plugin_name_len);
+	memcpy (plugin_name + gomp_plugin_prefix_len + cur_plugin_name_len,
+		gomp_plugin_suffix, gomp_plugin_suffix_len);
+	plugin_name[gomp_plugin_prefix_len
+		    + cur_plugin_name_len
+		    + gomp_plugin_suffix_len] = '\0';
+
 	struct gomp_device_descr current_device;
-
-	next = strchr (cur, ',');
-
-	plugin_name = (char *) malloc (1 + (next ? next - cur : strlen (cur))
-				       + strlen (prefix) + strlen (suffix));
-	if (!plugin_name)
-	  {
-	    num_devices = 0;
-	    break;
-	  }
-
-	strcpy (plugin_name, prefix);
-	strncat (plugin_name, cur, next ? next - cur : strlen (cur));
-	strcat (plugin_name, suffix);
-
 	if (gomp_load_plugin_for_device (&current_device, plugin_name))
 	  {
 	    new_num_devices = current_device.get_num_devices_func ();
 	    if (new_num_devices >= 1)
 	      {
-		/* Augment DEVICES and NUM_DEVICES.  */
-
-		devices = realloc (devices, (num_devices + new_num_devices)
-				   * sizeof (struct gomp_device_descr));
-		if (!devices)
-		  {
-		    num_devices = 0;
-		    free (plugin_name);
-		    break;
-		  }
-
 		current_device.name = current_device.get_name_func ();
 		/* current_device.capabilities has already been set.  */
 		current_device.type = current_device.get_type_func ();
 		current_device.mem_map.root = NULL;
 		current_device.state = GOMP_DEVICE_UNINITIALIZED;
 		current_device.openacc.data_environ = NULL;
+
+		/* Augment DEVICES and NUM_DEVICES.  */
+		devices = gomp_realloc_unlock
+		  (devices, ((num_devices + new_num_devices)
+			     * sizeof (struct gomp_device_descr)));
 		for (i = 0; i < new_num_devices; i++)
 		  {
 		    current_device.target_id = i;
@@ -2555,18 +2692,13 @@ gomp_target_init (void)
 	free (plugin_name);
 	cur = next + 1;
       }
-    while (next);
+    while (*next);
 
   /* In DEVICES, sort the GOMP_OFFLOAD_CAP_OPENMP_400 ones first, and set
      NUM_DEVICES_OPENMP.  */
   struct gomp_device_descr *devices_s
-    = malloc (num_devices * sizeof (struct gomp_device_descr));
-  if (!devices_s)
-    {
-      num_devices = 0;
-      free (devices);
-      devices = NULL;
-    }
+    = gomp_realloc_unlock (NULL,
+			   num_devices * sizeof (struct gomp_device_descr));
   num_devices_openmp = 0;
   for (i = 0; i < num_devices; i++)
     if (devices[i].capabilities & GOMP_OFFLOAD_CAP_OPENMP_400)
