@@ -2643,12 +2643,13 @@ eliminate_indirect_cycles (unsigned int node)
    constraints and propagating the copy constraints, until everything stops
    changed.  This corresponds to steps 6-8 in the solving list given above.  */
 
-static void
+static bool
 solve_graph (constraint_graph_t graph)
 {
   unsigned int size = graph->size;
   unsigned int i;
   bitmap pts;
+  bool res = true;
 
   changed = BITMAP_ALLOC (NULL);
 
@@ -2677,6 +2678,11 @@ solve_graph (constraint_graph_t graph)
 
       while (ti->topo_order.length () != 0)
 	{
+	  if (stats.num_edges > 4000000)
+	    {
+	      res = false;
+	      break;
+	    }
 
 	  i = ti->topo_order.pop ();
 
@@ -2788,11 +2794,15 @@ solve_graph (constraint_graph_t graph)
 	}
       free_topo_info (ti);
       bitmap_obstack_release (&iteration_obstack);
+      if (!res)
+	break;
     }
 
   BITMAP_FREE (pts);
   BITMAP_FREE (changed);
   bitmap_obstack_release (&oldpta_obstack);
+
+  return res;
 }
 
 /* Map from trees to variable infos.  */
@@ -6784,7 +6794,7 @@ remove_preds_and_fake_succs (constraint_graph_t graph)
 
 /* Solve the constraint set.  */
 
-static void
+static bool
 solve_constraints (void)
 {
   struct scc_info *si;
@@ -6841,7 +6851,9 @@ solve_constraints (void)
   if (dump_file)
     fprintf (dump_file, "Solving graph\n");
 
-  solve_graph (graph);
+  bool solved = solve_graph (graph);
+  if (!solved)
+    return false;
 
   if (dump_file && (dump_flags & TDF_GRAPH))
     {
@@ -6853,6 +6865,8 @@ solve_constraints (void)
 
   if (dump_file)
     dump_sa_points_to_info (dump_file);
+
+  return true;
 }
 
 /* Create points-to sets for the current function.  See the comments
@@ -6899,7 +6913,9 @@ compute_points_to_sets (void)
     }
 
   /* From the constraints compute the points-to sets.  */
-  solve_constraints ();
+  bool solved = solve_constraints ();
+  if (!solved)
+    goto done;
 
   /* Compute the points-to set for ESCAPED used for call-clobber analysis.  */
   cfun->gimple_df->escaped = find_what_var_points_to (get_varinfo (escaped_id));
@@ -6976,6 +6992,7 @@ compute_points_to_sets (void)
 	}
     }
 
+ done:
   timevar_pop (TV_TREE_PTA);
 }
 
@@ -7492,7 +7509,9 @@ ipa_pta_execute (void)
     }
 
   /* From the constraints compute the points-to sets.  */
-  solve_constraints ();
+  bool solved = solve_constraints ();
+  if (!solved)
+    goto done;
 
   /* Compute the global points-to sets for ESCAPED.
      ???  Note that the computed escape set is not correct
@@ -7667,7 +7686,7 @@ ipa_pta_execute (void)
 
       fn->gimple_df->ipa_pta = true;
     }
-
+ done:
   delete_points_to_sets ();
 
   in_ipa_mode = 0;
