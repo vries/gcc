@@ -12770,10 +12770,12 @@ expand_omp_target (struct omp_region *region)
 	assign_assembler_name_if_neeeded (child_fn);
       cgraph_edge::rebuild_edges ();
 
+#if 0
       /* Prevent IPA from removing child_fn as unreachable, since there are no
 	 refs from the parent function to child_fn in offload LTO mode.  */
       if (ENABLE_OFFLOADING)
 	cgraph_node::get (child_fn)->mark_force_output ();
+#endif
 
       /* Some EH regions might become dead, see PR34608.  If
 	 pass_cleanup_cfg isn't the first pass to happen with the
