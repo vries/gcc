@@ -621,7 +621,8 @@ default_options_optimization (struct gcc_options *opts,
 	  break;
 
 	case OPT_fopenacc:
-	  openacc_mode = true;
+	  if (opt->value)
+	    openacc_mode = true;
 	  break;
 
 	default:
