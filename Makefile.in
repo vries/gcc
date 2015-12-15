@@ -50940,30 +50940,30 @@ configure-target-libgfortran: maybe-all-target-libbacktrace
 
 
 @if gcc-bootstrap
-configure-stage1-target-libstdc++-v3: maybe-all-stage1-target-libgcc
-configure-stage2-target-libstdc++-v3: maybe-all-stage2-target-libgcc
-configure-stage3-target-libstdc++-v3: maybe-all-stage3-target-libgcc
-configure-stage4-target-libstdc++-v3: maybe-all-stage4-target-libgcc
-configure-stageprofile-target-libstdc++-v3: maybe-all-stageprofile-target-libgcc
-configure-stagefeedback-target-libstdc++-v3: maybe-all-stagefeedback-target-libgcc
-configure-stage1-target-libsanitizer: maybe-all-stage1-target-libgcc
-configure-stage2-target-libsanitizer: maybe-all-stage2-target-libgcc
-configure-stage3-target-libsanitizer: maybe-all-stage3-target-libgcc
-configure-stage4-target-libsanitizer: maybe-all-stage4-target-libgcc
-configure-stageprofile-target-libsanitizer: maybe-all-stageprofile-target-libgcc
-configure-stagefeedback-target-libsanitizer: maybe-all-stagefeedback-target-libgcc
-configure-stage1-target-libmpx: maybe-all-stage1-target-libgcc
-configure-stage2-target-libmpx: maybe-all-stage2-target-libgcc
-configure-stage3-target-libmpx: maybe-all-stage3-target-libgcc
-configure-stage4-target-libmpx: maybe-all-stage4-target-libgcc
-configure-stageprofile-target-libmpx: maybe-all-stageprofile-target-libgcc
-configure-stagefeedback-target-libmpx: maybe-all-stagefeedback-target-libgcc
-configure-stage1-target-libvtv: maybe-all-stage1-target-libgcc
-configure-stage2-target-libvtv: maybe-all-stage2-target-libgcc
-configure-stage3-target-libvtv: maybe-all-stage3-target-libgcc
-configure-stage4-target-libvtv: maybe-all-stage4-target-libgcc
-configure-stageprofile-target-libvtv: maybe-all-stageprofile-target-libgcc
-configure-stagefeedback-target-libvtv: maybe-all-stagefeedback-target-libgcc
+configure-stage1-target-libstdc++-v3: maybe-all-stage1-target-libgcc maybe-all-stage1-target-libgomp
+configure-stage2-target-libstdc++-v3: maybe-all-stage2-target-libgcc maybe-all-stage2-target-libgomp
+configure-stage3-target-libstdc++-v3: maybe-all-stage3-target-libgcc maybe-all-stage3-target-libgomp
+configure-stage4-target-libstdc++-v3: maybe-all-stage4-target-libgcc maybe-all-stage4-target-libgomp
+configure-stageprofile-target-libstdc++-v3: maybe-all-stageprofile-target-libgcc maybe-all-stageprofile-target-libgomp
+configure-stagefeedback-target-libstdc++-v3: maybe-all-stagefeedback-target-libgcc maybe-all-stagefeedback-target-libgomp
+configure-stage1-target-libsanitizer: maybe-all-stage1-target-libgcc maybe-all-stage1-target-libgomp
+configure-stage2-target-libsanitizer: maybe-all-stage2-target-libgcc maybe-all-stage2-target-libgomp
+configure-stage3-target-libsanitizer: maybe-all-stage3-target-libgcc maybe-all-stage3-target-libgomp
+configure-stage4-target-libsanitizer: maybe-all-stage4-target-libgcc maybe-all-stage4-target-libgomp
+configure-stageprofile-target-libsanitizer: maybe-all-stageprofile-target-libgcc maybe-all-stageprofile-target-libgomp
+configure-stagefeedback-target-libsanitizer: maybe-all-stagefeedback-target-libgcc maybe-all-stagefeedback-target-libgomp
+configure-stage1-target-libmpx: maybe-all-stage1-target-libgcc maybe-all-stage1-target-libgomp
+configure-stage2-target-libmpx: maybe-all-stage2-target-libgcc maybe-all-stage2-target-libgomp
+configure-stage3-target-libmpx: maybe-all-stage3-target-libgcc maybe-all-stage3-target-libgomp
+configure-stage4-target-libmpx: maybe-all-stage4-target-libgcc maybe-all-stage4-target-libgomp
+configure-stageprofile-target-libmpx: maybe-all-stageprofile-target-libgcc maybe-all-stageprofile-target-libgomp
+configure-stagefeedback-target-libmpx: maybe-all-stagefeedback-target-libgcc maybe-all-stagefeedback-target-libgomp
+configure-stage1-target-libvtv: maybe-all-stage1-target-libgcc maybe-all-stage1-target-libgomp
+configure-stage2-target-libvtv: maybe-all-stage2-target-libgcc maybe-all-stage2-target-libgomp
+configure-stage3-target-libvtv: maybe-all-stage3-target-libgcc maybe-all-stage3-target-libgomp
+configure-stage4-target-libvtv: maybe-all-stage4-target-libgcc maybe-all-stage4-target-libgomp
+configure-stageprofile-target-libvtv: maybe-all-stageprofile-target-libgcc maybe-all-stageprofile-target-libgomp
+configure-stagefeedback-target-libvtv: maybe-all-stagefeedback-target-libgcc maybe-all-stagefeedback-target-libgomp
 configure-stage1-target-libgomp: maybe-all-stage1-target-libgcc
 configure-stage2-target-libgomp: maybe-all-stage2-target-libgcc
 configure-stage3-target-libgomp: maybe-all-stage3-target-libgcc
@@ -50973,31 +50973,31 @@ configure-stagefeedback-target-libgomp: maybe-all-stagefeedback-target-libgcc
 @endif gcc-bootstrap
 
 @if gcc-no-bootstrap
-configure-target-libstdc++-v3: maybe-all-target-libgcc
-configure-target-libsanitizer: maybe-all-target-libgcc
-configure-target-libmpx: maybe-all-target-libgcc
-configure-target-libvtv: maybe-all-target-libgcc
-configure-target-libcilkrts: maybe-all-target-libgcc
-configure-target-liboffloadmic: maybe-all-target-libgcc
-configure-target-libssp: maybe-all-target-libgcc
-configure-target-newlib: maybe-all-target-libgcc
-configure-target-libbacktrace: maybe-all-target-libgcc
-configure-target-libquadmath: maybe-all-target-libgcc
-configure-target-libgfortran: maybe-all-target-libgcc
-configure-target-libobjc: maybe-all-target-libgcc
-configure-target-libgo: maybe-all-target-libgcc
-configure-target-libtermcap: maybe-all-target-libgcc
-configure-target-winsup: maybe-all-target-libgcc
-configure-target-libgloss: maybe-all-target-libgcc
-configure-target-libffi: maybe-all-target-libgcc
-configure-target-libjava: maybe-all-target-libgcc
-configure-target-zlib: maybe-all-target-libgcc
-configure-target-boehm-gc: maybe-all-target-libgcc
-configure-target-rda: maybe-all-target-libgcc
-configure-target-libada: maybe-all-target-libgcc
+configure-target-libstdc++-v3: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libsanitizer: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libmpx: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libvtv: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libcilkrts: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-liboffloadmic: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libssp: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-newlib: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libbacktrace: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libquadmath: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libgfortran: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libobjc: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libgo: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libtermcap: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-winsup: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libgloss: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libffi: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libjava: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-zlib: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-boehm-gc: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-rda: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libada: maybe-all-target-libgcc maybe-all-target-libgomp
 configure-target-libgomp: maybe-all-target-libgcc
-configure-target-libitm: maybe-all-target-libgcc
-configure-target-libatomic: maybe-all-target-libgcc
+configure-target-libitm: maybe-all-target-libgcc maybe-all-target-libgomp
+configure-target-libatomic: maybe-all-target-libgcc maybe-all-target-libgomp
 @endif gcc-no-bootstrap
 
 
