@@ -237,6 +237,7 @@ AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
+override CFLAGS += -ftree-parallelize-loops=0
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CUDA_DRIVER_INCLUDE = @CUDA_DRIVER_INCLUDE@
@@ -433,7 +434,8 @@ nodist_libsubinclude_HEADERS = omp.h openacc.h
 
 LTLDFLAGS = $(shell $(SHELL) $(top_srcdir)/../libtool-ldflags $(LDFLAGS))
 LINK = $(LIBTOOL) --tag CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link \
-	$(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LTLDFLAGS) -o $@
+	$(CCLD) $(AM_CFLAGS) $(CFLAGS) -XCClinker -ftree-parallelize-loops=0 \
+	$(AM_LDFLAGS) $(LTLDFLAGS) -o $@
 
 
 # Automake Documentation:
