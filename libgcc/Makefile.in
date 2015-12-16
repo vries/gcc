@@ -77,6 +77,7 @@ AR_FLAGS = rc
 
 CC = @CC@
 CFLAGS = @CFLAGS@
+override CFLAGS += -ftree-parallelize-loops=0
 RANLIB = @RANLIB@
 LN_S = @LN_S@
 
