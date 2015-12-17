@@ -43,6 +43,9 @@
 # see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 # <http://www.gnu.org/licenses/>.
 
+host_subdir = .
+
+gcc_objdir = $(shell cd $(MULTIBUILDTOP)../../$(host_subdir)/gcc; pwd -P)
 
 VPATH = @srcdir@
 am__make_dryrun = \
@@ -458,8 +461,17 @@ info_TEXINFOS = libgomp.texi
 @BUILD_INFO_TRUE@STAMP_BUILD_INFO = stamp-build-info
 CLEANFILES = $(STAMP_GENINSRC) $(STAMP_BUILD_INFO) libgomp.info
 MAINTAINERCLEANFILES = $(srcdir)/libgomp.info
+MULTIDIR := $(shell $(CC) $(CFLAGS) -print-multi-directory)
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
+	# Now that we have built all the objects, we need to copy
+	# them back to the GCC directory.  Too many things (other
+	# in-tree libraries, and DejaGNU) know about the layout
+	# of the build tree, for now.
+	$(MAKE) install-leaf DESTDIR=$(gcc_objdir)/$(MULTIDIR) \
+	  slibdir= libsubdir= MULTIOSDIR=$(MULTIDIR) toolexeclibdir=/./ infodir=/./ fincludedir=/./ libsubincludedir=/./
+
+install-leaf: install
 
 .SUFFIXES:
 .SUFFIXES: .c .dvi .f90 .lo .o .obj .ps
