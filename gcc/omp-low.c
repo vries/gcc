@@ -20139,6 +20139,34 @@ execute_oacc_device_lower ()
 	     : fn_level < 0 ? "Function is parallel offload\n"
 	     : "Function is routine level %d\n", fn_level);
 
+#if defined ACCEL_COMPILER
+  bool is_kernels = oacc_fn_attrib_kernels_p (attrs);
+  if (is_kernels)
+    {
+      bool all_one = true;
+      tree pos = TREE_VALUE (attrs);
+      for (unsigned ix = 0; ix != GOMP_DIM_MAX; ix++)
+	{
+	  tree tree_val = TREE_VALUE (pos);
+	  unsigned HOST_WIDE_INT val = (tree_val
+					? TREE_INT_CST_LOW (tree_val)
+					: 1);
+	  if (val != 1)
+	    {
+	      all_one = false;
+	      break;
+	    }
+	  pos = TREE_CHAIN (pos);
+	}
+
+      if (all_one)
+	dump_printf_loc (MSG_MISSED_OPTIMIZATION, cfun->function_start_locus,
+			 "Kernels region executed sequentially.  Consider"
+			 " mapping it to host execution, to avoid data copy"
+			 " penalty.\n");
+    }
+#endif
+
   unsigned outer_mask = fn_level >= 0 ? GOMP_DIM_MASK (fn_level) - 1 : 0;
   unsigned used_mask = oacc_loop_partition (loops, outer_mask);
   int dims[GOMP_DIM_MAX];
@@ -20312,7 +20340,7 @@ const pass_data pass_data_oacc_device_lower =
 {
   GIMPLE_PASS, /* type */
   "oaccdevlow", /* name */
-  OPTGROUP_NONE, /* optinfo_flags */
+  OPTGROUP_OACC, /* optinfo_flags */
   TV_NONE, /* tv_id */
   PROP_cfg, /* properties_required */
   0 /* Possibly PROP_gimple_eomp.  */, /* properties_provided */

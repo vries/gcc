@@ -137,6 +137,7 @@ static const struct dump_option_value_info optgroup_options[] =
   {"loop", OPTGROUP_LOOP},
   {"inline", OPTGROUP_INLINE},
   {"vec", OPTGROUP_VEC},
+  {"oacc", OPTGROUP_OACC},
   {"optall", OPTGROUP_ALL},
   {NULL, 0}
 };
