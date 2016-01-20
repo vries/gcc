@@ -1204,6 +1204,7 @@ static const char *const driver_self_specs[] = {
   /* If linking against libgomp, add a setup file.  */
   "%{fopenacc|fopenmp|%:gt(%{ftree-parallelize-loops=*} 1):" \
   "%:add-omp-infile()}",
+  "%{fopenacc:%{fopt-info-oacc*:-foffload=-fopt-info-oacc%*}}",
   DRIVER_SELF_SPECS, CONFIGURE_SPECS, GOMP_SELF_SPECS, GTM_SELF_SPECS,
   CILK_SELF_SPECS
 };
