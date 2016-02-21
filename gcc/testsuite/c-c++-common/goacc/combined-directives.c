@@ -108,12 +108,12 @@ test ()
 //    ;
 }
 
-// { dg-final { scan-tree-dump-times "acc loop collapse.2. private.j. private.i" 2 "gimple" } }
-// { dg-final { scan-tree-dump-times "acc loop gang" 2 "gimple" } }
-// { dg-final { scan-tree-dump-times "acc loop worker" 2 "gimple" } }
-// { dg-final { scan-tree-dump-times "acc loop vector" 2 "gimple" } }
-// { dg-final { scan-tree-dump-times "acc loop seq" 2 "gimple" } }
-// { dg-final { scan-tree-dump-times "acc loop auto" 2 "gimple" } }
-// { dg-final { scan-tree-dump-times "acc loop tile.2, 3" 2 "gimple" } }
-// { dg-final { scan-tree-dump-times "acc loop independent private.i" 2 "gimple" } }
+// { dg-final { scan-tree-dump-times "acc loop collapse.2. private.j. private.i" 1 "gimple" } }
+// { dg-final { scan-tree-dump-times "acc loop gang" 1 "gimple" } }
+// { dg-final { scan-tree-dump-times "acc loop worker" 1 "gimple" } }
+// { dg-final { scan-tree-dump-times "acc loop vector" 1 "gimple" } }
+// { dg-final { scan-tree-dump-times "acc loop seq" 1 "gimple" } }
+// { dg-final { scan-tree-dump-times "acc loop auto" 1 "gimple" } }
+// { dg-final { scan-tree-dump-times "acc loop tile.2, 3" 1 "gimple" } }
+// { dg-final { scan-tree-dump-times "acc loop independent private.i" 1 "gimple" } }
 // { dg-final { scan-tree-dump-times "private.z" 2 "gimple" } }
