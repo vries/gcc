@@ -78,5 +78,5 @@ end subroutine test
 ! { dg-final { scan-tree-dump-times "gang\\(static:2\\)" 1 "omplower" } }
 ! { dg-final { scan-tree-dump-times "gang\\(static:5\\)" 1 "omplower" } }
 ! { dg-final { scan-tree-dump-times "gang\\(static:20\\)" 1 "omplower" } }
-! { dg-final { scan-tree-dump-times "gang\\(num: 5 static:\\\*\\)" 1 "omplower" } }
-! { dg-final { scan-tree-dump-times "gang\\(num: 30 static:20\\)" 1 "omplower" } }
+! { dg-final { scan-tree-dump-times "gang\\(num: 5 static:\\\*\\)" 0 "omplower" } }
+! { dg-final { scan-tree-dump-times "gang\\(num: 30 static:20\\)" 0 "omplower" } }

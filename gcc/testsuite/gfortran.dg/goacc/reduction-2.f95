@@ -11,6 +11,7 @@ subroutine foo ()
   !$acc end parallel loop
   !$acc kernels loop reduction(+:a)
   do k = 2,6
+     a = a + 1
   enddo
   !$acc end kernels loop
 end subroutine
@@ -18,5 +19,5 @@ end subroutine
 ! { dg-final { scan-tree-dump-times "target oacc_parallel firstprivate.a." 1 "gimple" } }
 ! { dg-final { scan-tree-dump-times "acc loop private.p. reduction..:a." 1 "gimple" } }
 ! { dg-final { scan-tree-dump-times "target oacc_kernels map.force_tofrom:a .len: 4.." 1 "gimple" } }
-! { dg-final { scan-tree-dump-times "acc loop private.k. reduction..:a." 1 "gimple" } }
+! { dg-final { scan-tree-dump-times "acc loop private.k." 1 "gimple" } }
 

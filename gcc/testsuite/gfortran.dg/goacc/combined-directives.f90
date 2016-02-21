@@ -144,12 +144,12 @@ subroutine test
 !  !$acc end kernels loop
 end subroutine test
 
-! { dg-final { scan-tree-dump-times "acc loop private.i. private.j. collapse.2." 2 "gimple" } }
-! { dg-final { scan-tree-dump-times "acc loop private.i. gang" 2 "gimple" } }
-! { dg-final { scan-tree-dump-times "acc loop private.i. private.j. worker" 2 "gimple" } }
-! { dg-final { scan-tree-dump-times "acc loop private.i. private.j. vector" 2 "gimple" } }
-! { dg-final { scan-tree-dump-times "acc loop private.i. private.j. seq" 2 "gimple" } }
-! { dg-final { scan-tree-dump-times "acc loop private.i. private.j. auto" 2 "gimple" } }
-! { dg-final { scan-tree-dump-times "acc loop private.i. private.j. tile.2, 3" 2 "gimple" } }
-! { dg-final { scan-tree-dump-times "acc loop private.i. independent" 2 "gimple" } }
+! { dg-final { scan-tree-dump-times "acc loop private.i. private.j. collapse.2." 1 "gimple" } }
+! { dg-final { scan-tree-dump-times "acc loop private.i. gang" 1 "gimple" } }
+! { dg-final { scan-tree-dump-times "acc loop private.i. private.j. worker" 1 "gimple" } }
+! { dg-final { scan-tree-dump-times "acc loop private.i. private.j. vector" 1 "gimple" } }
+! { dg-final { scan-tree-dump-times "acc loop private.i. private.j. seq" 1 "gimple" } }
+! { dg-final { scan-tree-dump-times "acc loop private.i. private.j. auto" 1 "gimple" } }
+! { dg-final { scan-tree-dump-times "acc loop private.i. private.j. tile.2, 3" 1 "gimple" } }
+! { dg-final { scan-tree-dump-times "acc loop private.i. independent" 1 "gimple" } }
 ! { dg-final { scan-tree-dump-times "private.z" 2 "gimple" } }

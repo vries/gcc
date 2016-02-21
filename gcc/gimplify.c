@@ -8364,6 +8364,20 @@ find_combined_omp_for (tree *tp, int *walk_subtrees, void *)
   return NULL_TREE;
 }
 
+/* Return true if CTX is (part of) an oacc kernels region.  */
+
+static bool
+gimplify_ctx_in_oacc_kernels_region (gimplify_omp_ctx *ctx)
+{
+  for (;ctx != NULL; ctx = ctx->outer_context)
+    {
+      if (ctx->region_type == ORT_ACC_KERNELS)
+	return true;
+    }
+
+  return false;
+}
+
 /* Gimplify the gross structure of an OMP_FOR statement.  */
 
 static enum gimplify_status
@@ -8401,6 +8415,33 @@ gimplify_omp_for (tree *expr_p, gimple_seq *pre_p)
       break;
     default:
       gcc_unreachable ();
+    }
+
+  /* Skip loop clauses not handled in kernels region.  */
+  if (gimplify_ctx_in_oacc_kernels_region (gimplify_omp_ctxp))
+    {
+      tree *prev_ptr = &OMP_FOR_CLAUSES (for_stmt);
+
+      while (tree probe = *prev_ptr)
+	{
+	  tree *next_ptr = &OMP_CLAUSE_CHAIN (probe);
+
+	  bool keep_clause;
+	  switch (OMP_CLAUSE_CODE (probe))
+	    {
+	    case OMP_CLAUSE_PRIVATE:
+	      keep_clause = true;
+	      break;
+	    default:
+	      keep_clause = false;
+	      break;
+	    }
+
+	  if (keep_clause)
+	    prev_ptr = next_ptr;
+	  else
+	    *prev_ptr = *next_ptr;
+	}
     }
 
   /* Set OMP_CLAUSE_LINEAR_NO_COPYIN flag on explicit linear

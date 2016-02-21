@@ -10,4 +10,4 @@ f (int i, int j)
       ;
 }
 
-/* { dg-final { scan-tree-dump-times "#pragma acc loop collapse\\(2\\) private\\(j\\) private\\(i\\)" 1 "gimple" } } */
+/* { dg-final { scan-tree-dump-times "#pragma acc loop private\\(j\\) private\\(i\\)" 1 "gimple" } } */

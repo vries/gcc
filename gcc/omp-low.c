@@ -14944,6 +14944,75 @@ lower_omp_for_lastprivate (struct omp_for_data *fd, gimple_seq *body_p,
     }
 }
 
+/* Lower the loops with index I and higher in omp_for FOR_STMT as a sequential
+   loop, and append the resulting gimple statements to PRE_P.  */
+
+static void
+lower_omp_for_seq (gimple_seq *pre_p, gimple *for_stmt, unsigned int i)
+{
+  unsigned int len = gimple_omp_for_collapse (for_stmt);
+  gcc_assert (i < len);
+
+  /* Gimplify OMP_FOR[i] as:
+
+     OMP_FOR_INIT[i];
+     goto <loop_entry_label>;
+     <fall_thru_label>:
+     if (i == len - 1)
+       OMP_FOR_BODY;
+     else
+       OMP_FOR[i+1];
+    OMP_FOR_INCR[i];
+    <loop_entry_label>:
+    if (OMP_FOR_COND[i])
+      goto <fall_thru_label>;
+    else
+      goto <loop_exit_label>;
+    <loop_exit_label>:
+  */
+
+  tree loop_entry_label = create_artificial_label (UNKNOWN_LOCATION);
+  tree fall_thru_label = create_artificial_label (UNKNOWN_LOCATION);
+  tree loop_exit_label = create_artificial_label (UNKNOWN_LOCATION);
+
+  /* OMP_FOR_INIT[i].  */
+  tree init = gimple_omp_for_initial (for_stmt, i);
+  tree var = gimple_omp_for_index (for_stmt, i);
+  gimple *g = gimple_build_assign (var, init);
+  gimple_seq_add_stmt (pre_p, g);
+
+  /* goto <loop_entry_label>.  */
+  gimple_seq_add_stmt (pre_p, gimple_build_goto (loop_entry_label));
+
+  /* <fall_thru_label>.  */
+  gimple_seq_add_stmt (pre_p, gimple_build_label (fall_thru_label));
+
+  /* if (i == len - 1) OMP_FOR_BODY
+     else OMP_FOR[i+1].  */
+  if (i == len - 1)
+    gimple_seq_add_seq (pre_p, gimple_omp_body (for_stmt));
+  else
+    lower_omp_for_seq (pre_p, for_stmt, i + 1);
+
+  /* OMP_FOR_INCR[i].  */
+  tree incr = gimple_omp_for_incr (for_stmt, i);
+  g = gimple_build_assign (var, incr);
+  gimple_seq_add_stmt (pre_p, g);
+
+  /* <loop_entry_label>.  */
+  gimple_seq_add_stmt (pre_p, gimple_build_label (loop_entry_label));
+
+  /* if (OMP_FOR_COND[i]) goto <fall_thru_label>
+     else goto <loop_exit_label>.  */
+  enum tree_code cond = gimple_omp_for_cond (for_stmt, i);
+  tree final_val = gimple_omp_for_final (for_stmt, i);
+  gimple *gimple_cond = gimple_build_cond (cond, var, final_val,
+					   fall_thru_label, loop_exit_label);
+  gimple_seq_add_stmt (pre_p, gimple_cond);
+
+  /* <loop_exit_label>.  */
+  gimple_seq_add_stmt (pre_p, gimple_build_label (loop_exit_label));
+}
 
 /* Lower code for an OMP loop directive.  */
 
@@ -14957,6 +15026,8 @@ lower_omp_for (gimple_stmt_iterator *gsi_p, omp_context *ctx)
   gimple_seq omp_for_body, body, dlist;
   gimple_seq oacc_head = NULL, oacc_tail = NULL;
   size_t i;
+  bool oacc_kernels_p = (is_gimple_omp_oacc (ctx->stmt)
+			 && ctx_in_oacc_kernels_region (ctx));
 
   push_gimplify_context ();
 
@@ -15065,7 +15136,7 @@ lower_omp_for (gimple_stmt_iterator *gsi_p, omp_context *ctx)
   extract_omp_for_data (stmt, &fd, NULL);
 
   if (is_gimple_omp_oacc (ctx->stmt)
-      && !ctx_in_oacc_kernels_region (ctx))
+      && !oacc_kernels_p)
     lower_oacc_head_tail (gimple_location (stmt),
 			  gimple_omp_for_clauses (stmt),
 			  &oacc_head, &oacc_tail, ctx);
@@ -15088,13 +15159,18 @@ lower_omp_for (gimple_stmt_iterator *gsi_p, omp_context *ctx)
 						ctx);
 	}
 
-  if (!gimple_omp_for_grid_phony (stmt))
-    gimple_seq_add_stmt (&body, stmt);
-  gimple_seq_add_seq (&body, gimple_omp_body (stmt));
+  if (oacc_kernels_p)
+    lower_omp_for_seq (&body, stmt, 0);
+  else if (gimple_omp_for_grid_phony (stmt))
+    gimple_seq_add_seq (&body, gimple_omp_body (stmt));
+  else
+    {
+      gimple_seq_add_stmt (&body, stmt);
+      gimple_seq_add_seq (&body, gimple_omp_body (stmt));
 
-  if (!gimple_omp_for_grid_phony (stmt))
-    gimple_seq_add_stmt (&body, gimple_build_omp_continue (fd.loop.v,
-							   fd.loop.v));
+      gimple_seq_add_stmt (&body, gimple_build_omp_continue (fd.loop.v,
+							     fd.loop.v));
+    }
 
   /* After the loop, add exit clauses.  */
   lower_reduction_clauses (gimple_omp_for_clauses (stmt), &body, ctx);
@@ -15106,7 +15182,8 @@ lower_omp_for (gimple_stmt_iterator *gsi_p, omp_context *ctx)
 
   body = maybe_catch_exception (body);
 
-  if (!gimple_omp_for_grid_phony (stmt))
+  if (!gimple_omp_for_grid_phony (stmt)
+      && !oacc_kernels_p)
     {
       /* Region exit marker goes at the end of the loop body.  */
       gimple_seq_add_stmt (&body, gimple_build_omp_return (fd.have_nowait));
