@@ -8420,8 +8420,17 @@ gimplify_omp_for (tree *expr_p, gimple_seq *pre_p)
   /* Skip loop clauses not handled in kernels region.  */
   if (gimplify_ctx_in_oacc_kernels_region (gimplify_omp_ctxp))
     {
-      tree *prev_ptr = &OMP_FOR_CLAUSES (for_stmt);
+      bool independent_p = false;
+      for (tree c = OMP_FOR_CLAUSES (for_stmt); c; c = OMP_CLAUSE_CHAIN (c))
+	{
+	  if (OMP_CLAUSE_CODE (c) == OMP_CLAUSE_INDEPENDENT)
+	    {
+	      independent_p = true;
+	      break;
+	    }
+	}
 
+      tree *prev_ptr = &OMP_FOR_CLAUSES (for_stmt);
       while (tree probe = *prev_ptr)
 	{
 	  tree *next_ptr = &OMP_CLAUSE_CHAIN (probe);
@@ -8429,7 +8438,13 @@ gimplify_omp_for (tree *expr_p, gimple_seq *pre_p)
 	  bool keep_clause;
 	  switch (OMP_CLAUSE_CODE (probe))
 	    {
+	    case OMP_CLAUSE_VECTOR:
+	    case OMP_CLAUSE_GANG:
+	    case OMP_CLAUSE_WORKER:
+	      keep_clause = independent_p;
+	      break;
 	    case OMP_CLAUSE_PRIVATE:
+	    case OMP_CLAUSE_INDEPENDENT:
 	      keep_clause = true;
 	      break;
 	    default:

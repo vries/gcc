@@ -2901,7 +2901,7 @@ enclosing_target_ctx (omp_context *ctx)
 
 /* Return true if ctx is part of an oacc kernels region.  */
 
-static bool
+static bool __attribute__((noinline,noclone))
 ctx_in_oacc_kernels_region (omp_context *ctx)
 {
   for (;ctx != NULL; ctx = ctx->outer)
@@ -15028,6 +15028,14 @@ lower_omp_for (gimple_stmt_iterator *gsi_p, omp_context *ctx)
   size_t i;
   bool oacc_kernels_p = (is_gimple_omp_oacc (ctx->stmt)
 			 && ctx_in_oacc_kernels_region (ctx));
+  bool oacc_kernels_parloops_p = true;
+
+  if (oacc_kernels_p)
+    {
+      for (tree c = gimple_omp_for_clauses (stmt); c; c = OMP_CLAUSE_CHAIN (c))
+	if (OMP_CLAUSE_CODE (c) == OMP_CLAUSE_INDEPENDENT)
+	  oacc_kernels_parloops_p = false;
+    }
 
   push_gimplify_context ();
 
@@ -15136,7 +15144,7 @@ lower_omp_for (gimple_stmt_iterator *gsi_p, omp_context *ctx)
   extract_omp_for_data (stmt, &fd, NULL);
 
   if (is_gimple_omp_oacc (ctx->stmt)
-      && !oacc_kernels_p)
+      && !oacc_kernels_parloops_p)
     lower_oacc_head_tail (gimple_location (stmt),
 			  gimple_omp_for_clauses (stmt),
 			  &oacc_head, &oacc_tail, ctx);
@@ -15159,7 +15167,7 @@ lower_omp_for (gimple_stmt_iterator *gsi_p, omp_context *ctx)
 						ctx);
 	}
 
-  if (oacc_kernels_p)
+  if (oacc_kernels_parloops_p)
     lower_omp_for_seq (&body, stmt, 0);
   else if (gimple_omp_for_grid_phony (stmt))
     gimple_seq_add_seq (&body, gimple_omp_body (stmt));
@@ -15183,7 +15191,7 @@ lower_omp_for (gimple_stmt_iterator *gsi_p, omp_context *ctx)
   body = maybe_catch_exception (body);
 
   if (!gimple_omp_for_grid_phony (stmt)
-      && !oacc_kernels_p)
+      && !oacc_kernels_parloops_p)
     {
       /* Region exit marker goes at the end of the loop body.  */
       gimple_seq_add_stmt (&body, gimple_build_omp_return (fd.have_nowait));
