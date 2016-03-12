@@ -593,8 +593,10 @@ dump_omp_clause (pretty_printer *pp, tree clause, int spc, int flags)
       switch (OMP_CLAUSE_MAP_KIND (clause))
 	{
 	case GOMP_MAP_ALLOC:
-	case GOMP_MAP_POINTER:
 	  pp_string (pp, "alloc");
+	  break;
+	case GOMP_MAP_POINTER:
+	  pp_string (pp, "pointer");
 	  break;
 	case GOMP_MAP_TO:
 	case GOMP_MAP_TO_PSET:
