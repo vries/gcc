@@ -5019,7 +5019,20 @@ handle_omp_array_sections (tree c, bool is_omp)
 	  tree c2 = build_omp_clause (OMP_CLAUSE_LOCATION (c),
 				      OMP_CLAUSE_MAP);
 	  if (!is_omp)
-	    OMP_CLAUSE_SET_MAP_KIND (c2, GOMP_MAP_POINTER);
+	    {
+	      OMP_CLAUSE_SET_MAP_KIND (c2, GOMP_MAP_POINTER);
+	      switch (OMP_CLAUSE_MAP_KIND (c))
+		{
+		case GOMP_MAP_FORCE_ALLOC:
+		case GOMP_MAP_FORCE_TO:
+		case GOMP_MAP_FORCE_FROM:
+		case GOMP_MAP_FORCE_TOFROM:
+		  OMP_CLAUSE_MAP_POINTER_TO_FORCED (c2) = 1;
+		  break;
+		default:
+		  break;
+		}
+	    }
 	  else if (TREE_CODE (t) == COMPONENT_REF)
 	    OMP_CLAUSE_SET_MAP_KIND (c2, GOMP_MAP_ALWAYS_POINTER);
 	  else if (REFERENCE_REF_P (t)

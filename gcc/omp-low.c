@@ -1429,6 +1429,9 @@ install_var_field (tree var, bool by_ref, int mask, omp_context *ctx,
     }
   else if (by_ref)
     {
+      if (base_pointers_restrict
+	  && POINTER_TYPE_P (type))
+	type = build_qualified_type (type, TYPE_QUAL_RESTRICT);
       type = build_pointer_type (type);
       if (base_pointers_restrict)
 	type = build_qualified_type (type, TYPE_QUAL_RESTRICT);
@@ -3132,6 +3135,47 @@ omp_target_base_pointers_restrict_p (tree clauses)
      Because both mappings have the force prefix, we know that they will be
      allocated when calling the corresponding offloaded function, which means we
      can mark the base pointers for a and b in the offloaded function as
+     restrict.
+
+     II.  GOMP_MAP_POINTER example:
+
+       void foo (unsigned int *a, unsigned int *b)
+       {
+	 #pragma acc kernels copyout (a[0:2]) copyout (b[0:2])
+	 {
+	   a[0] = 0;
+	   b[0] = 1;
+	 }
+       }
+
+     After gimplification, we have:
+
+     foo (unsigned int * a, unsigned int * b)
+     {
+       unsigned int * b.0;
+       unsigned int * a.1;
+
+       b.0 = b;
+       a.1 = a;
+       #pragma omp target oacc_kernels \
+	 map(force_from:*a.1 (*a) [len: 8]) \
+	 map(alloc:a [pointer assign, bias: 0]) \
+	 map(force_from:*b.0 (*b) [len: 8]) \
+	 map(alloc:b [pointer assign, bias: 0])
+       {
+	 unsigned int * a.2;
+	 unsigned int * b.3;
+
+	 a.2 = a;
+	 *a.2 = 0;
+	 b.3 = b;
+	 *b.3 = 1;
+       }
+     }
+
+     By testing for OMP_CLAUSE_MAP_POINTER_TO_FORCED, we can known for both
+     pointer assign mappings that they point to a force-prefixed mapping,  so
+     we can mark the base pointers for a and b in the offloaded function as
      restrict.  */
 
   tree c;
@@ -3146,6 +3190,10 @@ omp_target_base_pointers_restrict_p (tree clauses)
 	case GOMP_MAP_FORCE_TO:
 	case GOMP_MAP_FORCE_FROM:
 	case GOMP_MAP_FORCE_TOFROM:
+	  break;
+	case GOMP_MAP_POINTER:
+	  if (!OMP_CLAUSE_MAP_POINTER_TO_FORCED (c))
+	    return false;
 	  break;
 	default:
 	  return false;
