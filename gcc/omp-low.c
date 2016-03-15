@@ -1425,7 +1425,12 @@ install_var_field (tree var, bool by_ref, int mask, omp_context *ctx,
   if (mask & 4)
     {
       gcc_assert (TREE_CODE (type) == ARRAY_TYPE);
-      type = build_pointer_type (build_pointer_type (type));
+      type = build_pointer_type (type);
+      if (base_pointers_restrict)
+	type = build_qualified_type (type, TYPE_QUAL_RESTRICT);
+      type = build_pointer_type (type);
+      if (base_pointers_restrict)
+	type = build_qualified_type (type, TYPE_QUAL_RESTRICT);
     }
   else if (by_ref)
     {
@@ -2121,7 +2126,8 @@ scan_sharing_clauses (tree clauses, omp_context *ctx,
 		      && OMP_CLAUSE_MAP_KIND (c) == GOMP_MAP_POINTER
 		      && !OMP_CLAUSE_MAP_ZERO_BIAS_ARRAY_SECTION (c)
 		      && TREE_CODE (TREE_TYPE (decl)) == ARRAY_TYPE)
-		    install_var_field (decl, true, 7, ctx);
+		    install_var_field (decl, true, 7, ctx,
+				       base_pointers_restrict);
 		  else
 		    install_var_field (decl, true, 3, ctx,
 				       base_pointers_restrict);

@@ -2099,6 +2099,17 @@ gfc_trans_omp_clauses (stmtblock_t *block, gfc_omp_clauses *clauses,
 		      node3 = build_omp_clause (input_location,
 						OMP_CLAUSE_MAP);
 		      OMP_CLAUSE_SET_MAP_KIND (node3, GOMP_MAP_POINTER);
+		      switch (n->u.map_op)
+			{
+			case OMP_MAP_FORCE_ALLOC:
+			case OMP_MAP_FORCE_TO:
+			case OMP_MAP_FORCE_FROM:
+			case OMP_MAP_FORCE_TOFROM:
+			  OMP_CLAUSE_MAP_POINTER_TO_FORCED (node3) = 1;
+			  break;
+			default:
+			  break;
+			}
 		      OMP_CLAUSE_DECL (node3) = decl;
 		    }
 		  ptr2 = fold_convert (sizetype, ptr2);
