@@ -2725,6 +2725,13 @@ copy_bb_and_scalar_dependences (basic_block bb, edge next_e, vec<tree> iv_map)
     }
   else
     {
+      if (num_phis > 0
+	  && EDGE_COUNT (bb->preds) > 2)
+	{
+	  codegen_error = true;
+	  return NULL;
+	}
+
       new_bb = split_edge (next_e);
       if (num_phis > 0 && bb_contains_loop_phi_nodes (bb))
 	{
