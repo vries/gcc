@@ -2111,7 +2111,7 @@ copy_loop_close_phi_args (basic_block old_bb, basic_block new_bb, bool postpone)
 
       if (is_gimple_reg (res) && scev_analyzable_p (res, region->region))
 	/* Loop close phi nodes should not be scev_analyzable_p.  */
-	gcc_unreachable ();
+	continue;
 
       gphi *new_close_phi = create_phi_node (SSA_NAME_VAR (res), new_bb);
       tree new_res = create_new_def_for (res, new_close_phi,
