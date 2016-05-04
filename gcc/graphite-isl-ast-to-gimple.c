@@ -2778,6 +2778,12 @@ copy_bb_and_scalar_dependences (basic_block bb, edge next_e, vec<tree> iv_map)
 	}
       else if (num_phis > 0)
 	{
+	  if (EDGE_COUNT (bb->preds) != 2)
+	    {
+	      codegen_error = true;
+	      return NULL;
+	    }
+
 	  if (dump_file)
 	    fprintf (dump_file, "[codegen] bb_%d contains cond phi nodes.\n",
 		     bb->index);
