@@ -336,35 +336,108 @@ split_mode_p (machine_mode mode)
   return maybe_split_mode (mode) != VOIDmode;
 }
 
-/* Output a register, subreg, or register pair (with optional
-   enclosing braces).  */
+/* Output a register with regno REGNO.  */
 
 static void
-output_reg (FILE *file, unsigned regno, machine_mode inner_mode,
-	    int subreg_offset = -1)
+output_reg (FILE *file, unsigned regno)
 {
-  if (inner_mode == VOIDmode)
-    {
-      if (HARD_REGISTER_NUM_P (regno))
-	fprintf (file, "%s", reg_names[regno]);
-      else
-	fprintf (file, "%%r%d", regno);
-    }
-  else if (subreg_offset >= 0)
-    {
-      output_reg (file, regno, VOIDmode);
-      fprintf (file, "$%d", subreg_offset);
-    }
+  if (HARD_REGISTER_NUM_P (regno))
+    fprintf (file, "%s", reg_names[regno]);
   else
+    fprintf (file, "%%r%d", regno);
+}
+
+/* Output half of a register pair.  */
+
+static void
+output_regpair_half (FILE *file, unsigned regno, int subreg_offset)
+{
+  output_reg (file, regno);
+  fprintf (file, "$%d", subreg_offset);
+}
+
+/* Output a register pair, with enclosing braces if DECL_P is false.  */
+
+static void
+output_regpair (FILE *file, rtx x, bool decl_p = false)
+{
+  unsigned regno = REGNO (x);
+  machine_mode split_mode = GET_MODE (x);
+  if (split_mode_p (split_mode))
+    split_mode = maybe_split_mode (split_mode);
+
+  if (!decl_p)
+    fprintf (file, "{");
+
+  output_regpair_half (file, regno, GET_MODE_SIZE (split_mode));
+
+  fprintf (file, ",");
+
+  output_regpair_half (file, regno, 0);
+
+  if (!decl_p)
+    fprintf (file, "}");
+}
+
+/* Output a reg, or a subreg.  */
+
+static void
+output_reg (FILE *file, rtx x)
+{
+  machine_mode mode = GET_MODE (x);
+
+  switch (GET_CODE (x))
     {
-      if (subreg_offset == -1)
-	fprintf (file, "{");
-      output_reg (file, regno, inner_mode, GET_MODE_SIZE (inner_mode));
-      fprintf (file, ",");
-      output_reg (file, regno, inner_mode, 0);
-      if (subreg_offset == -1)
-	fprintf (file, "}");
+    case REG:
+      {
+	gcc_assert (!split_mode_p (mode));
+	output_reg (file, REGNO (x));
+      }
+      break;
+
+    case SUBREG:
+      {
+	rtx inner_x = SUBREG_REG (x);
+	machine_mode inner_mode = GET_MODE (inner_x);
+
+	if (split_mode_p (inner_mode))
+	  {
+	    if (GET_MODE_SIZE (inner_mode) == GET_MODE_SIZE (mode))
+	      {
+		/* Print a register pair.  */
+		output_regpair (file, inner_x);
+	      }
+	    else
+	      {
+		/* Print half of a register pair.  */
+		output_regpair_half (file, REGNO (inner_x), SUBREG_BYTE (x));
+	      }
+	  }
+	else
+	  output_reg (file, REGNO (inner_x));
+      }
+      break;
+
+    default:
+      gcc_unreachable ();
     }
+}
+
+/* Output a reg decl.  */
+
+static void
+output_reg_decl (FILE *file, rtx x)
+{
+  machine_mode mode = GET_MODE (x);
+  machine_mode type_mode = mode;
+  if (split_mode_p (type_mode))
+    type_mode  = maybe_split_mode (type_mode);
+  fprintf (file, "\t.reg%s ", nvptx_ptx_type_from_mode (type_mode, true));
+  if (split_mode_p (mode))
+    output_regpair (file, x, true);
+  else
+    output_reg (file, x);
+  fprintf (file, ";\n");
 }
 
 /* Emit forking instructions for MASK.  */
@@ -1256,16 +1329,7 @@ nvptx_declare_function_name (FILE *file, const char *name, const_tree decl)
   for (int i = LAST_VIRTUAL_REGISTER + 1; i < maxregs; i++)
     {
       if (regno_reg_rtx[i] != const0_rtx)
-	{
-	  machine_mode mode = PSEUDO_REGNO_MODE (i);
-	  machine_mode split = maybe_split_mode (mode);
-
-	  if (split_mode_p (mode))
-	    mode = split;
-	  fprintf (file, "\t.reg%s ", nvptx_ptx_type_from_mode (mode, true));
-	  output_reg (file, i, split, -2);
-	  fprintf (file, ";\n");
-	}
+	output_reg_decl (file, regno_reg_rtx[i]);
     }
 
   /* Emit axis predicates. */
@@ -1283,13 +1347,13 @@ nvptx_declare_function_name (FILE *file, const char *name, const_tree decl)
    value in register given by SRC_REGNO.  */
 
 const char *
-nvptx_output_set_softstack (unsigned src_regno)
+nvptx_output_set_softstack (rtx x)
 {
   if (cfun->machine->has_softstack && !crtl->is_leaf)
     {
       fprintf (asm_out_file, "\tst.shared.u%d\t[%s], ",
 	       POINTER_SIZE, reg_names[SOFTSTACK_SLOT_REGNUM]);
-      output_reg (asm_out_file, src_regno, VOIDmode);
+      output_reg (asm_out_file, x);
       fprintf (asm_out_file, ";\n");
     }
   return "";
@@ -2110,7 +2174,7 @@ nvptx_output_call_insn (rtx_insn *insn, rtx result, rtx callee)
       fprintf (asm_out_file, "\t\t.param%s %%out_arg%d;\n"
 	       "\t\tst.param%s [%%out_arg%d], ",
 	       ptx_type, argno, ptx_type, argno);
-      output_reg (asm_out_file, REGNO (t), VOIDmode);
+      output_reg (asm_out_file, t);
       fprintf (asm_out_file, ";\n");
     }
 
@@ -2242,7 +2306,7 @@ nvptx_print_operand (FILE *file, rtx x, int code)
 	  fputs ("@", file);
 	  if (GET_CODE (x) == EQ)
 	    fputs ("!", file);
-	  output_reg (file, REGNO (XEXP (x, 0)), VOIDmode);
+	  output_reg (file, XEXP (x, 0));
 	}
       return;
     }
@@ -2373,20 +2437,11 @@ nvptx_print_operand (FILE *file, rtx x, int code)
       switch (x_code)
 	{
 	case SUBREG:
-	  {
-	    rtx inner_x = SUBREG_REG (x);
-	    machine_mode inner_mode = GET_MODE (inner_x);
-
-	    if (split_mode_p (inner_mode)
-		&& (GET_MODE_SIZE (inner_mode) == GET_MODE_SIZE (mode)))
-	      output_reg (file, REGNO (inner_x), maybe_split_mode (inner_mode));
-	    else
-	      output_reg (file, REGNO (inner_x), VOIDmode, SUBREG_BYTE (x));
-	  }
+	  output_reg (file, x);
 	  break;
 
 	case REG:
-	  output_reg (file, REGNO (x), maybe_split_mode (mode));
+	  output_reg (file, x);
 	  break;
 
 	case MEM:

@@ -1023,7 +1023,7 @@
 	   UNSPEC_SET_SOFTSTACK)]
   "TARGET_SOFT_STACK"
 {
-  return nvptx_output_set_softstack (REGNO (operands[0]));
+  return nvptx_output_set_softstack (operands[0]);
 })
 
 (define_expand "restore_stack_block"
