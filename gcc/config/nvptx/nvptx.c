@@ -314,7 +314,7 @@ nvptx_name_replacement (const char *name)
 }
 
 /* If MODE should be treated as two registers of an inner mode, return
-   that inner mode.  Otherwise return VOIDmode.  */
+   that inner mode.  Otherwise return MODE.  */
 
 static machine_mode
 maybe_split_mode (machine_mode mode)
@@ -325,7 +325,7 @@ maybe_split_mode (machine_mode mode)
   if (mode == TImode)
     return DImode;
 
-  return VOIDmode;
+  return mode;
 }
 
 /* Return true if mode should be treated as two registers.  */
@@ -333,7 +333,7 @@ maybe_split_mode (machine_mode mode)
 static bool
 split_mode_p (machine_mode mode)
 {
-  return maybe_split_mode (mode) != VOIDmode;
+  return maybe_split_mode (mode) != mode;
 }
 
 /* Output a register with regno REGNO.  */
@@ -362,9 +362,7 @@ static void
 output_regpair (FILE *file, rtx x, bool decl_p = false)
 {
   unsigned regno = REGNO (x);
-  machine_mode split_mode = GET_MODE (x);
-  if (split_mode_p (split_mode))
-    split_mode = maybe_split_mode (split_mode);
+  machine_mode split_mode = maybe_split_mode (GET_MODE (x));
 
   if (!decl_p)
     fprintf (file, "{");
@@ -429,9 +427,7 @@ static void
 output_reg_decl (FILE *file, rtx x)
 {
   machine_mode mode = GET_MODE (x);
-  machine_mode type_mode = mode;
-  if (split_mode_p (type_mode))
-    type_mode  = maybe_split_mode (type_mode);
+  machine_mode type_mode = maybe_split_mode (mode);
   fprintf (file, "\t.reg%s ", nvptx_ptx_type_from_mode (type_mode, true));
   if (split_mode_p (mode))
     output_regpair (file, x, true);
@@ -2340,8 +2336,7 @@ nvptx_print_operand (FILE *file, rtx x, int code)
       if (x_code == SUBREG)
 	{
 	  mode = GET_MODE (SUBREG_REG (x));
-	  if (split_mode_p (mode))
-	    mode = maybe_split_mode (mode);
+	  mode = maybe_split_mode (mode);
 	}
       fprintf (file, "%s", nvptx_ptx_type_from_mode (mode, code == 't'));
       break;
