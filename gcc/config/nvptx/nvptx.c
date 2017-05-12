@@ -309,6 +309,23 @@ split_mode_p (machine_mode mode)
   return maybe_split_mode (mode) != mode;
 }
 
+/* Return true if SUBREG is half of a register pair.  */
+
+static bool
+split_reg_p (rtx subreg)
+{
+  if (GET_CODE (subreg) != SUBREG)
+    return false;
+  machine_mode subreg_mode = GET_MODE (subreg);
+
+  rtx reg = SUBREG_REG (subreg);
+  machine_mode reg_mode = GET_MODE (reg);
+
+  return (split_mode_p (reg_mode)
+	  && (GET_MODE_SIZE (subreg_mode)
+	      == GET_MODE_SIZE (maybe_split_mode (reg_mode))));
+}
+
 /* Output a register with regno REGNO.  */
 
 static void
@@ -1836,12 +1853,6 @@ nvptx_assemble_undefined_decl (FILE *file, const char *name, const_tree decl)
 const char *
 nvptx_output_mov_insn (rtx dst, rtx src)
 {
-  machine_mode dst_mode = GET_MODE (dst);
-  machine_mode dst_inner = (GET_CODE (dst) == SUBREG
-			    ? GET_MODE (XEXP (dst, 0)) : dst_mode);
-  machine_mode src_inner = (GET_CODE (src) == SUBREG
-			    ? GET_MODE (XEXP (src, 0)) : dst_mode);
-
   rtx sym = src;
   if (GET_CODE (sym) == CONST)
     sym = XEXP (XEXP (sym, 0), 0);
@@ -1852,18 +1863,94 @@ nvptx_output_mov_insn (rtx dst, rtx src)
       nvptx_maybe_record_fnsym (sym);
     }
 
-  if (src_inner == dst_inner)
-    return "%.\tmov%t0\t%0, %1;";
+  machine_mode dst_mode = GET_MODE (dst);
+  machine_mode src_mode = GET_MODE (src);
+  gcc_assert (!split_mode_p (dst_mode) && !split_mode_p (src_mode));
+  machine_mode dst_inner = (GET_CODE (dst) == SUBREG
+			    ? GET_MODE (XEXP (dst, 0)) : dst_mode);
+  machine_mode src_inner = (GET_CODE (src) == SUBREG
+			    ? GET_MODE (XEXP (src, 0)) : dst_mode);
+  bool dst_split_reg_p = split_reg_p (dst);
+  bool src_split_reg_p = split_reg_p (src);
+  bool dst_reg_p = REG_P (dst) || dst_split_reg_p;
+  bool src_reg_p = REG_P (src) || src_split_reg_p;
+  bool dst_subreg_p = GET_CODE (dst) == SUBREG && !dst_split_reg_p;
+  bool src_subreg_p = GET_CODE (src) == SUBREG && !src_split_reg_p;
+
+  gcc_assert (dst_reg_p || dst_subreg_p);
 
   if (CONSTANT_P (src))
-    return (GET_MODE_CLASS (dst_inner) == MODE_INT
-	    && GET_MODE_CLASS (src_inner) != MODE_FLOAT
-	    ? "%.\tmov%t0\t%0, %1;" : "%.\tmov.b%T0\t%0, %1;");
+    {
+      bool src_int_cst_p = (CONST_SCALAR_INT_P (src)
+			    || GET_MODE_CLASS (src_mode) == MODE_INT);
+      bool dst_int_p = GET_MODE_CLASS (dst_mode) == MODE_INT;
+      if (dst_reg_p
+	  && ((dst_int_p && src_int_cst_p)
+	      || (!dst_int_p && !src_int_cst_p)))
+	{
+	  /* Set from const.  */
+	  return "%.\tmov%t0\t%0, %1;";
+	}
+      else if (dst_subreg_p
+	       && GET_MODE_CLASS (dst_mode) != GET_MODE_CLASS (dst_inner)
+	       && GET_MODE_SIZE (dst_mode) == GET_MODE_SIZE (dst_inner))
+	{
+	  /* Set from different type of const.  */
+	  return "%.\tmov.b%T0\t%0, %1;";
+	}
+      else
+	gcc_unreachable ();
+    }
 
-  if (GET_MODE_SIZE (dst_inner) == GET_MODE_SIZE (src_inner))
-    return "%.\tmov.b%T0\t%0, %1;";
+  gcc_assert (src_reg_p || src_subreg_p);
 
-  return "%.\tcvt%t0%t1\t%0, %1;";
+  if (dst_reg_p && src_reg_p && dst_mode == src_mode)
+    {
+      /* Regular move.  */
+      return "%.\tmov%t0\t%0, %1;";
+    }
+
+  if (dst_subreg_p && src_subreg_p
+      && dst_mode == src_mode
+      && dst_inner == src_inner
+      && GET_MODE_SIZE (dst_inner) < UNITS_PER_WORD)
+    {
+      /* Subreg to subreg move.  */
+      /* When storing to a normal subreg that is smaller than a word, the other
+	 bits of the referenced word are usually left in an undefined state.
+	 So, when the full reg is smaller than a word, we can safely write to
+	 the full reg, and implement the move by moving the full reg.  */
+      /* This is triggered quite rarely.  Only trigger in testsuite:
+	 gcc.c-torture/execute/pr47155.c.  */
+      return "%.\tmov%t0\t%0, %1;";
+    }
+
+  if (src_subreg_p && dst_reg_p
+      && GET_MODE_CLASS (src_mode) != GET_MODE_CLASS (src_inner)
+      && GET_MODE_SIZE (src_mode) == GET_MODE_SIZE (src_inner))
+    {
+      /* Converting same-size move.  Converting subreg in src.  */
+      return "%.\tmov.b%T0\t%0, %1;";
+    }
+
+  if (dst_subreg_p && src_reg_p
+      && GET_MODE_CLASS (dst_mode) != GET_MODE_CLASS (dst_inner)
+      && GET_MODE_SIZE (dst_mode) == GET_MODE_SIZE (dst_inner))
+    {
+      /* Converting same-size move.  Converting subreg in dst.  */
+      return "%.\tmov.b%T0\t%0, %1;";
+    }
+
+  if (src_subreg_p && dst_reg_p
+      && GET_MODE_CLASS (src_mode) == GET_MODE_CLASS (src_inner)
+      && GET_MODE_SIZE (src_mode) != GET_MODE_SIZE (src_inner))
+    {
+      /* Different size move. */
+      return "%.\tcvt%t0%t1\t%0, %1;";
+    }
+
+  gcc_unreachable ();
+  return NULL;
 }
 
 /* Output INSN, which is a call to CALLEE with result RESULT.  For ptx, this
