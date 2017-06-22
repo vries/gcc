@@ -48,6 +48,9 @@
 #include <unistd.h>
 #include <assert.h>
 #include <errno.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #if CUDA_VERSION < 6000
 extern CUresult cuGetErrorString (CUresult, const char **);
@@ -617,6 +620,104 @@ process_GOMP_NVPTX_JIT (intptr_t *gomp_nvptx_o)
     }
 }
 
+static void
+do_prog (const char *prog, const char *arg)
+{
+  pid_t pid = fork ();
+
+  if (pid == -1)
+    {
+      GOMP_PLUGIN_error ("Fork failed");
+      return;
+    }
+  else if (pid > 0)
+    {
+      int status;
+      waitpid (pid, &status, 0);
+      if (!WIFEXITED (status))
+	GOMP_PLUGIN_error ("Running %s %s failed", prog, arg);
+    }
+  else
+    {
+      execlp (prog, prog /* argv[0] */, arg, NULL);
+      abort ();
+    }
+}
+
+static void
+debug_linkout (void *linkout, size_t linkoutsize)
+{
+  static int gomp_nvptx_disasm = -1;
+  if (gomp_nvptx_disasm == -1)
+    {
+      const char *var_name = "GOMP_NVPTX_DISASM";
+      const char *env_var = secure_getenv (var_name);
+      notify_var (var_name, env_var);
+      gomp_nvptx_disasm
+	= ((env_var != NULL && env_var[0] == '1' && env_var[1] == '\0')
+	   ? 1 : 0);
+    }
+
+  static int gomp_nvptx_save_temps = -1;
+  if (gomp_nvptx_save_temps == -1)
+    {
+      const char *var_name = "GOMP_NVPTX_SAVE_TEMPS";
+      const char *env_var = secure_getenv (var_name);
+      notify_var (var_name, env_var);
+      gomp_nvptx_save_temps
+	= ((env_var != NULL && env_var[0] == '1' && env_var[1] == '\0')
+	   ? 1 : 0);
+    }
+
+  if (gomp_nvptx_disasm == 0
+      && gomp_nvptx_save_temps == 0)
+    return;
+
+  const char *prefix = "gomp-nvptx.";
+  const char *postfix = ".cubin";
+  const int len =	(strlen (prefix)
+			 + 20 /* %lld.  */
+			 + strlen (postfix)
+			 + 1  /* '\0'.  */);
+  char file_name[len];
+  int res = snprintf (file_name, len, "%s%lld%s", prefix,
+		      (long long)getpid (), postfix);
+  assert (res < len); /* Assert there's no truncation.  */
+
+  GOMP_PLUGIN_debug (0, "Generating %s with size %zu\n",
+		     file_name, linkoutsize);
+  FILE *cubin_file = fopen (file_name, "wb");
+  if (cubin_file == NULL)
+    {
+      GOMP_PLUGIN_debug (0, "Opening %s failed\n", file_name);
+      return;
+    }
+
+  fwrite (linkout, linkoutsize, 1, cubin_file);
+  unsigned int write_succeeded = ferror (cubin_file) == 0;
+  if (!write_succeeded)
+    GOMP_PLUGIN_debug (0, "Writing %s failed\n", file_name);
+
+  res = fclose (cubin_file);
+  if (res != 0)
+    GOMP_PLUGIN_debug (0, "Closing %s failed\n", file_name);
+
+  if (!write_succeeded)
+    return;
+
+  if (gomp_nvptx_disasm == 1)
+    {
+      GOMP_PLUGIN_debug (0, "Disassembling %s\n", file_name);
+      do_prog ("nvdisasm", file_name);
+    }
+
+  if (gomp_nvptx_save_temps == 0)
+    {
+      GOMP_PLUGIN_debug (0, "Removing %s\n", file_name);
+      remove (file_name);
+    }
+}
+
 static bool
 link_ptx (CUmodule *module, const struct targ_ptx_obj *ptx_objs,
 	  unsigned num_objs)
@@ -705,6 +806,8 @@ link_ptx (CUmodule *module, const struct targ_ptx_obj *ptx_objs,
       GOMP_PLUGIN_error ("cuLinkComplete error: %s", cuda_error (r));
       return false;
     }
+
+  debug_linkout (linkout, linkoutsize);
 
   CUDA_CALL (cuModuleLoadData, module, linkout);
   CUDA_CALL (cuLinkDestroy, linkstate);
