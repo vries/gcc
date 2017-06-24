@@ -71,6 +71,10 @@ cuda_error (CUresult r)
 
 #include "secure_getenv.h"
 
+#if CUDA_VERSION < 8000
+#define CU_JIT_NEW_SM3X_OPT 15
+#endif
+
 /* Convenience macros for the frequently used CUDA library call and
    error handling sequence.  This does not capture all the cases we
    use in this file, but is common enough.  */
@@ -1073,11 +1077,77 @@ post_process_ptx (unsigned num, const char **res_code, size_t *res_size)
 }
 
 static bool
+parse_number (const char *c, unsigned long* resp, char **end)
+{
+  unsigned long res;
+
+  errno = 0;
+  res = strtoul (c, end, 10);
+  if (errno)
+    return false;
+
+  *resp = res;
+  return true;
+}
+
+static void
+process_GOMP_NVPTX_JIT (intptr_t *gomp_nvptx_o, intptr_t *gomp_nvptx_ori,
+			uintptr_t *gomp_nvptx_target)
+{
+  const char *var_name = "GOMP_NVPTX_JIT";
+  const char *env_var = getenv (var_name);
+  notify_var (var_name, env_var);
+
+  if (env_var == NULL)
+    return;
+
+  const char *c = env_var;
+  while (*c != '\0')
+    {
+      while (*c == ' ')
+	c++;
+
+      if (c[0] == '-' && c[1] == 'O'
+	  && '0' <= c[2] && c[2] <= '4'
+	  && (c[3] == '\0' || c[3] == ' '))
+	{
+	  *gomp_nvptx_o = c[2] - '0';
+	  c += 3;
+	  continue;
+	}
+
+      if (c[0] == '-' && c[1] == 'o' && c[2] == 'r' && c[3] == 'i'
+	  && (c[4] == '\0' || c[4] == ' '))
+	{
+	  *gomp_nvptx_ori = 1;
+	  c += 4;
+	  continue;
+	}
+
+      if (c[0] == '-' && c[1] == 'a' && c[2] == 'r' && c[3] == 'c'
+	  && c[4] == 'h' && c[5] == '=')
+	{
+	  const char *end;
+	  unsigned long val;
+	  if (parse_number (&c[6], &val, (char**)&end))
+	    {
+	      *gomp_nvptx_target = val;
+	      c = end;
+	      continue;
+	    }
+	}
+
+      GOMP_PLUGIN_error ("Error parsing %s", var_name);
+      break;
+    }
+}
+
+static bool
 link_ptx (CUmodule *module, const struct targ_ptx_obj *ptx_objs,
 	  unsigned num_objs)
 {
-  CUjit_option opts[6];
-  void *optvals[6];
+  CUjit_option opts[9];
+  void *optvals[9];
   float elapsed = 0.0;
 #define LOGSIZE 8192
   char elog[LOGSIZE];
@@ -1106,7 +1176,39 @@ link_ptx (CUmodule *module, const struct targ_ptx_obj *ptx_objs,
   opts[5] = CU_JIT_LOG_VERBOSE;
   optvals[5] = (void *) 1;
 
-  CUDA_CALL (cuLinkCreate, 6, opts, optvals, &linkstate);
+  static intptr_t gomp_nvptx_o = -1;
+  static intptr_t gomp_nvptx_ori = -1;
+  static uintptr_t gomp_nvptx_target = 0;
+
+  static bool init_done = false;
+  if (!init_done)
+    {
+      process_GOMP_NVPTX_JIT (&gomp_nvptx_o, &gomp_nvptx_ori,
+			      &gomp_nvptx_target);
+      init_done = true;
+  }
+
+  int nopts = 6;
+  if (gomp_nvptx_o != -1)
+    {
+      opts[nopts] = CU_JIT_OPTIMIZATION_LEVEL;
+      optvals[nopts] = (void *) gomp_nvptx_o;
+      nopts++;
+    }
+  if (gomp_nvptx_ori != -1)
+    {
+      opts[nopts] = CU_JIT_NEW_SM3X_OPT;
+      optvals[nopts] = (void *) gomp_nvptx_ori;
+      nopts++;
+    }
+  if (gomp_nvptx_target != 0)
+    {
+      opts[nopts] = CU_JIT_TARGET;
+      optvals[nopts] = (void *) gomp_nvptx_target;
+      nopts++;
+    }
+
+  CUDA_CALL (cuLinkCreate, nopts, opts, optvals, &linkstate);
 
   for (; num_objs--; ptx_objs++)
     {
