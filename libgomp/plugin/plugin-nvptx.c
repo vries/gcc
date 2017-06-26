@@ -718,6 +718,131 @@ debug_linkout (void *linkout, size_t linkoutsize)
     }
 }
 
+/* If environment variable GOMP_NVPTX_PTXRW=[Ww], write *RES_CODE to file
+   gomp-nvptx.<NUM>.ptx.  If it is [Rr], read *RES_CODE from file
+   instead.  */
+
+static void
+post_process_ptx (unsigned num, const char **res_code, size_t *res_size)
+{
+  static int gomp_nvptx_ptxrw = -1;
+
+  if (gomp_nvptx_ptxrw == -1)
+    {
+      const char *var_name = "GOMP_NVPTX_PTXRW";
+      const char *env_var = secure_getenv (var_name);
+      notify_var (var_name, env_var);
+
+      gomp_nvptx_ptxrw = 0;
+      if (env_var == NULL)
+	;
+      else if ((env_var[0] == 'w' || env_var[0] == 'W')
+	       && env_var[1] == '\0')
+	gomp_nvptx_ptxrw = 1;
+      else if ((env_var[0] == 'r' || env_var[0] == 'R')
+	       && env_var[1] == '\0')
+	gomp_nvptx_ptxrw = 2;
+      else
+	GOMP_PLUGIN_error ("Error parsing %s", var_name);
+    }
+
+  if (gomp_nvptx_ptxrw == 0)
+    return;
+
+  const char *code = *res_code;
+  size_t size = *res_size;
+
+  const char *prefix = "gomp-nvptx.";
+  const char *postfix = ".ptx";
+  const int len =	(strlen (prefix)
+			 + 10 /* %u.  */
+			 + strlen (postfix)
+			 + 1  /* '\0'.  */);
+  char file_name[len];
+  int res = snprintf (file_name, len, "%s%u%s", prefix,
+		      num, postfix);
+  assert (res < len); /* Assert there's no truncation.  */
+
+  GOMP_PLUGIN_debug (0, "%s %s \n",
+		     (gomp_nvptx_ptxrw == 1 ? "Writing" : "Reading"),
+		     file_name);
+
+  if (gomp_nvptx_ptxrw == 1)
+    {
+      FILE *ptx_file = fopen (file_name, "w");
+      if (ptx_file == NULL)
+	{
+	  GOMP_PLUGIN_debug (0, "Opening %s failed\n", file_name);
+	  return;
+	}
+
+      int res = fprintf (ptx_file, "%s", code);
+      unsigned int write_succeeded = res == size - 1;
+      if (!write_succeeded)
+	GOMP_PLUGIN_debug (0,
+			   "Writing %s failed: written %d but expected %zu\n",
+			   file_name, res, size - 1);
+
+      res = fclose (ptx_file);
+      if (res != 0)
+	GOMP_PLUGIN_debug (0, "Closing %s failed\n", file_name);
+
+      return;
+    }
+
+  if (gomp_nvptx_ptxrw == 2)
+    {
+      FILE *ptx_file = fopen (file_name, "r");
+      if (ptx_file == NULL)
+	{
+	  GOMP_PLUGIN_debug (0, "Opening %s failed\n", file_name);
+	  return;
+	}
+
+      if (fseek (ptx_file, 0L, SEEK_END) != 0)
+	{
+	  GOMP_PLUGIN_debug (0, "Seeking end of %s failed\n", file_name);
+	  return;
+	}
+
+      long bufsize = ftell (ptx_file);
+      if (bufsize == -1)
+	{
+	  GOMP_PLUGIN_debug (0, "ftell of %s failed\n", file_name);
+	  return;
+	}
+
+      if (fseek (ptx_file, 0L, SEEK_SET) != 0)
+	{
+	  GOMP_PLUGIN_debug (0, "Seeking start of %s failed\n", file_name);
+	  return;
+	}
+
+	char *new_code = GOMP_PLUGIN_malloc (sizeof (char) * (bufsize + 1));
+
+	size_t new_size = fread (new_code, sizeof (char), bufsize, ptx_file);
+	if (ferror (ptx_file) != 0)
+	  {
+	    GOMP_PLUGIN_debug (0, "Reading %s failed\n", file_name);
+	    return;
+	  }
+
+	assert (new_size < bufsize + 1);
+	new_code[new_size++] = '\0';
+
+	int res = fclose (ptx_file);
+	if (res != 0)
+	  {
+	    GOMP_PLUGIN_debug (0, "Closing %s failed\n", file_name);
+	    return;
+	  }
+
+	*res_code = new_code;
+	*res_size = new_size;
+	return;
+    }
+}
+
 static bool
 link_ptx (CUmodule *module, const struct targ_ptx_obj *ptx_objs,
 	  unsigned num_objs)
@@ -774,16 +899,19 @@ link_ptx (CUmodule *module, const struct targ_ptx_obj *ptx_objs,
 
   for (; num_objs--; ptx_objs++)
     {
+      const char *ptx_code = ptx_objs->code;
+      size_t ptx_size = ptx_objs->size;
+      post_process_ptx (num_objs, &ptx_code, &ptx_size);
       /* cuLinkAddData's 'data' argument erroneously omits the const
 	 qualifier.  */
-      GOMP_PLUGIN_debug (0, "Loading:\n---\n%s\n---\n", ptx_objs->code);
+      GOMP_PLUGIN_debug (0, "Loading:\n---\n%s\n---\n", ptx_code);
       if (CUDA_CALL_EXISTS (cuLinkAddData_v2))
 	r = CUDA_CALL_NOCHECK (cuLinkAddData_v2, linkstate, CU_JIT_INPUT_PTX,
-			       (char *) ptx_objs->code, ptx_objs->size,
+			       (char *) ptx_code, ptx_size,
 			       0, 0, 0, 0);
       else
 	r = CUDA_CALL_NOCHECK (cuLinkAddData, linkstate, CU_JIT_INPUT_PTX,
-			       (char *) ptx_objs->code, ptx_objs->size,
+			       (char *) ptx_code, ptx_size,
 			       0, 0, 0, 0);
       if (r != CUDA_SUCCESS)
 	{
