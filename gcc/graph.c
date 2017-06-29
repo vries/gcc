@@ -37,22 +37,44 @@ along with GCC; see the file COPYING3.  If not see
    ignore that recommendation...  */
 static const char *const graph_ext = ".dot";
 
+/* Return filename for dumping our graph to.  If NUM, use *NUM in the file name
+   and increase *NUM.  */
+
+static char *
+get_graph_file_name (const char *base, unsigned int *num = NULL)
+{
+  size_t namelen = strlen (base);
+  size_t extlen = strlen (graph_ext);
+  size_t numlen = num ? 11 : 0;
+  size_t len = namelen + extlen + numlen + 1;
+  char *buf = XNEWVEC (char, len);
+
+  char *pos = buf;
+  memcpy (pos, base, namelen);
+  pos += namelen;
+  if (num)
+    {
+      pos += snprintf (pos, numlen, ".%u", *num);
+      ++*num;
+    }
+  memcpy (pos, graph_ext, extlen + 1);
+
+  return buf;
+}
+
 /* Open a file with MODE for dumping our graph to.
    Return the file pointer.  */
 static FILE *
 open_graph_file (const char *base, const char *mode)
 {
-  size_t namelen = strlen (base);
-  size_t extlen = strlen (graph_ext) + 1;
-  char *buf = XALLOCAVEC (char, namelen + extlen);
+  char *buf = get_graph_file_name (base);
   FILE *fp;
-
-  memcpy (buf, base, namelen);
-  memcpy (buf + namelen, graph_ext, extlen);
 
   fp = fopen (buf, mode);
   if (fp == NULL)
     fatal_error (input_location, "can%'t open %s: %m", buf);
+
+  XDELETEVEC (buf);
 
   return fp;
 }
@@ -353,4 +375,38 @@ finish_graph_dump_file (const char *base)
   FILE *fp = open_graph_file (base, "a");
   end_graph_dump (fp);
   fclose (fp);
+}
+
+/* Dump graph into file '<base>.dot', or if COUNTER is defined
+   '<base>.<*COUNTER>.dot'.  If POPUP, show the graph in a popup window.  */
+
+void DEBUG_FUNCTION
+dotfn (const char *base, unsigned int *counter, bool popup)
+{
+  char *name = get_graph_file_name (base, counter);
+
+  FILE *fp = fopen (name, "w");
+  if (fp != NULL)
+    {
+      start_graph_dump (fp, "<debug>");
+      print_graph_cfg (fp, cfun, dump_flags);
+      end_graph_dump (fp);
+      fclose (fp);
+
+      if (popup)
+	{
+	  char prog[] = "dot";
+	  char arg1[] = "-Tx11";
+	  char *const cmd[] = { prog, arg1, name , NULL };
+	  struct pex_obj *pex = pex_init (0, prog, NULL);
+	  int err;
+	  pex_run (pex, PEX_LAST | PEX_SEARCH, prog, cmd, NULL, NULL, &err);
+
+	  int status;
+	  pex_get_status (pex, 1, &status);
+	  pex_free (pex);
+	}
+    }
+
+  XDELETEVEC (name);
 }

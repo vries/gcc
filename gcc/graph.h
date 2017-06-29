@@ -24,4 +24,11 @@ extern void print_graph_cfg (const char *, struct function *);
 extern void clean_graph_dump_file (const char *);
 extern void finish_graph_dump_file (const char *);
 
+extern void dotfn (const char *base, unsigned int *counter, bool popup);
+#define DOTFN(base, popup)			\
+  {						\
+    static unsigned int counter = 0;		\
+    dotfn (base, &counter, popup);		\
+  }
+
 #endif /* ! GCC_GRAPH_H */
