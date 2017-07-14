@@ -370,26 +370,34 @@ generate_host_descr_file (const char *host_compiler)
 	   "#ifdef __cplusplus\n"
 	   "extern \"C\"\n"
 	   "#endif\n"
-	   "void GOMP_offload_register (const void *, int, const void *);\n"
+	   "void GOMP_offload_register_ver "
+	   "(unsigned version, const void *, int, const void *);\n"
 	   "#ifdef __cplusplus\n"
 	   "extern \"C\"\n"
 	   "#endif\n"
-	   "void GOMP_offload_unregister (const void *, int, const void *);\n\n"
+	   "void GOMP_offload_unregister_ver "
+	   "(unsigned version, const void *, int, const void *);\n\n"
 
 	   "__attribute__((constructor))\n"
 	   "static void\n"
 	   "init (void)\n"
 	   "{\n"
-	   "  GOMP_offload_register (&__OFFLOAD_TABLE__, %d, __offload_target_data);\n"
-	   "}\n\n", GOMP_DEVICE_INTEL_MIC);
+	   "  GOMP_offload_register_ver (%#x, &__OFFLOAD_TABLE__, "
+	   "%d, __offload_target_data);\n"
+	   "}\n\n",
+	   GOMP_VERSION_PACK (GOMP_VERSION, GOMP_VERSION_INTEL_MIC),
+	   GOMP_DEVICE_INTEL_MIC);
 
   fprintf (src_file,
 	   "__attribute__((destructor))\n"
 	   "static void\n"
 	   "fini (void)\n"
 	   "{\n"
-	   "  GOMP_offload_unregister (&__OFFLOAD_TABLE__, %d, __offload_target_data);\n"
-	   "}\n", GOMP_DEVICE_INTEL_MIC);
+	   "  GOMP_offload_unregister_ver (%#x, &__OFFLOAD_TABLE__, "
+	   "%d, __offload_target_data);\n"
+	   "}\n",
+	   GOMP_VERSION_PACK (GOMP_VERSION, GOMP_VERSION_INTEL_MIC),
+	   GOMP_DEVICE_INTEL_MIC);
 
   fclose (src_file);
 
