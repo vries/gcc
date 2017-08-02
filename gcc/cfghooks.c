@@ -152,6 +152,8 @@ verify_flow_info (void)
 		 bb->index, bb->frequency);
 	  err = 1;
 	}
+      bool has_prob_uninit_edges = false;
+      bool has_prob_init_edges = false;
       FOR_EACH_EDGE (e, ei, bb->succs)
 	{
 	  if (last_visited [e->dest->index] == bb)
@@ -165,6 +167,13 @@ verify_flow_info (void)
 	      error ("verify_flow_info: Wrong probability of edge %i->%i",
 		     e->src->index, e->dest->index);
 	      err = 1;
+	    }
+	  if ((e->flags & EDGE_EH) == 0)
+	    {
+	      if (e->probability.initialized_p ())
+		has_prob_init_edges = true;
+	      else
+		has_prob_uninit_edges = true;
 	    }
 	  if (!e->count.verify ())
 	    {
@@ -195,6 +204,12 @@ verify_flow_info (void)
       if (n_fallthru > 1)
 	{
 	  error ("wrong amount of branch edges after unconditional jump %i", bb->index);
+	  err = 1;
+	}
+      if (has_prob_uninit_edges && has_prob_init_edges)
+	{
+	  error ("Missing edge probability after unconditional jump in bb %i",
+		 bb->index);
 	  err = 1;
 	}
 
