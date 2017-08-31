@@ -1741,7 +1741,7 @@
    (set_attr "mode" "<MODE>")])
 
 (define_insn "srcp14<mode>_mask"
-  [(set (match_operand:VF_128 0 "register_operand" "=v")
+  [(set (match_operand:VF_128 0 "register_operand" "=&v")
 	(vec_merge:VF_128
 	  (vec_merge:VF_128
 	    (unspec:VF_128
