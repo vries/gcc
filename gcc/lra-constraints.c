@@ -2951,14 +2951,14 @@ process_alt_operands (int only_alternative)
 	      curr_alt_win[i] = curr_alt_match_win[i] = false;
 	      losers++;
 	      /* Early clobber was already reflected in REJECT. */
-	      lra_assert (reject > 0);
 	      if (lra_dump_file != NULL)
 		fprintf
 		  (lra_dump_file,
 		   "            %d Matched conflict early clobber reloads: "
-		   "reject--\n",
-		   i);
-	      reject--;
+		   "reject%s\n",
+		   i, (reject > 0) ? "--" : " == 0");
+	      if (reject > 0)
+		reject--;
 	      overall += LRA_LOSER_COST_FACTOR - 1;
 	    }
 	}
