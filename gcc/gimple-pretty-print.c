@@ -41,6 +41,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "stringpool.h"
 #include "attribs.h"
 #include "asan.h"
+#include "gomp-constants.h"
 
 #define INDENT(SPACE)							\
   do { int i; for (i = 0; i < SPACE; i++) pp_space (buffer); } while (0)
@@ -765,6 +766,47 @@ dump_gimple_call_args (pretty_printer *buffer, gcall *gs, dump_flags_t flags)
       if (i)
 	pp_string (buffer, ", ");
       dump_generic_node (buffer, gimple_call_arg (gs, i), 0, flags, false);
+
+      if (gimple_call_internal_p (gs))
+	switch (gimple_call_internal_fn (gs))
+	  {
+	  case IFN_GOACC_REDUCTION:
+	    switch (i)
+	      {
+	      case 3:
+		switch (tree_to_shwi (gimple_call_arg (gs, i)))
+		  {
+		  case GOMP_DIM_GANG:
+		    pp_string (buffer, " /*GOMP_DIM_GANG*/");
+		    break;
+		  case GOMP_DIM_WORKER:
+		    pp_string (buffer, " /*GOMP_DIM_WORKER*/");
+		    break;
+		  case GOMP_DIM_VECTOR:
+		    pp_string (buffer, " /*GOMP_DIM_VECTOR*/");
+		    break;
+		  case -1:
+		    pp_string (buffer, " /*GOMP_DIM_NONE*/");
+		    break;
+		  default:
+		    gcc_unreachable ();
+		  }
+		break;
+	      case 4:
+		{
+		  enum tree_code rcode
+		    = (enum tree_code)tree_to_shwi (gimple_call_arg (gs, i));
+		  pp_string (buffer, " /*");
+		  pp_string (buffer, op_symbol_code (rcode));
+		  pp_string (buffer, "*/");
+		}
+		break;
+	      default:
+		break;
+	      }
+	  default:
+	    break;
+	  }
     }
 
   if (gimple_call_va_arg_pack_p (gs))
