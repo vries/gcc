@@ -1,6 +1,5 @@
 /* Test _Float64x <float.h> macros.  */
 /* { dg-do run } */
-/* { dg-options "" } */
 /* { dg-add-options float64x } */
 /* { dg-add-options ieee } */
 /* { dg-require-effective-target float64x_runtime } */

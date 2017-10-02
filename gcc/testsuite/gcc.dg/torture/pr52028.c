@@ -1,6 +1,6 @@
 /* { dg-do run } */
 /* { dg-require-effective-target int32plus } */
-/* { dg-options "-ftree-loop-distribution" } */
+/* { dg-additional-options "-ftree-loop-distribution" } */
 
 #define CAST_LONG unsigned int
 typedef struct cast_key_st

@@ -1,6 +1,5 @@
 /* Test _Float128x type-generic built-in functions: __builtin_isinf_sign.  */
 /* { dg-do run } */
-/* { dg-options "" } */
 /* { dg-add-options float128x } */
 /* { dg-add-options ieee } */
 /* { dg-require-effective-target float128x_runtime } */

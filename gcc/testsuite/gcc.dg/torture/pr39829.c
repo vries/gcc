@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-w" } */
+/* { dg-additional-options "-w" } */
 
 void foo (void * DAG_temp117584)
 {

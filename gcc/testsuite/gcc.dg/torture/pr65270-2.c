@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fno-common" { target hppa*-*-hpux* } } */
+/* { dg-additional-options "-fno-common" { target hppa*-*-hpux* } } */
 
 struct a 
 {

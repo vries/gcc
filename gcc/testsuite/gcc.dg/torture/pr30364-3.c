@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fwrapv" } */
+/* { dg-additional-options "-fwrapv" } */
 
 #include <limits.h>
 extern void abort (void);

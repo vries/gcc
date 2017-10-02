@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-funswitch-loops" } */
+/* { dg-additional-options "-funswitch-loops" } */
 
 void foo(double);
 void CreateDefaultTexture(double mnMinimum, double mnMaximum,

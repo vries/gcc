@@ -7,7 +7,7 @@
    Written by Kaveh Ghazi, 2003-08-04.  */
 
 /* { dg-do link } */
-/* { dg-options "-ffast-math" } */
+/* { dg-additional-options "-ffast-math" } */
 
 /* These are helper macros to test combinations of functions.  We test
    foo() != foo() with the same arguments, and expect the compiler to

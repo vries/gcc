@@ -1,6 +1,6 @@
 /* PR middle-end/pr42363, extended from the test for PR middle-end/37913.  */
 /* { dg-do compile } */
-/* { dg-options "-g" } */
+/* { dg-additional-options "-g" } */
 
 void foo (void) __attribute__ ((noreturn));
 

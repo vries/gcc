@@ -1,5 +1,5 @@
 /* Check that hard-float MIPS code doesn't use library calls for 1.0/x.  */
-/* { dg-options "-fno-delayed-branch" } */
+/* { dg-additional-options "-fno-delayed-branch" } */
 /* { dg-do compile { target mips*-*-* } } */
 
 float f1 (float x) { return 1.0f / x; }

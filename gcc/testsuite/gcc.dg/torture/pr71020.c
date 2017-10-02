@@ -1,4 +1,4 @@
-/* { dg-options "-funsafe-math-optimizations" } */
+/* { dg-additional-options "-funsafe-math-optimizations" } */
 
 double random_double (void);
 int setjmp (void *);

@@ -9,7 +9,7 @@
    foo is a floating point expression.  We need -fno-math-errno so
    that various math functions are marked const/pure and can be
    folded.  */
-/* { dg-options "-ffinite-math-only -fno-math-errno" } */
+/* { dg-additional-options "-ffinite-math-only -fno-math-errno" } */
 /* { dg-add-options c99_runtime } */
 /* { dg-require-effective-target c99_runtime } */
 /* { dg-skip-if "" { *-*-* } { "-O0" } { "" } } */

@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fwrapv" } */
+/* { dg-additional-options "-fwrapv" } */
 
 void foo( unsigned long long bb, unsigned short tn, unsigned e, unsigned* w );
 void foo( unsigned long long bb, unsigned short tn, unsigned e, unsigned* w )

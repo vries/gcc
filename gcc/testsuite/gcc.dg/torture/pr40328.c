@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-fno-tree-sra" } */
+/* { dg-additional-options "-fno-tree-sra" } */
 
 _Complex float foo(void)
 {

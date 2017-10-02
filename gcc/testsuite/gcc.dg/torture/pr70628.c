@@ -1,6 +1,6 @@
 /* PR debug/70628 */
 /* { dg-do compile } */
-/* { dg-options "-g -w" } */
+/* { dg-additional-options "-g -w" } */
 
 struct S { char s[64]; int *t; } *a;
 char b[64];

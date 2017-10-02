@@ -1,6 +1,6 @@
 /* PR middle-end/57251 */
 /* { dg-do compile } */
-/* { dg-options "-ftracer" } */
+/* { dg-additional-options "-ftracer" } */
 
 short a, b;
 int

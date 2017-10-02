@@ -1,4 +1,4 @@
-/* { dg-options "-G0" { target mips*-*-* } } */
+/* { dg-additional-options "-G0" { target mips*-*-* } } */
 
 volatile int g[32];
 long long gll;

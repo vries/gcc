@@ -1,6 +1,6 @@
 /* PR debug/48343 */
 /* { dg-do compile } */
-/* { dg-options "-fcompare-debug" } */
+/* { dg-additional-options "-fcompare-debug" } */
 
 void foo (unsigned char *, unsigned char *);
 

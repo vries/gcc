@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-ftree-vectorize" } */
+/* { dg-additional-options "-ftree-vectorize" } */
 
 int synths_ ( float * rc)
 {

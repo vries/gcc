@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-Wall -fwrapv" } */
+/* { dg-additional-options "-Wall -fwrapv" } */
 
 long A[4], B[100];
 

@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-Wuninitialized" } */
+/* { dg-additional-options "-Wuninitialized" } */
 
 struct xxx {
     short a;

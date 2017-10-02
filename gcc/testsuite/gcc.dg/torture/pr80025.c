@@ -1,6 +1,6 @@
 /* PR debug/80025 */
 /* { dg-do compile } */
-/* { dg-options "-g -ftracer -w" } */
+/* { dg-additional-options "-g -ftracer -w" } */
 
 int a;
 long int b, c;

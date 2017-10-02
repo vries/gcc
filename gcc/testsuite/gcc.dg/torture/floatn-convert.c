@@ -1,6 +1,5 @@
 /* Tests for _FloatN / _FloatNx types: test conversions.  */
 /* { dg-do run } */
-/* { dg-options "" } */
 /* { dg-add-options float16 } */
 /* { dg-add-options float32 } */
 /* { dg-add-options float64 } */

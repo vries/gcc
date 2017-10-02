@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fdump-tree-alias" } */
+/* { dg-additional-options "-fdump-tree-alias" } */
 /* { dg-skip-if "" { *-*-* } { "-O0" "-fno-fat-lto-objects" } { "" } } */
 
 volatile int i;

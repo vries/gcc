@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-funswitch-loops" } */
+/* { dg-additional-options "-funswitch-loops" } */
 
 unsigned short status;
 void foo (const _Bool flag)

@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-w" } */
+/* { dg-additional-options "-w" } */
 
 int a;
 void try_help () __attribute__ ((__noreturn__));

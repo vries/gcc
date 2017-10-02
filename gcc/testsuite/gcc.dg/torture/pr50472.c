@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-fdump-tree-optimized" } */
+/* { dg-additional-options "-fdump-tree-optimized" } */
 /* { dg-skip-if "" { *-*-* } { "-fno-fat-lto-objects" } { "" } } */
 
 static const unsigned int foo = 1;

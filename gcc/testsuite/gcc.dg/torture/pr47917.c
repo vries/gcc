@@ -1,6 +1,6 @@
 /* { dg-do run } */
-/* { dg-options "-std=c99" } */
-/* { dg-options "-std=gnu99" { target *-*-hpux* } } */
+/* { dg-additional-options "-std=c99" } */
+/* { dg-additional-options "-std=gnu99" { target *-*-hpux* } } */
 /* { dg-additional-options "-D__USE_MINGW_ANSI_STDIO=1" { target *-*-mingw* } } */
 /* { dg-xfail-run-if "no C99 snprintf function" { *-*-hpux10* } } */
 /* { dg-xfail-run-if "non-conforming C99 snprintf" { *-*-hpux11.[012]* } } */

@@ -1,5 +1,5 @@
 /* { dg-do compile { target i?86-*-* x86_64-*-* } } */
-/* { dg-options "-mgeneral-regs-only" } */
+/* { dg-additional-options "-mgeneral-regs-only" } */
 
 extern void foo (void);
 extern void bad (void);

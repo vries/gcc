@@ -1,6 +1,5 @@
 /* Test floating-point conversions.  _Float32x type with TImode.  */
 /* { dg-do run } */
-/* { dg-options "" } */
 /* { dg-add-options float32x } */
 /* { dg-require-effective-target float32x_runtime } */
 

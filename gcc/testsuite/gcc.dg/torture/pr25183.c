@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-pedantic" } */
+/* { dg-additional-options "-pedantic" } */
 
 enum err {
   err_IO = 0x8a450000, /* { dg-warning "int" } */

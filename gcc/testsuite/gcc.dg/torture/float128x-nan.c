@@ -1,6 +1,6 @@
 /* Test _Float128x NaNs.  */
 /* { dg-do run } */
-/* { dg-options "-fsignaling-nans" } */
+/* { dg-additional-options "-fsignaling-nans" } */
 /* { dg-add-options float128x } */
 /* { dg-add-options ieee } */
 /* { dg-require-effective-target float128x_runtime } */

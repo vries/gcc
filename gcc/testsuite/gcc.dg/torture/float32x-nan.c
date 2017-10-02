@@ -1,6 +1,6 @@
 /* Test _Float32x NaNs.  */
 /* { dg-do run } */
-/* { dg-options "-fsignaling-nans" } */
+/* { dg-additional-options "-fsignaling-nans" } */
 /* { dg-add-options float32x } */
 /* { dg-add-options ieee } */
 /* { dg-require-effective-target float32x_runtime } */

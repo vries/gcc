@@ -6,7 +6,7 @@
    Written by Kaveh Ghazi, 2004-03-17.  */
 
 /* { dg-do link } */
-/* { dg-options "-ffast-math" } */
+/* { dg-additional-options "-ffast-math" } */
 /* { dg-add-options c99_runtime } */
 /* { dg-require-effective-target c99_runtime } */
 

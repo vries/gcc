@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-ftracer" } */
+/* { dg-additional-options "-ftracer" } */
 /* { dg-require-effective-target indirect_jumps } */
 /* { dg-require-effective-target label_values } */
 

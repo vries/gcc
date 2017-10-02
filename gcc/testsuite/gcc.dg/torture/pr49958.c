@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fstrict-overflow" } */
+/* { dg-additional-options "-fstrict-overflow" } */
 
 extern void abort (void);
 int foo (int i, int j, int o, int m) { return i*o + 1 + j*m > 1; }

@@ -1,6 +1,6 @@
 /* PR tree-optimization/48063 */
 /* { dg-do compile } */
-/* { dg-options "-fno-early-inlining" } */
+/* { dg-additional-options "-fno-early-inlining" } */
 
 extern void abort (void);
 static void bar ();

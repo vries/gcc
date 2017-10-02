@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-Wtype-limits" } */
+/* { dg-additional-options "-Wtype-limits" } */
 
 struct A
 {

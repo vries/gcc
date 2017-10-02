@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fno-toplevel-reorder" } */
+/* { dg-additional-options "-fno-toplevel-reorder" } */
 /* { dg-require-effective-target int32plus } */
 
 extern void abort (void);

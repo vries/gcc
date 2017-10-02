@@ -1,6 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "" } */
-/* { dg-options "-mno-prefer-avx128 -march=bdver4" { target i?86-*-* x86_64-*-* } } */
+/* { dg-additional-options "-mno-prefer-avx128 -march=bdver4" { target i?86-*-* x86_64-*-* } } */
 
 void
 f0a (char *result, char *arg1, char *arg4, char temp_6)

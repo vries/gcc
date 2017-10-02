@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-fprofile-arcs" } */
+/* { dg-additional-options "-fprofile-arcs" } */
 /* { dg-require-profiling "-fprofile-generate" } */
 
 extern void relocate_kernel();

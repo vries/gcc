@@ -1,6 +1,6 @@
 /* PR target/39903 */
 /* { dg-do run } */
-/* { dg-options "-Wno-psabi" } */
+/* { dg-additional-options "-Wno-psabi" } */
 
 struct X {
   float d;

@@ -1,6 +1,6 @@
 /* { dg-do compile } */
 /* { dg-require-effective-target int128 } */
-/* { dg-options "-std=gnu99" } */
+/* { dg-additional-options "-std=gnu99" } */
 
 typedef long unsigned int size_t;
 typedef long int ssize_t;

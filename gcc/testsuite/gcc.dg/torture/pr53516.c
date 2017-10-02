@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-ftree-vectorize -ftree-loop-distribute-patterns" } */
+/* { dg-additional-options "-ftree-vectorize -ftree-loop-distribute-patterns" } */
 
 extern void abort (void);
 

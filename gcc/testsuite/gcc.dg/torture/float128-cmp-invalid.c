@@ -1,6 +1,5 @@
 /* Test for "invalid" exceptions from __float128 comparisons.  */
 /* { dg-do run } */
-/* { dg-options "" } */
 /* { dg-require-effective-target __float128 } */
 /* { dg-require-effective-target base_quadfloat_support } */
 /* { dg-require-effective-target fenv_exceptions } */

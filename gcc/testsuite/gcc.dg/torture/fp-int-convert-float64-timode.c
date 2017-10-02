@@ -1,6 +1,5 @@
 /* Test floating-point conversions.  _Float64 type with TImode.  */
 /* { dg-do run } */
-/* { dg-options "" } */
 /* { dg-add-options float64 } */
 /* { dg-require-effective-target float64_runtime } */
 

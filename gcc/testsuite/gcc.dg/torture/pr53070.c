@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-ffast-math -ftree-loop-if-convert -fno-tree-loop-im" } */
+/* { dg-additional-options "-ffast-math -ftree-loop-if-convert -fno-tree-loop-im" } */
 int
 foo (int c)
 {

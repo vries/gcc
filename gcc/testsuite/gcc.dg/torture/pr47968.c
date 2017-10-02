@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-w -Wno-psabi" } */
+/* { dg-additional-options "-w -Wno-psabi" } */
 
 typedef __attribute__ ((vector_size (16))) float float4;
 typedef __attribute__ ((vector_size (16))) double double2;

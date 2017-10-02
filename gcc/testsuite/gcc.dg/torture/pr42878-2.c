@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-fcompare-debug" } */
+/* { dg-additional-options "-fcompare-debug" } */
 
 extern void error(void) __attribute__((noreturn));
 

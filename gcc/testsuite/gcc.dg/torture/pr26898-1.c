@@ -1,5 +1,5 @@
 /* { dg-do link } */
-/* { dg-options "-fstrict-overflow" } */
+/* { dg-additional-options "-fstrict-overflow" } */
 
 #include <limits.h>
 

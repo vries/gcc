@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-fno-tree-ch -fno-tree-fre" } */
+/* { dg-additional-options "-fno-tree-ch -fno-tree-fre" } */
 
 void
 foo (int *__restrict__ * r, int n)

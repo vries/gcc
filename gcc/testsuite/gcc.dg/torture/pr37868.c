@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fno-strict-aliasing" } */
+/* { dg-additional-options "-fno-strict-aliasing" } */
 /* { dg-skip-if "unaligned access" { arc*-*-* epiphany-*-* nds32*-*-* sparc*-*-* sh*-*-* tic6x-*-* } } */
 
 extern void abort (void);

@@ -1,6 +1,5 @@
 /* Test floating-point conversions.  _Float16 type with TImode.  */
 /* { dg-do run } */
-/* { dg-options "" } */
 /* { dg-add-options float16 } */
 /* { dg-require-effective-target float16_runtime } */
 

@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-finline-functions -fnon-call-exceptions" } */
+/* { dg-additional-options "-finline-functions -fnon-call-exceptions" } */
 
 extern int g_78, g_223;
 static int MOD(int si1, int si2) {

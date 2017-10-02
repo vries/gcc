@@ -3,7 +3,7 @@
 /* Developed by Ziemowit Laski <zlaski@apple.com>.  */
 
 /* { dg-do compile { target *-*-darwin* } } */
-/* { dg-options "-mconstant-cfstrings" } */
+/* { dg-additional-options "-mconstant-cfstrings" } */
 
 typedef const struct __CFString *CFStringRef;
 

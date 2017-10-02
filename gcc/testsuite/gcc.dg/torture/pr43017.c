@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fwrapv" } */
+/* { dg-additional-options "-fwrapv" } */
 
 signed char foo(unsigned char c2)
 {

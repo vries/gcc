@@ -1,5 +1,5 @@
 /* Check that sdata-accesses are applied regardless of size or ABI.  */
-/* { dg-options -mexplicit-relocs } */
+/* { dg-additional-options -mexplicit-relocs } */
 /* { dg-do compile { target mips*-*-elf* } } */
 
 struct s { int x[4]; };

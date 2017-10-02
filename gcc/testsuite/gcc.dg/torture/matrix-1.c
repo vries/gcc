@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fwhole-program" } */
+/* { dg-additional-options "-fwhole-program" } */
 
 #include <stdio.h>
 #include <stdlib.h>

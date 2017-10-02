@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-ffat-lto-objects" } */
+/* { dg-additional-options "-ffat-lto-objects" } */
 
 struct barstruct { char const* some_string; };
 

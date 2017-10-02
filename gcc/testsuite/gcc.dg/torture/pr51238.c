@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-ftree-loop-distribution" } */
+/* { dg-additional-options "-ftree-loop-distribution" } */
 
 extern int ia[];
 extern int ib[];

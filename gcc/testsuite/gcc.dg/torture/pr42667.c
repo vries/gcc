@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-w" } */
+/* { dg-additional-options "-w" } */
 
 extern int strlen(const char *);
 void WriteTextDots(int len);

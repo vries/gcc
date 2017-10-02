@@ -7,7 +7,7 @@
    Origin: Kaveh R. Ghazi 12/17/2006.  */
 
 /* { dg-do compile } */
-/* { dg-options "-fdump-tree-original" } */
+/* { dg-additional-options "-fdump-tree-original" } */
 
 extern double testit()
 {

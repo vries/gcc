@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-freorder-blocks -ftracer" } */
+/* { dg-additional-options "-freorder-blocks -ftracer" } */
 
 extern int data[];
 extern int i;

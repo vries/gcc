@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-funswitch-loops" } */
+/* { dg-additional-options "-funswitch-loops" } */
 
 int a, b, c, d, e, f;
 void

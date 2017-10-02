@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-ftracer" } */
+/* { dg-additional-options "-ftracer" } */
 
 int a, b;
 

@@ -1,6 +1,6 @@
 /* PR debug/69518 */
 /* { dg-do compile } */
-/* { dg-options "-g" } */
+/* { dg-additional-options "-g" } */
 
 struct A a;
 typedef struct A B;

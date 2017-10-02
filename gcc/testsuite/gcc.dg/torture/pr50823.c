@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-finline-functions" } */
+/* { dg-additional-options "-finline-functions" } */
 
 int k1, k2, k3, k4, k5, k6, k7, k8;
 

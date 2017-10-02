@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-fno-tree-pre -fno-tree-loop-im" } */
+/* { dg-additional-options "-fno-tree-pre -fno-tree-loop-im" } */
 
 void putShort (int, int);
 

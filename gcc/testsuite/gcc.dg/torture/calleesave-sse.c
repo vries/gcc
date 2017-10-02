@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fno-omit-frame-pointer" } */
+/* { dg-additional-options "-fno-omit-frame-pointer" } */
 /* { dg-require-effective-target alloca } */
 
 #define alloca __builtin_alloca

@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-w" } */
+/* { dg-additional-options "-w" } */
 
 static unsigned short
 foo (unsigned short ui1, unsigned short ui2)

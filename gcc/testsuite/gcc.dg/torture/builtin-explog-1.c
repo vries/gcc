@@ -6,7 +6,7 @@
    Written by Kaveh Ghazi, 2003-09-05.  */
 
 /* { dg-do link } */
-/* { dg-options "-ffast-math" } */
+/* { dg-additional-options "-ffast-math" } */
 /* { dg-skip-if "PR44214" { *-*-* } { "-O0" } { "" } } */
 
 /* Define "e" with as many bits as found in builtins.c:dconste.  */

@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-fno-tree-copy-prop -fno-tree-dominator-opts" } */
+/* { dg-additional-options "-fno-tree-copy-prop -fno-tree-dominator-opts" } */
 
 struct S
 {

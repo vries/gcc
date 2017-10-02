@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-fno-dse" } */
+/* { dg-additional-options "-fno-dse" } */
 
 void bar(void);
 

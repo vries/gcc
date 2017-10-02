@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-ftree-loop-if-convert" } */
+/* { dg-additional-options "-ftree-loop-if-convert" } */
 
 void abort (void);
 

@@ -1,6 +1,5 @@
 /* Test _Float32 <float.h> macros.  */
 /* { dg-do run } */
-/* { dg-options "" } */
 /* { dg-add-options float32 } */
 /* { dg-add-options ieee } */
 /* { dg-require-effective-target float32_runtime } */

@@ -1,6 +1,6 @@
 /* PR c/47473 */
 /* { dg-do run } */
-/* { dg-options "-std=c99" } */
+/* { dg-additional-options "-std=c99" } */
 
 int
 main (void)

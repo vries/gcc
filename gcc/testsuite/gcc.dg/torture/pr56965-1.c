@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fschedule-insns" { target scheduling } } */
+/* { dg-additional-options "-fschedule-insns" { target scheduling } } */
 
 extern void abort (void);
 

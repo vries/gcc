@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-fno-inline" } */
+/* { dg-additional-options "-fno-inline" } */
 
 int
 func_4 (int si1, int si2)

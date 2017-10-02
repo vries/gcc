@@ -1,6 +1,5 @@
 /* Test floating-point conversions.  Standard types and _Float32.  */
 /* { dg-do run } */
-/* { dg-options "" } */
 /* { dg-add-options float32 } */
 /* { dg-require-effective-target float32_runtime } */
 

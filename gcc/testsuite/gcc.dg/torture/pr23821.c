@@ -3,7 +3,7 @@
 /* At -O1 DOM threads a jump in a non-optimal way which leads to
    the bogus propagation.  */
 /* { dg-skip-if "" { *-*-* } { "-O1" } { "" } } */
-/* { dg-options "-fdump-tree-ivcanon-details" } */
+/* { dg-additional-options "-fdump-tree-ivcanon-details" } */
 
 int a[199];
 

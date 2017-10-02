@@ -1,7 +1,7 @@
 /* Test complex arithmetic with signed zeros.  Pure complex
    multiplication.  */
 /* { dg-do run } */
-/* { dg-options "-std=gnu99" { target c } } */
+/* { dg-additional-options "-std=gnu99" { target c } } */
 
 #include "complex-sign.h"
 

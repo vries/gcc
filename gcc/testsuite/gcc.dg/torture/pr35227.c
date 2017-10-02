@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-std=gnu89" } */
+/* { dg-additional-options "-std=gnu89" } */
 
 int
 mandel(double _Complex C)

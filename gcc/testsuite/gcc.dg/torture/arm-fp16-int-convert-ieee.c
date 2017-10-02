@@ -1,6 +1,6 @@
 /* Test floating-point conversions.  Standard types and __fp16.  */
 /* { dg-do run { target arm*-*-* } } */
-/* { dg-options "-mfp16-format=ieee" } */
+/* { dg-additional-options "-mfp16-format=ieee" } */
 
 #include "fp-int-convert.h"
 #define FP16_MANT_DIG 11

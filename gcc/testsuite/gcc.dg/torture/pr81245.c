@@ -1,4 +1,4 @@
-/* { dg-options "-ffast-math" } */
+/* { dg-additional-options "-ffast-math" } */
 /* { dg-do compile } */
 /* This test used to crash the vectorizer as the ifconvert pass
    used to convert the if to copysign but called update_stmt on

@@ -1,6 +1,5 @@
 /* Test _Float128.  */
 /* { dg-do run } */
-/* { dg-options "" } */
 /* { dg-add-options float128 } */
 /* { dg-require-effective-target float128_runtime } */
 

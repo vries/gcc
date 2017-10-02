@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fno-early-inlining" } */
+/* { dg-additional-options "-fno-early-inlining" } */
 
 extern void abort (void);
 int i;

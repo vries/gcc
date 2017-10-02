@@ -1,6 +1,6 @@
 /* Test _Float16 NaNs.  */
 /* { dg-do run } */
-/* { dg-options "-fsignaling-nans" } */
+/* { dg-additional-options "-fsignaling-nans" } */
 /* { dg-add-options float16 } */
 /* { dg-add-options ieee } */
 /* { dg-require-effective-target float16_runtime } */

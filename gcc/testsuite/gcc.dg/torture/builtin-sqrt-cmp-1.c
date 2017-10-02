@@ -1,5 +1,5 @@
 /* { dg-do link } */
-/* { dg-options "-ffast-math" } */
+/* { dg-additional-options "-ffast-math" } */
 /* { dg-skip-if "" { *-*-* } { "-O0" } { "" } } */
 
 extern double sqrt (double);

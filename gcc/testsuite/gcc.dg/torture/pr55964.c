@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-ftree-loop-distribution -funswitch-loops -w" } */
+/* { dg-additional-options "-ftree-loop-distribution -funswitch-loops -w" } */
 
 int a, b;
 

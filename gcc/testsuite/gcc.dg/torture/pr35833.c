@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-ftree-vrp" } */
+/* { dg-additional-options "-ftree-vrp" } */
 
 struct S {struct S *field;};
 struct S True, False, Z;

@@ -1,6 +1,5 @@
 /* Test floating-point conversions.  Standard types and _Float128x.  */
 /* { dg-do run } */
-/* { dg-options "" } */
 /* { dg-add-options float128x } */
 /* { dg-require-effective-target float128x_runtime } */
 

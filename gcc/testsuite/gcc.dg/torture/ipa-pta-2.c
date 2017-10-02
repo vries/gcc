@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fipa-pta" } */
+/* { dg-additional-options "-fipa-pta" } */
 
 int **x;
 

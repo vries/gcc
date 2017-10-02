@@ -1,7 +1,7 @@
 /* Accesses to complex numbers were sometimes marked as scalar and
    sometimes as struct accesses.  */
 /* { dg-do run } */
-/* { dg-options "-std=c99" { target c } } */
+/* { dg-additional-options "-std=c99" { target c } } */
 
 #ifdef __cplusplus
 extern "C" {

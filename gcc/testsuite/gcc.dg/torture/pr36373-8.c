@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fno-tree-sra" } */
+/* { dg-additional-options "-fno-tree-sra" } */
 
 extern void abort (void);
 struct Foo {

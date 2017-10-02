@@ -1,7 +1,6 @@
 /* Test floating-point conversions.  Standard types and long double.  */
 /* Origin: Joseph Myers <joseph@codesourcery.com> */
 /* { dg-do run } */
-/* { dg-options "" } */
 
 #include <float.h>
 #include "fp-int-convert.h"

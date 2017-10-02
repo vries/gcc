@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-ftree-loop-distribute-patterns" } */
+/* { dg-additional-options "-ftree-loop-distribute-patterns" } */
 
 void foo (volatile int *p, int n)
 {

@@ -1,7 +1,7 @@
 /* Reduced test case from PR53703.  Used to ICE.  */
 
 /* { dg-do compile } */
-/* { dg-options "-w" } */
+/* { dg-additional-options "-w" } */
 
 typedef long unsigned int size_t;
 typedef unsigned short int sa_family_t;

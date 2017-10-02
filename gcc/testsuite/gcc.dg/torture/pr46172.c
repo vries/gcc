@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-fno-tree-dce -ftree-vectorize" } */
+/* { dg-additional-options "-fno-tree-dce -ftree-vectorize" } */
 
 extern short X[];
 

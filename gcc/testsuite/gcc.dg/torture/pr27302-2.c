@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fstrict-overflow" } */
+/* { dg-additional-options "-fstrict-overflow" } */
 
 extern void link_error (void);
 

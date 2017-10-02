@@ -2,6 +2,18 @@
 
 load_lib gcc-dg.exp
 
+if { [info procs dg-torture-exp-saved-dg-options] == [list] } {
+    rename dg-options dg-torture-exp-saved-dg-options
+
+    proc dg-options { args } {
+	error "dg-options not supported in dg-torture.exp, consider using dg-additional-options"
+    }
+}
+
 dg-init
 gcc-dg-runtest [lsort [glob $srcdir/$subdir/*.c $srcdir/c-c++-common/torture/*.c]] "" ""
 dg-finish
+
+if { [info procs dg-options] == [list] } {
+    rename dg-torture-exp-saved-dg-options dg-options 
+}

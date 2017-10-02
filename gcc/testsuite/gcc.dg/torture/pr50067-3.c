@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fpredictive-commoning" } */
+/* { dg-additional-options "-fpredictive-commoning" } */
 
 extern void abort (void);
 int a[6] = { 0, 0, 0, 0, 7, 0 };

@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fno-tree-ccp -fno-tree-fre" } */
+/* { dg-additional-options "-fno-tree-ccp -fno-tree-fre" } */
 
 extern void abort (void);
 

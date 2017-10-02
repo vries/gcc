@@ -1,6 +1,6 @@
 /* PR tree-optimization/56443 */
 /* { dg-do run } */
-/* { dg-options "-ftree-vectorize" } */
+/* { dg-additional-options "-ftree-vectorize" } */
 
 extern void abort (void);
 typedef int myint __attribute__ ((__aligned__ (16)));

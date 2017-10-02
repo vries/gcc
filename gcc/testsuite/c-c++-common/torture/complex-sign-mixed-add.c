@@ -1,7 +1,7 @@
 /* Test complex arithmetic with signed zeros.  Mixed real/complex
    addition.  */
 /* { dg-do run } */
-/* { dg-options "-std=gnu99" { target c } } */
+/* { dg-additional-options "-std=gnu99" { target c } } */
 /* { dg-skip-if "ptx can elide zero additions" { "nvptx-*-*" } { "-O0" } { "" } } */
 
 #include "complex-sign.h"

@@ -1,5 +1,5 @@
 /* { dg-do compile { target arm*-*-* } } */
-/* { dg-options "-mfp16-format=ieee" } */
+/* { dg-additional-options "-mfp16-format=ieee" } */
 
 /* Test basic assignments and conversions for __fp16.  */
 

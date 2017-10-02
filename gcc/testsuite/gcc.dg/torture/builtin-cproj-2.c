@@ -8,7 +8,7 @@
    Origin: Kaveh R. Ghazi,  April 9, 2010.  */
 
 /* { dg-do link } */
-/* { dg-options "-ffinite-math-only" } */
+/* { dg-additional-options "-ffinite-math-only" } */
 
 /* All references to link_error should go away at compile-time.  The
    argument is the __LINE__ number.  It appears in the tree dump file

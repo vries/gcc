@@ -1,5 +1,5 @@
 /* { dg-do compile { target i?86-*-* x86_64-*-* } } */
-/* { dg-options "-msse4" } */
+/* { dg-additional-options "-msse4" } */
 #include <nmmintrin.h>
 __m128i load (char *);
 char *

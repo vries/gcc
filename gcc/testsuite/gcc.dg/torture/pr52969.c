@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-ftree-loop-if-convert-stores" } */
+/* { dg-additional-options "-ftree-loop-if-convert-stores" } */
 
 int a, b;
 float xsum[100];

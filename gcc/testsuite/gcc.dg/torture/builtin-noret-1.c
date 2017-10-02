@@ -1,6 +1,6 @@
 /* Test for builtin noreturn attributes.  */
 /* Origin: Joseph Myers <jsm28@cam.ac.uk> */
-/* { dg-options "-multiply_defined suppress" { target powerpc-*-darwin* } } */
+/* { dg-additional-options "-multiply_defined suppress" { target powerpc-*-darwin* } } */
 /* { dg-do link } */
 /* { dg-require-weak "" } */
 /* { dg-prune-output "recognized" } */

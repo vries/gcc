@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-funswitch-loops -ftree-loop-distribution" } */
+/* { dg-additional-options "-funswitch-loops -ftree-loop-distribution" } */
 
 typedef struct AVProgram {
     void *priv_data;

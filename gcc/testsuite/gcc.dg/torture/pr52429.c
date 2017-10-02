@@ -1,7 +1,7 @@
 /* PR tree-optimization/52429 */
 /* { dg-do compile } */
 /* { dg-require-effective-target pthread } */
-/* { dg-options "-g -ftree-parallelize-loops=4" } */
+/* { dg-additional-options "-g -ftree-parallelize-loops=4" } */
 
 double d[65536], e[65536];
 

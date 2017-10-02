@@ -1,7 +1,6 @@
 /* Test floating-point conversions.  TImode types.  */
 /* Origin: Joseph Myers <joseph@codesourcery.com> */
 /* { dg-do run } */
-/* { dg-options "" } */
 
 #include <float.h>
 #include "fp-int-convert.h"

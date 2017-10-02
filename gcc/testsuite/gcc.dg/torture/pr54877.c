@@ -1,6 +1,6 @@
 /* PR tree-optimization/54877 */
 /* { dg-do run } */
-/* { dg-options "-ffast-math" } */
+/* { dg-additional-options "-ffast-math" } */
 
 extern void abort (void);
 

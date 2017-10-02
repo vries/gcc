@@ -2,7 +2,7 @@
    byte alignment.  */
 
 /* { dg-do compile } */
-/* { dg-options "-fno-common" { target { hppa*-*-hpux* } } } */
+/* { dg-additional-options "-fno-common" { target { hppa*-*-hpux* } } } */
 
 typedef float v4sf __attribute__((vector_size(16)));
 v4sf value;

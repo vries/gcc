@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-fpic" { target fpic } } */
+/* { dg-additional-options "-fpic" { target fpic } } */
 
 typedef int int32_t;
 static const int init_jk[] = {2,3,4,6};

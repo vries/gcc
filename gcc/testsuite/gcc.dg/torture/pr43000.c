@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fwrapv" } */
+/* { dg-additional-options "-fwrapv" } */
 
 int __attribute__((noinline))
 foo (long i, long j)

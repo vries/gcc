@@ -1,6 +1,6 @@
 /* PR c/70307 */
 /* { dg-do compile } */
-/* { dg-options "-Wno-psabi" } */
+/* { dg-additional-options "-Wno-psabi" } */
 
 typedef int v4si __attribute__ ((vector_size (16)));
 

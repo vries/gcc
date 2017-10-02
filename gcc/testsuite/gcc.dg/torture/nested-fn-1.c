@@ -1,7 +1,7 @@
 /* PR middle-end/15345, c/16450 */
 /* Test whether unused nested functions aren't emitted into the assembly.  */
 /* { dg-do compile } */
-/* { dg-options "-g0" } */
+/* { dg-additional-options "-g0" } */
 /* { dg-require-effective-target trampolines } */
 
 int

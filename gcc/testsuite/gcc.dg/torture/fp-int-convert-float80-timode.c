@@ -1,8 +1,7 @@
 /* Test floating-point conversions.  __float80 type with TImode.  */
 /* Origin: Joseph Myers <joseph@codesourcery.com> */
 /* { dg-do run { target i?86-*-* x86_64-*-* ia64-*-* } } */
-/* { dg-options "" } */
-/* { dg-options "-mmmx" { target { { i?86-*-* x86_64-*-* } && ia32 } } } */
+/* { dg-additional-options "-mmmx" { target { { i?86-*-* x86_64-*-* } && ia32 } } } */
 
 #include "fp-int-convert.h"
 

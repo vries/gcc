@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-fmodulo-sched" } */
+/* { dg-additional-options "-fmodulo-sched" } */
 
 int foo(short* vec1, short* vec2, short* vec3,int len )
 {

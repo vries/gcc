@@ -3,7 +3,6 @@
 /* { dg-do run } */
 /* { dg-require-effective-target __float128 } */
 /* { dg-require-effective-target base_quadfloat_support } */
-/* { dg-options "" } */
 /* { dg-add-options __float128 } */
 
 #include "fp-int-convert.h"

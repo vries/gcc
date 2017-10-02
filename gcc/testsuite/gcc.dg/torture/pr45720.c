@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-ftree-vectorize" } */
+/* { dg-additional-options "-ftree-vectorize" } */
 
 float val[256];
 float x;

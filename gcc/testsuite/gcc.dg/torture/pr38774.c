@@ -1,7 +1,6 @@
 /* PR rtl-optimization/38774 */
 /* { dg-do compile } */
-/* { dg-options "" } */
-/* { dg-options "-march=i686" { target { { i?86-*-* x86_64-*-* } && ia32 } } } */
+/* { dg-additional-options "-march=i686" { target { { i?86-*-* x86_64-*-* } && ia32 } } } */
 
 extern int bar (void);
 volatile int g;

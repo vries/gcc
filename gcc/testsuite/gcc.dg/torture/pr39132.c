@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-ftree-loop-distribution" } */
+/* { dg-additional-options "-ftree-loop-distribution" } */
 
 extern void abort(void);
 

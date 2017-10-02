@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fno-strict-aliasing" } */
+/* { dg-additional-options "-fno-strict-aliasing" } */
 /* { dg-require-effective-target int32plus } */
 
 #include <stdint.h>

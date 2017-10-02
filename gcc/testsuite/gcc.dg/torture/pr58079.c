@@ -1,4 +1,4 @@
-/* { dg-options "-mlong-calls" { target mips*-*-* } } */
+/* { dg-additional-options "-mlong-calls" { target mips*-*-* } } */
 
 typedef unsigned char u8;
 typedef unsigned short u16;

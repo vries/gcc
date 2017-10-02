@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-fPIC" { target fpic } } */
+/* { dg-additional-options "-fPIC" { target fpic } } */
 __attribute__ ((noinline, noclone)) int
 bar (int flag, const char *__restrict format, ...)
 {
