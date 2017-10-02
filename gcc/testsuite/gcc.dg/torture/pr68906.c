@@ -1,5 +1,4 @@
 /* { dg-do compile } */
-/* { dg-options "-O3" } */
 
 int a;
 volatile int b;

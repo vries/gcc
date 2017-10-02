@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-O3 -g" } */
+/* { dg-additional-options "-g" } */
 /* { dg-require-effective-target ptr32plus } */
 
 int d0, sj, v0, rp, zi;

@@ -1,5 +1,5 @@
 /* { dg-do compile } */
-/* { dg-options "-O3 -Wno-int-conversion" } */
+/* { dg-additional-options "-Wno-int-conversion" } */
 
 /* PR77916: This failed with "error: invalid (pointer) operands to plus/minus"
    after SLSR.  */
