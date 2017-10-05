@@ -5791,7 +5791,7 @@ lower_oacc_head_tail (location_t loc, tree clauses,
       gimple_seq fork_seq = NULL;
       gimple_seq join_seq = NULL;
 
-      tree place = build_int_cst (integer_type_node, -1);
+      tree place = build_int_cst (integer_type_node, GOMP_DIM_UNKNOWN);
       gcall *fork = gimple_build_call_internal (IFN_UNIQUE, 3,
 						fork_kind, ddvar, place);
       gimple_set_location (fork, loc);

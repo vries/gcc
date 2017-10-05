@@ -24,6 +24,10 @@ along with GCC; see the file COPYING3.  If not see
 
 #include "gomp-constants.h"
 
+/* GOMP_DIM_ constant that is only used internally, so it's not listed in
+   gomp-constants.h.  */
+#define GOMP_DIM_UNKNOWN -1
+
 /*  Flags for an OpenACC loop.  */
 
 enum oacc_loop_flags {

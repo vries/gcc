@@ -1583,7 +1583,8 @@ execute_oacc_device_lower ()
 
 	    /* If the level is -1, this ended up being an unused
 	       axis.  Handle as a default.  */
-	    if (integer_minus_onep (gimple_call_arg (call, 3)))
+	    if (TREE_INT_CST_LOW (gimple_call_arg (call, 3))
+		== GOMP_DIM_UNKNOWN)
 	      default_goacc_reduction (call);
 	    else
 	      targetm.goacc.reduction (call);
