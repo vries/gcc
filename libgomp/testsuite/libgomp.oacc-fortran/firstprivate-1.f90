@@ -1,4 +1,3 @@
-! { dg-do run }
 
 program firstprivate
   integer, parameter :: Nupper=100

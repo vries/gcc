@@ -1,5 +1,4 @@
 ! PR fortran/46753
-! { dg-do run }
 
   integer :: i, j
   j = 0

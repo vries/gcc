@@ -1,4 +1,3 @@
-! { dg-do run }
 
 module m
   interface operator(.add.)

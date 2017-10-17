@@ -1,5 +1,4 @@
 ! PR fortran/42866
-! { dg-do run }
 
 program pr42866
   integer, allocatable :: a(:)

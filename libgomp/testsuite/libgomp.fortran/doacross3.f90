@@ -1,4 +1,3 @@
-! { dg-do run }
 
   integer, parameter :: N = 256
   integer, save :: a(N), b(N / 16, 8, 4), c(N / 32, 8, 8), g(N/16,8,6)

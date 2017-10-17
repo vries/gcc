@@ -1,4 +1,3 @@
-! { dg-do run }
 
   integer :: x(3:6, 7:12), y
   y = 1

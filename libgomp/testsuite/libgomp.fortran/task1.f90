@@ -1,4 +1,3 @@
-! { dg-do run }
 
 program tasktest
   use omp_lib

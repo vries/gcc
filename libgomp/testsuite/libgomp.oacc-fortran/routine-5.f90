@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-options "-fno-inline" }
 
 program main

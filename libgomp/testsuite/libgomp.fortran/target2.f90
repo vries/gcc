@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-options "-ffree-line-length-160" }
 
 module target2

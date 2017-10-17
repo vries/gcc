@@ -1,4 +1,3 @@
-! { dg-do run }
             MODULE MOD
             INTRINSIC MAX, MIN
             END MODULE MOD

@@ -1,4 +1,3 @@
-! { dg-do run }
 
 program associate2
   type dl

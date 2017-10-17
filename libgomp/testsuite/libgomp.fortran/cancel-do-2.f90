@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-options "-fno-inline -fno-ipa-sra -fno-ipa-cp -fno-ipa-cp-clone" }
 ! { dg-set-target-env-var OMP_CANCELLATION "true" }
 

@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-additional-options "-cpp" }
 
 program test

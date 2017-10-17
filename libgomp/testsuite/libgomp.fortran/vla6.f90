@@ -1,4 +1,3 @@
-! { dg-do run }
 
   call test
 contains

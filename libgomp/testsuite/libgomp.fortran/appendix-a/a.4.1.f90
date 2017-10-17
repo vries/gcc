@@ -1,4 +1,3 @@
-! { dg-do run }
       SUBROUTINE SUBDOMAIN(X, ISTART, IPOINTS)
           INTEGER ISTART, IPOINTS
           REAL X(*)

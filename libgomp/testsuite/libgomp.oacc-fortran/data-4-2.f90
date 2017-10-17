@@ -1,7 +1,6 @@
 ! Copy of data-4.f90 with self exchanged with host for !acc update, and with
 ! default (present) clauses added.
 
-! { dg-do run }
 
 program asyncwait
   real, allocatable :: a(:), b(:), c(:), d(:), e(:)

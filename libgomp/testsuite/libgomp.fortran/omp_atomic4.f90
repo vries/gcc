@@ -1,4 +1,3 @@
-! { dg-do run }
     integer (kind = 4) :: a, a2
     integer (kind = 2) :: b, b2
     real :: c

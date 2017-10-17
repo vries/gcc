@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-additional-options "-fdefault-integer-8" }
 ! { dg-skip-if "" { ! run_expensive_tests } { "*" } { "-O2" } }
 ! { dg-set-target-env-var OMP_PROC_BIND "spread,close" }

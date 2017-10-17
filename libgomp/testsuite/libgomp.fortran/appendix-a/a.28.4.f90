@@ -1,4 +1,3 @@
-! { dg-do run }
 
        PROGRAM A28_4
          INTEGER I, J

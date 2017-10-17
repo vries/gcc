@@ -2,7 +2,6 @@
 ! offloaded regions are properly mapped using present_or_copy, or (default)
 ! present.
 
-! { dg-do run }
 
 program main
   implicit none

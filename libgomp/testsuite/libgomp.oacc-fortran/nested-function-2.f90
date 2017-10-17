@@ -1,6 +1,5 @@
 ! Exercise nested function decomposition, gcc/tree-nested.c.
 
-! { dg-do run }
 
 program collapse3
   integer :: p1, p2, p3, p4, p5, p6, p7, p8, p9

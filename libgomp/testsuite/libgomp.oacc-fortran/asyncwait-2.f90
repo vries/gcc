@@ -1,4 +1,3 @@
-! { dg-do run }
 
 program asyncwait
   integer, parameter :: N = 64

@@ -1,5 +1,4 @@
 ! PR fortran/49792
-! { dg-do run }
 
 subroutine reverse(n, a)
   integer :: n

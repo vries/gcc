@@ -1,4 +1,3 @@
-! { dg-do run }
 
   call dep ()
   call dep2 ()

@@ -1,5 +1,4 @@
 ! PR fortran/32550
-! { dg-do run }
 ! { dg-require-effective-target tls_runtime }
 
       integer, pointer, save :: ptr

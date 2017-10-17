@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-options "-fcheck=recursion" }
 !
 ! PR 42517: Bogus runtime error with -fopenmp -fcheck=recursion

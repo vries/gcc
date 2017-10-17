@@ -1,4 +1,3 @@
-! { dg-do run }
 
   interface
     subroutine bar (q)

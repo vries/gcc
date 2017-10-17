@@ -1,4 +1,3 @@
-! { dg-do run }
 
         PROGRAM A28_3
         EQUIVALENCE (X,Y)

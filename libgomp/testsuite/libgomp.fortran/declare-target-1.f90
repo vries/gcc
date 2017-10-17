@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-additional-sources declare-target-2.f90 }
 
 module declare_target_1_mod

@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-options "-fcray-pointer" }
 ! { dg-require-effective-target tls_runtime }
 

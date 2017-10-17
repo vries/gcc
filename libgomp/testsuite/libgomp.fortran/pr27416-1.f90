@@ -1,5 +1,4 @@
 ! PR middle-end/27416
-! { dg-do run }
 
   integer :: j
   j = 6

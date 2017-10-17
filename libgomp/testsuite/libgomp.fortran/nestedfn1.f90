@@ -1,4 +1,3 @@
-! { dg-do run }
 
   integer :: a, b, c
   a = 1

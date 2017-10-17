@@ -1,4 +1,3 @@
-! { dg-do run }
 
       SUBROUTINE SKIP(ID)
       END SUBROUTINE SKIP

@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-require-effective-target offload_device_nonshared_as }
 
 module e_51_6_mod

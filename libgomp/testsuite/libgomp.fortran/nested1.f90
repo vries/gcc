@@ -1,4 +1,3 @@
-! { dg-do run }
 program nested1
   use omp_lib
   integer :: e1, e2, e3, e

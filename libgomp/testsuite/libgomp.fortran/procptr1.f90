@@ -1,4 +1,3 @@
-! { dg-do run }
   interface
     integer function foo ()
     end function

@@ -1,4 +1,3 @@
-! { dg-do run }
 
 module udr8m1
   integer, parameter :: a = 6

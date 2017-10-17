@@ -1,5 +1,4 @@
 ! PR fortran/34020
-! { dg-do run }
 
       subroutine atomic_add(lhs, rhs)
       real lhs, rhs

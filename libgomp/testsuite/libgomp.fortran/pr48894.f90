@@ -1,5 +1,4 @@
 ! PR fortran/48894
-! { dg-do run }
 ! { dg-options "-fdefault-integer-8" }
 
   use omp_lib

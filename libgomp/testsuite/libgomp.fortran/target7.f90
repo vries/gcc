@@ -1,4 +1,3 @@
-! { dg-do run }
 
   interface
     real function foo (x)

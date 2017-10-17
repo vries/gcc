@@ -1,4 +1,3 @@
-! { dg-do run }
 
 program lib4
   use omp_lib

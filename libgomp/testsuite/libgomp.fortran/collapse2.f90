@@ -1,4 +1,3 @@
-! { dg-do run }
 
 program collapse2
   call test1

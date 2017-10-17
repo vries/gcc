@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-options "-ffixed-form" }
       PROGRAM A3
 !234567890

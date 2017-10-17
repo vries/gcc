@@ -1,4 +1,3 @@
-! { dg-do run }
 
 program main
   integer igot, iexp, itmp

@@ -1,4 +1,3 @@
-! { dg-do run }
       SUBROUTINE WORK1()
       END SUBROUTINE WORK1
       SUBROUTINE WORK2()

@@ -1,4 +1,3 @@
-! { dg-do run }
 
   interface
     elemental subroutine sub1 (x, y)

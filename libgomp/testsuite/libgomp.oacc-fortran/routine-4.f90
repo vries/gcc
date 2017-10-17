@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-options "-fno-inline" }
 
   integer, parameter :: n = 10

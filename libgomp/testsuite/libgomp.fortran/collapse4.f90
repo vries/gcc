@@ -1,4 +1,3 @@
-! { dg-do run }
 
   integer :: i, j, k
   !$omp parallel do lastprivate (i, j, k) collapse (3)

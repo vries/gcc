@@ -1,4 +1,3 @@
-! { dg-do run }
 !$ use omp_lib
 
   logical :: l, la (4), m, ma (4), v

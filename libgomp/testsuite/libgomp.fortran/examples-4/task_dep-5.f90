@@ -1,4 +1,3 @@
-! { dg-do run }
 
 module task_dep5_mod
 contains

@@ -1,4 +1,3 @@
-! { dg-do run }
 use omp_lib
   call test_parallel
   call test_do

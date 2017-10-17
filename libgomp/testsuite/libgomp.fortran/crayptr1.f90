@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-options "-fcray-pointer" }
 
   use omp_lib

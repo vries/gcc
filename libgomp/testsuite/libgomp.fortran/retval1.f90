@@ -1,4 +1,3 @@
-! { dg-do run }
 
 function f1 ()
   use omp_lib

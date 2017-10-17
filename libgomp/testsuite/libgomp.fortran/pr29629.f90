@@ -1,5 +1,4 @@
 ! PR fortran/29629
-! { dg-do run }
 
 program pr29629
   integer :: n

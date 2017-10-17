@@ -1,4 +1,3 @@
-! { dg-do run }
 
        SUBROUTINE SUB()
        COMMON /BLOCK/ X

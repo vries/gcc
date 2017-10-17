@@ -1,5 +1,4 @@
 ! PR middle-end/33880
-! { dg-do run }
 
 program pr33880
   integer :: i, j

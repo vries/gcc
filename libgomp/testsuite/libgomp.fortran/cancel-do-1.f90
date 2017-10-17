@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-set-target-env-var OMP_CANCELLATION "true" }
 
   use omp_lib

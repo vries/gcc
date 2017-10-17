@@ -1,4 +1,3 @@
-! { dg-do run }
 
   use omp_lib
 

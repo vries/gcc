@@ -1,4 +1,3 @@
-! { dg-do run }
 
 !$omp declare reduction (foo : character(kind=1, len=*) &
 !$omp & : omp_out = trim(omp_out) // omp_in) initializer (omp_priv = '')

@@ -1,5 +1,4 @@
 ! PR fortran/71014
-! { dg-do run }
 ! { dg-additional-options "-O0" }
 
 program pr71014

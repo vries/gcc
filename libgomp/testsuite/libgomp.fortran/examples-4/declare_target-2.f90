@@ -1,4 +1,3 @@
-! { dg-do run }
 
 program e_53_2
   !$omp declare target (fib)

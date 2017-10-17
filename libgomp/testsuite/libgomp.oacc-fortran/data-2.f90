@@ -1,4 +1,3 @@
-! { dg-do run }
 
 program test
   integer, parameter :: N = 8

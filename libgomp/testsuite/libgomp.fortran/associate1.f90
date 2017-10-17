@@ -1,4 +1,3 @@
-! { dg-do run }
 
 program associate1
   integer :: v, i, j

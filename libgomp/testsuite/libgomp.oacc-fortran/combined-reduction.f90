@@ -1,6 +1,5 @@
 ! Test a combined acc parallel loop reduction.
 
-! { dg-do run }
 
 program test
   implicit none

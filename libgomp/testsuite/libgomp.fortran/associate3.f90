@@ -1,5 +1,4 @@
 ! PR fortran/71717
-! { dg-do run }
 
   type t
     real, allocatable :: f(:)

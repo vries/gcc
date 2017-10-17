@@ -1,5 +1,4 @@
 ! PR fortran/46874
-! { dg-do run }
 
   interface
     subroutine sub (a, b, c, d, n)

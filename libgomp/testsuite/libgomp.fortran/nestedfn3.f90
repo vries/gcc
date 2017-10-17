@@ -1,5 +1,4 @@
 ! PR middle-end/28790
-! { dg-do run }
 
 program nestomp
   integer :: j

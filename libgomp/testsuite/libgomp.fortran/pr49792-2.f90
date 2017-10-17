@@ -1,5 +1,4 @@
 ! PR fortran/49792
-! { dg-do run }
 ! { dg-options "-std=f2003 -fall-intrinsics" }
 
 subroutine reverse(n, a)

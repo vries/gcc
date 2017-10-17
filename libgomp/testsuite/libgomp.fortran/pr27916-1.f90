@@ -1,7 +1,6 @@
 ! PR fortran/27916
 ! Test whether allocatable privatized arrays has "not currently allocated"
 ! status at the start of OpenMP constructs.
-! { dg-do run }
 
 program pr27916
   integer :: n, i

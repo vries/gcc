@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-skip-if "" { *-*-* } { "*" } { "-DACC_MEM_SHARED=0" } }
 
 program main

@@ -1,4 +1,3 @@
-! { dg-do run }
   real, dimension (5) :: b
   b = 5
   call foo (b)

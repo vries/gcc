@@ -1,4 +1,3 @@
-! { dg-do run }
 
   integer :: x(2, 3)
   integer, allocatable :: z(:, :)

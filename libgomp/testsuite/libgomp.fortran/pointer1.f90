@@ -1,4 +1,3 @@
-! { dg-do run }
   integer, pointer :: a, c(:)
   integer, target :: b, d(10)
   b = 0

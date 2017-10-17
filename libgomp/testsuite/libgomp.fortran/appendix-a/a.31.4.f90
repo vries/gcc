@@ -1,4 +1,3 @@
-! { dg-do run }
         MODULE M
         INTRINSIC MAX
         END MODULE M

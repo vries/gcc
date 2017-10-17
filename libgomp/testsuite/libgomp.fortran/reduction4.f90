@@ -1,4 +1,3 @@
-! { dg-do run }
 !$ use omp_lib
 
   integer (kind = 4) :: i, ia (6), j, ja (6), k, ka (6), ta (6), n, cnt, x

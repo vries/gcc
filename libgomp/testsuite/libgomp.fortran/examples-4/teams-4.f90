@@ -1,4 +1,3 @@
-! { dg-do run }
 
 function dotprod_ref (B, C, N) result (sum)
   implicit none

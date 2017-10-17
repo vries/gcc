@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-skip-if "" { ! run_expensive_tests } { "*" } { "-O2" } }
 ! { dg-set-target-env-var OMP_PROC_BIND "spread,close" }
 ! { dg-set-target-env-var OMP_PLACES "{6,7}:4:-2,!{2,3}" }

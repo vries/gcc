@@ -1,4 +1,3 @@
-! { dg-do run }
 
 module e_53_4_mod
   !$omp declare target (N, Q)

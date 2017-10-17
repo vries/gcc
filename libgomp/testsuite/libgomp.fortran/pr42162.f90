@@ -1,5 +1,4 @@
 ! PR fortran/42162
-! { dg-do run }
 
 subroutine sub1(k, a)
   implicit none

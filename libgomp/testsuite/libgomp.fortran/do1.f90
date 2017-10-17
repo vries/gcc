@@ -1,4 +1,3 @@
-! { dg-do run }
 
   integer, dimension (128) :: a, b
   integer :: i

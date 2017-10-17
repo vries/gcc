@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-options "-ffixed-form" }
       REAL FUNCTION FN1(I)
         INTEGER I

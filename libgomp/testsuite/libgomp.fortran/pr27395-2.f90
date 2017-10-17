@@ -1,5 +1,4 @@
 ! PR fortran/27395
-! { dg-do run }
 
 program pr27395_2
   implicit none

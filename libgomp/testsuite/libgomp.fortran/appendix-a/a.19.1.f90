@@ -1,4 +1,3 @@
-! { dg-do run }
         SUBROUTINE F1(Q)
         COMMON /DATA/ P, X
         INTEGER, TARGET :: X

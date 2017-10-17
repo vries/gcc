@@ -1,4 +1,3 @@
-! { dg-do run }
 
 module udr10m
   type dt

@@ -1,4 +1,3 @@
-! { dg-do run }
 
 program collapse1
   integer :: i, j, k, a(1:3, 4:6, 5:7)

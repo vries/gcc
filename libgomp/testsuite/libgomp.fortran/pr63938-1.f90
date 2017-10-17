@@ -1,5 +1,4 @@
 ! PR fortran/63938
-! { dg-do run }
 
 program pr63938_1
   integer :: i, x(1)

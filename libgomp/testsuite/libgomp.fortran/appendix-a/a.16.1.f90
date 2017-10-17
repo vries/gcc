@@ -1,4 +1,3 @@
-! { dg-do run }
         REAL FUNCTION WORK1(I)
             INTEGER I
             WORK1 = 1.0 * I

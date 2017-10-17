@@ -1,4 +1,3 @@
-! { dg-do run }
 
   integer :: i
   common /c/ i

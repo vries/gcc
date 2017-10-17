@@ -1,4 +1,3 @@
-! { dg-do run }
 
   integer, dimension (6, 6) :: a
   character (36) :: c

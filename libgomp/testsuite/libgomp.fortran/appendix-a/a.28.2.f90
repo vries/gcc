@@ -1,4 +1,3 @@
-! { dg-do run }
 
       PROGRAM A28_2
         COMMON /BLOCK2/ X

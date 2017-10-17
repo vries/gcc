@@ -1,6 +1,5 @@
 ! Miscellaneous tests for private variables.
 
-! { dg-do run }
 
 
 ! Test of gang-private variables declared on loop directive.

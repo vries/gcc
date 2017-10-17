@@ -1,4 +1,3 @@
-! { dg-do run }
 program stack
   implicit none
   integer id

@@ -1,4 +1,3 @@
-! { dg-do run }
 
   integer, allocatable :: a(:, :)
   integer :: b(6, 3)

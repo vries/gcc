@@ -1,4 +1,3 @@
-! { dg-do run }
 
 module target6
 contains

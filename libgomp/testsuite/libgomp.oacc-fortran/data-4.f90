@@ -1,4 +1,3 @@
-! { dg-do run }
 
 program asyncwait
   real, allocatable :: a(:), b(:), c(:), d(:), e(:)

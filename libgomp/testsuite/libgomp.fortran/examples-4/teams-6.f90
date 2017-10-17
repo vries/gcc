@@ -1,4 +1,3 @@
-! { dg-do run }
 
 module e_54_6_mod
 contains

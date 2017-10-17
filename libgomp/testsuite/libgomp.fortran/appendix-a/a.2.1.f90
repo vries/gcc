@@ -1,4 +1,3 @@
-! { dg-do run }
 PROGRAM A2
   INCLUDE "omp_lib.h"      ! or USE OMP_LIB
   INTEGER X

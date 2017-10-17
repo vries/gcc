@@ -1,4 +1,3 @@
-! { dg-do run }
 
 module e_50_1_mod
 contains

@@ -1,4 +1,3 @@
-! { dg-do run }
 
   type dt
     integer :: g

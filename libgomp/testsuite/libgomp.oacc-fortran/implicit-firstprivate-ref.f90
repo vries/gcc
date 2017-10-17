@@ -1,7 +1,6 @@
 ! This test checks if the runtime can properly handle implicit
 ! firstprivate varaibles inside subroutines in modules.
 
-! { dg-do run }
 
 module test_mod
   contains

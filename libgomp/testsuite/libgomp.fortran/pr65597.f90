@@ -1,5 +1,4 @@
 ! PR fortran/65597
-! { dg-do run }
 
   integer :: i, a(151)
   a(:) = 0

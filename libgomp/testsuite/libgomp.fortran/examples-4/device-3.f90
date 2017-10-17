@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-require-effective-target offload_device }
 
 program e_57_3

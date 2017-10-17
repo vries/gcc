@@ -1,4 +1,3 @@
-! { dg-do run }
 
       program main
       implicit none

@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-require-effective-target tls_runtime }
 
       PROGRAM A22_7_GOOD

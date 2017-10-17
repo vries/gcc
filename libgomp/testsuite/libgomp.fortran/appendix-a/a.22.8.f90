@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-require-effective-target tls_runtime }
        MODULE A22_MODULE8
          REAL, POINTER :: WORK(:)

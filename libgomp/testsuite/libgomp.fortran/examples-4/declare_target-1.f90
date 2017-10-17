@@ -1,4 +1,3 @@
-! { dg-do run }
 
 module e_53_1_mod
   integer :: THRESHOLD = 20

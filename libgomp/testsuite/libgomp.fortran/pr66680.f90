@@ -1,4 +1,3 @@
-! { dg-do run }
 ! PR 66680: ICE with openmp, a loop and a type bound procedure
 ! Contributed by Miha Polajnar <polajnar.miha@gmail.com>
 !

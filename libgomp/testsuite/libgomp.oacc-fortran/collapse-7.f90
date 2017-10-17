@@ -1,4 +1,3 @@
-! { dg-do run }
 
 ! collapse3.f90:test4
 program collapse7

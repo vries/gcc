@@ -1,4 +1,3 @@
-! { dg-do run }
 
   integer, parameter :: n = 1000
   integer, parameter :: c = 100

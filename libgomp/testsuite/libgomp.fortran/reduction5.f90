@@ -1,4 +1,3 @@
-! { dg-do run }
 
 module reduction5
   intrinsic ior, min, max

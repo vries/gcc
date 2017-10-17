@@ -1,4 +1,3 @@
-! { dg-do run }
 
 program udr7
   implicit none

@@ -1,4 +1,3 @@
-! { dg-do run }
 ! { dg-options "-w" }
 
   character (6) :: c, f2

@@ -1,6 +1,5 @@
 ! Exercise nested function decomposition, gcc/tree-nested.c.
 
-! { dg-do run }
 
 program collapse2
   call test1
