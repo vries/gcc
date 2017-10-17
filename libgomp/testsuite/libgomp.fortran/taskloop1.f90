@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
   common /blk/ q, e
   integer :: q, r
   logical :: e

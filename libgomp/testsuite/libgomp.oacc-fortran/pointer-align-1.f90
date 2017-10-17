@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 ! PR middle-end/63247
 
 program test

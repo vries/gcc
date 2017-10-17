@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 ! { dg-additional-options "-cpp" }
 ! TODO: Have to disable the acc_on_device builtin for we want to test the
 ! libgomp library function?  The command line option

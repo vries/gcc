@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 function foo ()
   integer :: foo
   logical :: foo_seen

@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 ! PR fortran/25219
 
   implicit none

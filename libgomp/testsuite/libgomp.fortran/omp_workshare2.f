@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 C******************************************************************************
 C FILE: omp_workshare2.f
 C DESCRIPTION:

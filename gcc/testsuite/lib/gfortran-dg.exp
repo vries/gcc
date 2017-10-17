@@ -125,6 +125,7 @@ proc gfortran-dg-prune { system text } {
 proc gfortran-dg-runtest { testcases flags default-extra-flags } {
     global runtests
     global DG_TORTURE_OPTIONS torture_with_loops
+    global dg-do-what-default
 
     torture-init
     set-torture-options $DG_TORTURE_OPTIONS
@@ -136,9 +137,30 @@ proc gfortran-dg-runtest { testcases flags default-extra-flags } {
 	    continue
         }
 
+	set torture 0
+	if [expr [search_for $test "\{ dg-no-torture-options "]] {
+	    #
+	} else {
+	    set dorun 0
+	    if [expr [search_for $test "\{ dg-do "]] {
+		# We set dg-do
+		if [expr [search_for $test "\{ dg-do run"]] {
+		    # We set dg-do to run
+		    set torture 1
+		}
+	    } else {
+		# We don't set dg-do, use the default
+		if { ${dg-do-what-default} == "run" } {
+		    set dorun 1
+		}
+	    }
+	    if { $dorun } {
+		set torture 1
+	    }
+	}
 	# look if this is dg-do-run test, in which case
 	# we cycle through the option list, otherwise we don't
-	if [expr [search_for $test "dg-do run"]] {
+	if { $torture } {
 	    set option_list $torture_with_loops
 	} else {
 	    set option_list [list { -O } ]

@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 ! { dg-options "-fno-openmp" }
 	program condinc4
 		logical l

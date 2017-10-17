@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 c Test conditional compilation in fixed form if -fno-openmp
 ! { dg-options "-fno-openmp" }
    10 foo = 2

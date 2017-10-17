@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 ! { dg-options "-ffixed-form" }
       if (b().ne.2) call abort
       contains

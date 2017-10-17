@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 ! { dg-options "-O2" }
 ! { dg-skip-if "AArch64 tiny code model does not support programs larger than 1MiB" {aarch64_tiny} }
 

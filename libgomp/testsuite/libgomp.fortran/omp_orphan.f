@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 C******************************************************************************
 C FILE: omp_orphan.f
 C DESCRIPTION:

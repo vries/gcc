@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 program lastprivate
   integer :: i, k
   common /c/ i, k

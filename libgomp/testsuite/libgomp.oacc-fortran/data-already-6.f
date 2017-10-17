@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 ! { dg-skip-if "" { *-*-* } { "*" } { "-DACC_MEM_SHARED=0" } }
 
       IMPLICIT NONE

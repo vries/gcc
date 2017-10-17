@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 use openacc
 
 if (acc_get_num_devices (acc_device_host) .ne. 1) call abort

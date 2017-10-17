@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 program foo
   implicit none
   integer :: i

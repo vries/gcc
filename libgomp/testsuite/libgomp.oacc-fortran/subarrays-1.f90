@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 program subarrays
   integer, parameter     :: n = 20, c = 10
   integer                :: i, a(n), b(n)

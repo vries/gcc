@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 ! Test conditional compilation in free form if -fno-openmp
 ! { dg-options "-fno-openmp" }
    10 foo = 2&

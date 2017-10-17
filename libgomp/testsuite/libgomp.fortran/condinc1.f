@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
       program condinc1
       logical l
       l = .false.

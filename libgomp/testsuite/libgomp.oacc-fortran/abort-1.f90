@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 program main
   implicit none
 

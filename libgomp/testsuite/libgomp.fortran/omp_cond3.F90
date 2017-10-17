@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 ! Test conditional compilation in free form if -fopenmp
    10 foo = 2&
   &56

@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 C Test conditional compilation in fixed form if -fopenmp
    10 foo = 2
      &56

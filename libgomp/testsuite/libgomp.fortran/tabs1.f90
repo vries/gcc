@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 	if (b().ne.2) call abort
 contains
 subroutine a

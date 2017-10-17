@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
 MODULE reduction_test
 
 CONTAINS

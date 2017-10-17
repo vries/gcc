@@ -1,3 +1,4 @@
+! { dg-no-torture-options }
       INCLUDE "openacc_lib.h"
 
       IF (ACC_GET_NUM_DEVICES (ACC_DEVICE_HOST) .NE. 1) CALL ABORT
