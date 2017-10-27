@@ -2127,6 +2127,8 @@ GOMP_OFFLOAD_run (int ord, void *tgt_fn, void *tgt_vars, void **args)
   const char *maybe_abort_msg = "(perhaps abort was called)";
   int teams = 0, threads = 0;
 
+  nvptx_attach_host_thread_to_device (ord);
+
   if (!args)
     GOMP_PLUGIN_fatal ("No target arguments provided");
   while (*args)
@@ -2169,11 +2171,4 @@ GOMP_OFFLOAD_run (int ord, void *tgt_fn, void *tgt_vars, void **args)
   else if (r != CUDA_SUCCESS)
     GOMP_PLUGIN_fatal ("cuCtxSynchronize error: %s", cuda_error (r));
   nvptx_stacks_free (stacks, teams * threads);
-}
-
-void
-GOMP_OFFLOAD_async_run (int ord, void *tgt_fn, void *tgt_vars, void **args,
-			void *async_data)
-{
-  GOMP_PLUGIN_fatal ("GOMP_OFFLOAD_async_run unimplemented");
 }
