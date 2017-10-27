@@ -1868,6 +1868,59 @@ GOMP_target_enter_exit_data (int device, size_t mapnum, void **hostaddrs,
     gomp_exit_data (devicep, mapnum, hostaddrs, sizes, kinds);
 }
 
+/* Information to be passed to a thread running a kernel asycnronously.  */
+
+struct async_run_info
+{
+  struct gomp_device_descr *devicep;
+  void *tgt_fn;
+  void *tgt_vars;
+  void **args;
+  void *async_data;
+};
+
+/* Thread routine to run a kernel asynchronously.  */
+
+static void *
+default_async_run_1 (void *thread_arg)
+{
+  struct async_run_info *info = (struct async_run_info *) thread_arg;
+  struct gomp_device_descr *devicep = info->devicep;
+  void *tgt_fn = info->tgt_fn;
+  void *tgt_vars = info->tgt_vars;
+  void **args = info->args;
+  void *async_data = info->async_data;
+
+  free (info);
+  devicep->run_func (devicep->target_id, tgt_fn, tgt_vars, args);
+  GOMP_PLUGIN_target_task_completion (async_data);
+  return NULL;
+}
+
+static void
+default_async_run (struct gomp_device_descr *devicep, void *tgt_fn,
+		   void *tgt_vars, void **args, void *async_data)
+{
+  pthread_t pt;
+  struct async_run_info *info;
+  info = GOMP_PLUGIN_malloc (sizeof (struct async_run_info));
+
+  info->devicep = devicep;
+  info->tgt_fn = tgt_fn;
+  info->tgt_vars = tgt_vars;
+  info->args = args;
+  info->async_data = async_data;
+
+ int err = pthread_create (&pt, NULL, &default_async_run_1, info);
+  if (err != 0)
+    GOMP_PLUGIN_fatal ("Asynchronous thread creation failed: %s",
+		       strerror (err));
+  err = pthread_detach (pt);
+  if (err != 0)
+    GOMP_PLUGIN_fatal ("Failed to detach a thread to run kernel "
+		       "asynchronously: %s", strerror (err));
+}
+
 bool
 gomp_target_task_fn (void *data)
 {
@@ -1909,9 +1962,37 @@ gomp_target_task_fn (void *data)
 	}
       ttask->state = GOMP_TARGET_TASK_READY_TO_RUN;
 
-      devicep->async_run_func (devicep->target_id, fn_addr, actual_arguments,
-			       ttask->args, (void *) ttask);
-      return true;
+      if (gomp_target_async == 2)
+	{
+	  if (devicep->async_run_func)
+	    {
+	      devicep->async_run_func (devicep->target_id, fn_addr,
+				       actual_arguments, ttask->args,
+				       (void *) ttask);
+	      return true;
+	    }
+	  else if (gomp_target_async_set)
+	    gomp_fatal ("GOMP_OFFLOAD_async_run not implemented, cannot support"
+			" OMP_TARGET_ASYNC == 2");
+	}
+
+      if (gomp_target_async >= 1)
+	{
+	  default_async_run (devicep, fn_addr, actual_arguments, ttask->args,
+			     (void *) ttask);
+	  return true;
+	}
+
+      if (gomp_target_async == 0)
+	{
+	  devicep->run_func (devicep->target_id, fn_addr, actual_arguments,
+			     ttask->args);
+	  GOMP_PLUGIN_target_task_completion (ttask);
+	  return true;
+	}
+
+      gomp_fatal ("gomp_target_async not in 0-2 range: %d",
+		  gomp_target_async);
     }
   else if (devicep == NULL
 	   || !(devicep->capabilities & GOMP_OFFLOAD_CAP_OPENMP_400)
@@ -2393,7 +2474,7 @@ gomp_load_plugin_for_device (struct gomp_device_descr *device,
   if (device->capabilities & GOMP_OFFLOAD_CAP_OPENMP_400)
     {
       DLSYM (run);
-      DLSYM (async_run);
+      DLSYM_OPT (async_run, async_run);
       DLSYM_OPT (can_run, can_run);
       DLSYM (dev2dev);
     }

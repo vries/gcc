@@ -75,6 +75,8 @@ struct gomp_task_icv gomp_global_icv = {
 
 unsigned long gomp_max_active_levels_var = INT_MAX;
 bool gomp_cancel_var = false;
+int gomp_target_async = 2;
+bool gomp_target_async_set = false;
 int gomp_max_task_priority_var = 0;
 #ifndef HAVE_SYNC_BUILTINS
 gomp_mutex_t gomp_managed_threads_lock;
@@ -1230,6 +1232,17 @@ initialize_env (void)
   parse_boolean ("OMP_CANCELLATION", &gomp_cancel_var);
   parse_int ("OMP_DEFAULT_DEVICE", &gomp_global_icv.default_device_var, true);
   parse_int ("OMP_MAX_TASK_PRIORITY", &gomp_max_task_priority_var, true);
+  if (parse_int ("OMP_TARGET_ASYNC", &gomp_target_async, true))
+    {
+      if (0 <= gomp_target_async && gomp_target_async <= 2)
+	gomp_target_async_set = true;
+      else
+	{
+	  gomp_error ("OMP_TARGET_ASYNC not in 0-2 range: %d. "
+		      "Using default 2", gomp_target_async);
+	  gomp_target_async = 2;
+	}
+    }
   parse_unsigned_long ("OMP_MAX_ACTIVE_LEVELS", &gomp_max_active_levels_var,
 		       true);
   if (parse_unsigned_long ("OMP_THREAD_LIMIT", &thread_limit_var, false))

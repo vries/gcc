@@ -354,6 +354,8 @@ extern struct gomp_task_icv gomp_global_icv;
 extern gomp_mutex_t gomp_managed_threads_lock;
 #endif
 extern unsigned long gomp_max_active_levels_var;
+extern int gomp_target_async;
+extern bool gomp_target_async_set;
 extern bool gomp_cancel_var;
 extern int gomp_max_task_priority_var;
 extern unsigned long long gomp_spin_count_var, gomp_throttled_spin_count_var;
