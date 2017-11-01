@@ -52,7 +52,7 @@ extern int SYS$GL_CALL_HANDL;
 do { \
 (FS)->regs.reg[GRN].how = REG_SAVED_OFFSET;      \
 (FS)->regs.reg[GRN].loc.offset = (_Unwind_Sword) ((REG) (LOC) - (REG) (CFA)); \
-} while (0);
+} while (0)
 
 #define GIVEUP_ON_FAILURE(STATUS) \
   { if ((((STATUS) & 1) != 1)) return _URC_END_OF_STACK; }
