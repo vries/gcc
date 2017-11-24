@@ -5,6 +5,12 @@ extern void abort ();
 #define M(x, y, z) O(x, y, z)
 #define O(x, y, z) x ## _ ## y ## _ ## z
 
+#ifndef ONE_TEST
+#define TEST_ALL 1
+#else
+#define TEST_ALL 0
+#endif
+
 #pragma omp declare target
 
 #define F for
@@ -25,12 +31,15 @@ extern void abort ();
 #define OMPFROM(v) DO_PRAGMA (omp target update from(v))
 #define OMPTO(v) DO_PRAGMA (omp target update to(v))
 
+#if TEST_ALL || (1 <= TEST_NR && TEST_NR <= 5)
 #define F target parallel for
 #define G tpf
 #include "for-1.h"
 #undef F
 #undef G
+#endif
 
+#if TEST_ALL || TEST_NR == 6
 #define F target simd
 #define G t_simd
 #define S
@@ -40,13 +49,17 @@ extern void abort ();
 #undef N
 #undef F
 #undef G
+#endif
 
+#if TEST_ALL || (7 <= TEST_NR && TEST_NR <= 11)
 #define F target parallel for simd
 #define G tpf_simd
 #include "for-1.h"
 #undef F
 #undef G
+#endif
 
+#if TEST_ALL || TEST_NR == 12
 #define F target teams distribute
 #define G ttd
 #define S
@@ -56,7 +69,9 @@ extern void abort ();
 #undef N
 #undef F
 #undef G
+#endif
 
+#if TEST_ALL || TEST_NR == 13
 #define F target teams distribute
 #define G ttd_ds128
 #define S dist_schedule(static, 128)
@@ -66,7 +81,9 @@ extern void abort ();
 #undef N
 #undef F
 #undef G
+#endif
 
+#if TEST_ALL || TEST_NR == 14
 #define F target teams distribute simd
 #define G ttds
 #define S
@@ -76,7 +93,9 @@ extern void abort ();
 #undef N
 #undef F
 #undef G
+#endif
 
+#if TEST_ALL || TEST_NR == 15
 #define F target teams distribute simd
 #define G ttds_ds128
 #define S dist_schedule(static, 128)
@@ -86,69 +105,57 @@ extern void abort ();
 #undef N
 #undef F
 #undef G
+#endif
 
+#if TEST_ALL || (16 <= TEST_NR && TEST_NR <= 20)
 #define F target teams distribute parallel for
 #define G ttdpf
 #include "for-1.h"
 #undef F
 #undef G
+#endif
 
+#if TEST_ALL || (21 <= TEST_NR && TEST_NR <= 25)
 #define F target teams distribute parallel for dist_schedule(static, 128)
 #define G ttdpf_ds128
 #include "for-1.h"
 #undef F
 #undef G
+#endif
 
+#if TEST_ALL || (26 <= TEST_NR && TEST_NR <= 30)
 #define F target teams distribute parallel for simd
 #define G ttdpfs
 #include "for-1.h"
 #undef F
 #undef G
+#endif
 
+#if TEST_ALL || (31 <= TEST_NR && TEST_NR <= 35)
 #define F target teams distribute parallel for simd dist_schedule(static, 128)
 #define G ttdpfs_ds128
 #include "for-1.h"
 #undef F
 #undef G
+#endif
 
 int
 main ()
 {
-  if (test_tpf_static ()
-      || test_tpf_static32 ()
-      || test_tpf_auto ()
-      || test_tpf_guided32 ()
-      || test_tpf_runtime ()
-      || test_t_simd_normal ()
-      || test_tpf_simd_static ()
-      || test_tpf_simd_static32 ()
-      || test_tpf_simd_auto ()
-      || test_tpf_simd_guided32 ()
-      || test_tpf_simd_runtime ()
-      || test_ttd_normal ()
-      || test_ttd_ds128_normal ()
-      || test_ttds_normal ()
-      || test_ttds_ds128_normal ()
-      || test_ttdpf_static ()
-      || test_ttdpf_static32 ()
-      || test_ttdpf_auto ()
-      || test_ttdpf_guided32 ()
-      || test_ttdpf_runtime ()
-      || test_ttdpf_ds128_static ()
-      || test_ttdpf_ds128_static32 ()
-      || test_ttdpf_ds128_auto ()
-      || test_ttdpf_ds128_guided32 ()
-      || test_ttdpf_ds128_runtime ()
-      || test_ttdpfs_static ()
-      || test_ttdpfs_static32 ()
-      || test_ttdpfs_auto ()
-      || test_ttdpfs_guided32 ()
-      || test_ttdpfs_runtime ()
-      || test_ttdpfs_ds128_static ()
-      || test_ttdpfs_ds128_static32 ()
-      || test_ttdpfs_ds128_auto ()
-      || test_ttdpfs_ds128_guided32 ()
-      || test_ttdpfs_ds128_runtime ())
-    abort ();
+#define DO_TEST_1(test)				\
+  do {						\
+    if (test ())				\
+      abort ();					\
+  } while (0)
+
+#ifdef ONE_TEST
+  DO_TEST_1 (ONE_TEST);
+#else
+#define DO_TEST(test) DO_TEST_1 (test);
+#include "for-5.list"
+#undef DO_TEST
+#endif
+#undef DO_TEST_1
+
   return 0;
 }
