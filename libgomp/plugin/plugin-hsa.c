@@ -46,79 +46,9 @@
 
 struct hsa_runtime_fn_info
 {
-  /* HSA runtime.  */
-  hsa_status_t (*hsa_status_string_fn) (hsa_status_t status,
-					const char **status_string);
-  hsa_status_t (*hsa_agent_get_info_fn) (hsa_agent_t agent,
-					 hsa_agent_info_t attribute,
-					 void *value);
-  hsa_status_t (*hsa_init_fn) (void);
-  hsa_status_t (*hsa_iterate_agents_fn)
-    (hsa_status_t (*callback)(hsa_agent_t agent, void *data), void *data);
-  hsa_status_t (*hsa_region_get_info_fn) (hsa_region_t region,
-					  hsa_region_info_t attribute,
-					  void *value);
-  hsa_status_t (*hsa_queue_create_fn)
-    (hsa_agent_t agent, uint32_t size, hsa_queue_type_t type,
-     void (*callback)(hsa_status_t status, hsa_queue_t *source, void *data),
-     void *data, uint32_t private_segment_size,
-     uint32_t group_segment_size, hsa_queue_t **queue);
-  hsa_status_t (*hsa_agent_iterate_regions_fn)
-    (hsa_agent_t agent,
-     hsa_status_t (*callback)(hsa_region_t region, void *data), void *data);
-  hsa_status_t (*hsa_executable_destroy_fn) (hsa_executable_t executable);
-  hsa_status_t (*hsa_executable_create_fn)
-    (hsa_profile_t profile, hsa_executable_state_t executable_state,
-     const char *options, hsa_executable_t *executable);
-  hsa_status_t (*hsa_executable_global_variable_define_fn)
-    (hsa_executable_t executable, const char *variable_name, void *address);
-  hsa_status_t (*hsa_executable_load_code_object_fn)
-    (hsa_executable_t executable, hsa_agent_t agent,
-     hsa_code_object_t code_object, const char *options);
-  hsa_status_t (*hsa_executable_freeze_fn)(hsa_executable_t executable,
-					   const char *options);
-  hsa_status_t (*hsa_signal_create_fn) (hsa_signal_value_t initial_value,
-					uint32_t num_consumers,
-					const hsa_agent_t *consumers,
-					hsa_signal_t *signal);
-  hsa_status_t (*hsa_memory_allocate_fn) (hsa_region_t region, size_t size,
-					  void **ptr);
-  hsa_status_t (*hsa_memory_free_fn) (void *ptr);
-  hsa_status_t (*hsa_signal_destroy_fn) (hsa_signal_t signal);
-  hsa_status_t (*hsa_executable_get_symbol_fn)
-    (hsa_executable_t executable, const char *module_name,
-     const char *symbol_name, hsa_agent_t agent, int32_t call_convention,
-     hsa_executable_symbol_t *symbol);
-  hsa_status_t (*hsa_executable_symbol_get_info_fn)
-    (hsa_executable_symbol_t executable_symbol,
-     hsa_executable_symbol_info_t attribute, void *value);
-  uint64_t (*hsa_queue_add_write_index_release_fn) (const hsa_queue_t *queue,
-						    uint64_t value);
-  uint64_t (*hsa_queue_load_read_index_acquire_fn) (const hsa_queue_t *queue);
-  void (*hsa_signal_store_relaxed_fn) (hsa_signal_t signal,
-				       hsa_signal_value_t value);
-  void (*hsa_signal_store_release_fn) (hsa_signal_t signal,
-				       hsa_signal_value_t value);
-  hsa_signal_value_t (*hsa_signal_wait_acquire_fn)
-    (hsa_signal_t signal, hsa_signal_condition_t condition,
-     hsa_signal_value_t compare_value, uint64_t timeout_hint,
-     hsa_wait_state_t wait_state_hint);
-  hsa_signal_value_t (*hsa_signal_load_acquire_fn) (hsa_signal_t signal);
-  hsa_status_t (*hsa_queue_destroy_fn) (hsa_queue_t *queue);
-
-  /* HSA finalizer.  */
-  hsa_status_t (*hsa_ext_program_add_module_fn) (hsa_ext_program_t program,
-						 hsa_ext_module_t module);
-  hsa_status_t (*hsa_ext_program_create_fn)
-    (hsa_machine_model_t machine_model, hsa_profile_t profile,
-     hsa_default_float_rounding_mode_t default_float_rounding_mode,
-     const char *options, hsa_ext_program_t *program);
-  hsa_status_t (*hsa_ext_program_destroy_fn) (hsa_ext_program_t program);
-  hsa_status_t (*hsa_ext_program_finalize_fn)
-    (hsa_ext_program_t program,hsa_isa_t isa,
-     int32_t call_convention, hsa_ext_control_directives_t control_directives,
-     const char *options, hsa_code_object_type_t code_object_type,
-     hsa_code_object_t *code_object);
+#define FN(res, name, args) res (*name ## _fn) args;
+#include "hsa-fns.def"
+#undef FN
 };
 
 /* HSA runtime functions that are initialized in init_hsa_context.  */
@@ -463,10 +393,12 @@ struct hsa_context_info
 
 static struct hsa_context_info hsa_context;
 
-#define DLSYM_FN(function) \
-  hsa_fns.function##_fn = dlsym (handle, #function); \
-  if (hsa_fns.function##_fn == NULL) \
-    goto dl_fail;
+#define DLSYM_FN(function)				\
+  do {							\
+    hsa_fns.function##_fn = dlsym (handle, #function);	\
+    if (hsa_fns.function##_fn == NULL)			\
+      goto dl_fail;					\
+  } while (0)
 
 static bool
 init_hsa_runtime_functions (void)
@@ -475,35 +407,13 @@ init_hsa_runtime_functions (void)
   if (handle == NULL)
     goto dl_fail;
 
-  DLSYM_FN (hsa_status_string)
-  DLSYM_FN (hsa_agent_get_info)
-  DLSYM_FN (hsa_init)
-  DLSYM_FN (hsa_iterate_agents)
-  DLSYM_FN (hsa_region_get_info)
-  DLSYM_FN (hsa_queue_create)
-  DLSYM_FN (hsa_agent_iterate_regions)
-  DLSYM_FN (hsa_executable_destroy)
-  DLSYM_FN (hsa_executable_create)
-  DLSYM_FN (hsa_executable_global_variable_define)
-  DLSYM_FN (hsa_executable_load_code_object)
-  DLSYM_FN (hsa_executable_freeze)
-  DLSYM_FN (hsa_signal_create)
-  DLSYM_FN (hsa_memory_allocate)
-  DLSYM_FN (hsa_memory_free)
-  DLSYM_FN (hsa_signal_destroy)
-  DLSYM_FN (hsa_executable_get_symbol)
-  DLSYM_FN (hsa_executable_symbol_get_info)
-  DLSYM_FN (hsa_queue_add_write_index_release)
-  DLSYM_FN (hsa_queue_load_read_index_acquire)
-  DLSYM_FN (hsa_signal_wait_acquire)
-  DLSYM_FN (hsa_signal_store_relaxed)
-  DLSYM_FN (hsa_signal_store_release)
-  DLSYM_FN (hsa_signal_load_acquire)
-  DLSYM_FN (hsa_queue_destroy)
-  DLSYM_FN (hsa_ext_program_add_module)
-  DLSYM_FN (hsa_ext_program_create)
-  DLSYM_FN (hsa_ext_program_destroy)
-  DLSYM_FN (hsa_ext_program_finalize)
+#define FN(res, name, args)				\
+  hsa_fns.name ## _fn = dlsym (handle, #name);		\
+  if (hsa_fns.name ## _fn == NULL)			\
+    goto dl_fail;
+#include "hsa-fns.def"
+#undef FN
+
   return true;
 
  dl_fail:
