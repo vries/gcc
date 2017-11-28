@@ -740,13 +740,25 @@ static __inline vec_int4 spu_gencx(vec_int4 a, vec_int4 b, vec_int4 c)
 /* spu_hcmpeq
  * ========
  */
-#define spu_hcmpeq(_a, _b)	if (_a == _b) { SPU_HALT_ACTION; };
+#define spu_hcmpeq(_a, _b)			\
+  do {						\
+    if (_a == _b)				\
+      {						\
+	SPU_HALT_ACTION;			\
+      }						\
+  } while (0)
 
 
 /* spu_hcmpgt
  * ========
  */
-#define spu_hcmpgt(_a, _b)	if (_a > _b) { SPU_HALT_ACTION; };
+#define spu_hcmpgt(_a, _b)			\
+  do {						\
+    if (_a > _b)				\
+      {						\
+	SPU_HALT_ACTION;			\
+      }						\
+  } while (0)
 
 
 /* spu_idisable
