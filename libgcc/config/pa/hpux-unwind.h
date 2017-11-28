@@ -56,21 +56,33 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
    : (long) &((ssp)->ss_narrow.ss_reg))
 #endif
 
-#define UPDATE_FS_FOR_SAR(FS, N) \
-  (FS)->regs.reg[N].how = REG_SAVED_OFFSET;				\
-  (FS)->regs.reg[N].loc.offset = GetSSRegAddr (mc, ss_cr11) - new_cfa
+#define UPDATE_FS_FOR_SAR(FS, N)		\
+  do {						\
+    (FS)->regs.reg[N].how = REG_SAVED_OFFSET;	\
+    (FS)->regs.reg[N].loc.offset		\
+      = GetSSRegAddr (mc, ss_cr11) - new_cfa;	\
+  } while (0)
 
-#define UPDATE_FS_FOR_GR(FS, GRN, N) \
-  (FS)->regs.reg[N].how = REG_SAVED_OFFSET;				\
-  (FS)->regs.reg[N].loc.offset = GetSSRegAddr (mc, ss_gr##GRN) - new_cfa
+#define UPDATE_FS_FOR_GR(FS, GRN, N)			\
+  do {							\
+    (FS)->regs.reg[N].how = REG_SAVED_OFFSET;		\
+    (FS)->regs.reg[N].loc.offset			\
+      = GetSSRegAddr (mc, ss_gr##GRN) - new_cfa;	\
+  } while (0)
 
-#define UPDATE_FS_FOR_FR(FS, FRN, N) \
-  (FS)->regs.reg[N].how = REG_SAVED_OFFSET;				\
-  (FS)->regs.reg[N].loc.offset = (long) &(mc->ss_fr##FRN) - new_cfa;
+#define UPDATE_FS_FOR_FR(FS, FRN, N)		\
+  do {						\
+    (FS)->regs.reg[N].how = REG_SAVED_OFFSET;	\
+    (FS)->regs.reg[N].loc.offset		\
+      = (long) &(mc->ss_fr##FRN) - new_cfa;	\
+  } while (0)
 
-#define UPDATE_FS_FOR_PC(FS, N) \
-  (FS)->regs.reg[N].how = REG_SAVED_OFFSET;				\
-  (FS)->regs.reg[N].loc.offset = GetSSRegAddr (mc, ss_pcoq_head) - new_cfa
+#define UPDATE_FS_FOR_PC(FS, N)				\
+  do {							\
+    (FS)->regs.reg[N].how = REG_SAVED_OFFSET;		\
+    (FS)->regs.reg[N].loc.offset			\
+      = GetSSRegAddr (mc, ss_pcoq_head) - new_cfa;	\
+  } while (0)
 
 /* Extract bit field from word using HP's numbering (MSB = 0).  */
 #define GET_FIELD(X, FROM, TO) \
