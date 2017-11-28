@@ -3186,13 +3186,18 @@ static void internal_malloc_stats(mstate m) {
 
 #if ONLY_MSPACES
 #define internal_malloc(m, b) mspace_malloc(m, b)
-#define internal_free(m, mem) mspace_free(m,mem);
+#define internal_free(m, mem) mspace_free(m,mem)
 #else /* ONLY_MSPACES */
 #if MSPACES
 #define internal_malloc(m, b)\
    (m == gm)? dlmalloc(b) : mspace_malloc(m, b)
-#define internal_free(m, mem)\
-   if (m == gm) dlfree(mem); else mspace_free(m,mem);
+#define internal_free(m, mem)			\
+  do {						\
+    if (m == gm)				\
+      dlfree(mem);				\
+    else					\
+      mspace_free(m,mem);			\
+  } while (0)
 #else /* MSPACES */
 #define internal_malloc(m, b) dlmalloc(b)
 #define internal_free(m, mem) dlfree(mem)
@@ -3881,9 +3886,8 @@ static void* internal_realloc(mstate m, void* oldmem, size_t bytes) {
     POSTACTION(m);
 
     if (newp != 0) {
-      if (extra != 0) {
+      if (extra != 0)
         internal_free(m, extra);
-      }
       check_inuse_chunk(m, newp);
       return chunk2mem(newp);
     }
@@ -3975,12 +3979,10 @@ static void* internal_memalign(mstate m, size_t alignment, size_t bytes) {
       assert((((size_t)(chunk2mem(p))) % alignment) == 0);
       check_inuse_chunk(m, p);
       POSTACTION(m);
-      if (leader != 0) {
+      if (leader != 0)
         internal_free(m, leader);
-      }
-      if (trailer != 0) {
+      if (trailer != 0)
         internal_free(m, trailer);
-      }
       return chunk2mem(p);
     }
   }
