@@ -296,6 +296,7 @@ GOMP_4.5 {
 	GOMP_loop_ull_nonmonotonic_guided_start;
 	GOMP_parallel_loop_nonmonotonic_dynamic;
 	GOMP_parallel_loop_nonmonotonic_guided;
+	GOMP_enable_offload_targets;
 } GOMP_4.0.1;
 
 OACC_2.0 {
