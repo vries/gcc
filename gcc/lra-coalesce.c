@@ -231,6 +231,7 @@ lra_coalesce (void)
   
   timevar_push (TV_LRA_COALESCE);
 
+  lra_dump_bump ("lra_coalesce");
   if (lra_dump_file != NULL)
     fprintf (lra_dump_file,
 	     "\n********** Pseudos coalescing #%d: **********\n\n",

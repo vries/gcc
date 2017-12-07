@@ -523,4 +523,5 @@ lra_assign_reg_val (int from, int to)
   lra_reg_info[to].offset = lra_reg_info[from].offset;
 }
 
+extern void lra_dump_bump (const char * = NULL);
 #endif /* GCC_LRA_INT_H */

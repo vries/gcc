@@ -4646,6 +4646,7 @@ lra_constraints (bool first_p)
   bitmap_iterator bi;
 
   lra_constraint_iter++;
+  lra_dump_bump ("lra_constraints");
   if (lra_dump_file != NULL)
     fprintf (lra_dump_file, "\n********** Local #%d: **********\n\n",
 	     lra_constraint_iter);
@@ -6449,6 +6450,7 @@ lra_inheritance (void)
   basic_block bb, start_bb;
   edge e;
 
+  lra_dump_bump ("lra_inheritance");
   lra_inheritance_iter++;
   if (lra_inheritance_iter > LRA_MAX_INHERITANCE_PASSES)
     return;
@@ -6903,6 +6905,7 @@ lra_undo_inheritance (void)
   lra_undo_inheritance_iter++;
   if (lra_undo_inheritance_iter > LRA_MAX_INHERITANCE_PASSES)
     return false;
+  lra_dump_bump ("lra_undo_inheritance");
   if (lra_dump_file != NULL)
     fprintf (lra_dump_file,
 	     "\n********** Undoing inheritance #%d: **********\n\n",

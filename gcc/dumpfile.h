@@ -149,6 +149,9 @@ struct dump_file_info
   int alt_state;
   /* Dump file number.  */
   int num;
+  int bump;
+  int save_bump;
+  const char *bump_name;
   /* Fields "suffix", "swtch", "glob" can be const strings,
      or can be dynamically allocated, needing free.  */
   bool owns_strings;
@@ -159,6 +162,8 @@ struct dump_file_info
 
 /* In dumpfile.c */
 extern FILE *dump_begin (int, dump_flags_t *);
+extern FILE *dump_bump (int, const char * = NULL);
+extern FILE *reset_dump_bump (int);
 extern void dump_end (int, FILE *);
 extern int opt_info_switch_p (const char *);
 extern const char *dump_flag_name (int);
@@ -244,7 +249,13 @@ public:
   int
   dump_start (int phase, dump_flags_t *flag_ptr);
 
-  /* Finish a tree dump for PHASE and close associated dump streams.  Also
+  FILE *
+  dump_bump (int phase, const char *);
+
+  FILE *
+  reset_dump_bump (int);
+
+/* Finish a tree dump for PHASE and close associated dump streams.  Also
      reset the globals DUMP_FILE, ALT_DUMP_FILE, and DUMP_FLAGS.  */
   void
   dump_finish (int phase);

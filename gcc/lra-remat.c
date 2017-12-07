@@ -1306,6 +1306,7 @@ lra_remat (void)
   lra_rematerialization_iter++;
   if (lra_rematerialization_iter > LRA_MAX_REMATERIALIZATION_PASSES)
     return false;
+  lra_dump_bump ("lra_remat");
   if (lra_dump_file != NULL)
     fprintf (lra_dump_file,
 	     "\n******** Rematerialization #%d: ********\n\n",

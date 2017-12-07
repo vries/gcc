@@ -5416,7 +5416,7 @@ do_reload (void)
   bool need_dce;
   unsigned pic_offset_table_regno = INVALID_REGNUM;
 
-  if (flag_ira_verbose < 10)
+  if (flag_lra_split_dump || flag_ira_verbose < 10)
     ira_dump_file = dump_file;
 
   /* If pic_offset_table_rtx is a pseudo register, then keep it so

@@ -1624,6 +1624,7 @@ lra_assign (void)
   bool no_spills_p;
   int max_regno = max_reg_num ();
 
+  lra_dump_bump ("lra_assign");
   timevar_push (TV_LRA_ASSIGN);
   lra_assignment_iter++;
   if (lra_dump_file != NULL)

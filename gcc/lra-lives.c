@@ -1377,6 +1377,7 @@ lra_create_live_ranges_1 (bool all_p, bool dead_insn_p)
 void
 lra_create_live_ranges (bool all_p, bool dead_insn_p)
 {
+  lra_dump_bump ("lra_create_live_ranges");
   if (! lra_create_live_ranges_1 (all_p, dead_insn_p))
     return;
   if (lra_dump_file != NULL)

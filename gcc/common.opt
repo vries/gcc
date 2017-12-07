@@ -1798,6 +1798,9 @@ flra-remat
 Common Report Var(flag_lra_remat) Optimization
 Do CFG-sensitive rematerialization in LRA.
 
+flra-split-dump
+Common Report Var(flag_lra_split_dump)
+
 flto
 Common
 Enable link-time optimization.

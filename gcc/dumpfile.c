@@ -51,7 +51,7 @@ dump_flags_t dump_flags;
 
 #define DUMP_FILE_INFO(suffix, swtch, dkind, num) \
   {suffix, swtch, NULL, NULL, NULL, NULL, NULL, dkind, 0, 0, 0, 0, 0, num, \
-   false, false}
+   0, 0, NULL, false, false}
 
 /* Table of tree dump switches. This must be consistent with the
    TREE_DUMP_INDEX enumeration in dumpfile.h.  */
@@ -287,7 +287,14 @@ char *
 gcc::dump_manager::
 get_dump_file_name (struct dump_file_info *dfi) const
 {
-  char dump_id[10];
+  char dump_id[1   /* '.' */
+	       + 7 /* '%03d' */
+	       + 1 /* '[tir]' */
+	       + 1 /* '\0' */];
+
+  char bump_id[1   /* '.' */
+	       + 7 /* '%03d' */
+	       + 1 /* '\0' */];
 
   gcc_assert (dfi);
 
@@ -305,11 +312,24 @@ get_dump_file_name (struct dump_file_info *dfi) const
       /* (null), LANG, TREE, RTL, IPA.  */
       char suffix = " ltri"[dfi->dkind];
       
+      if (dfi->bump > 0)
+	{
+	  if (snprintf (bump_id, sizeof (bump_id), ".%03d", dfi->bump) < 0)
+	    bump_id[0] = '\0';
+	}
+
       if (snprintf (dump_id, sizeof (dump_id), ".%03d%c", dfi->num, suffix) < 0)
 	dump_id[0] = '\0';
     }
 
-  return concat (dump_base_name, dump_id, dfi->suffix, NULL);
+  if (dfi->bump_name)
+    return concat (dump_base_name, dump_id, dfi->suffix, bump_id, "." ,
+		   dfi->bump_name, NULL);
+
+  if (dfi->bump > 0)
+    return concat (dump_base_name, dump_id, dfi->suffix, bump_id, NULL);
+
+ return concat (dump_base_name, dump_id, dfi->suffix, NULL);
 }
 
 /* For a given DFI, open an alternate dump filename (which could also
@@ -494,11 +514,12 @@ dump_start (int phase, dump_flags_t *flag_ptr)
   name = get_dump_file_name (phase);
   if (name)
     {
-      stream = strcmp ("stderr", name) == 0
-          ? stderr
-          : strcmp ("stdout", name) == 0
-          ? stdout
-          : fopen (name, dfi->pstate < 0 ? "w" : "a");
+      stream
+	= (strcmp ("stderr", name) == 0
+	   ? stderr
+	   : strcmp ("stdout", name) == 0
+	   ? stdout
+	   : fopen (name, (dfi->pstate < 0 || dfi->bump) ? "w" : "a"));
       if (!stream)
         error ("could not open dump file %qs: %m", name);
       else
@@ -527,6 +548,42 @@ dump_start (int phase, dump_flags_t *flag_ptr)
     *flag_ptr = dfi->pflags;
 
   return count;
+}
+
+FILE *
+gcc::dump_manager::dump_bump (int phase, const char *bump_name)
+{
+  struct dump_file_info *dfi;
+  if (phase == TDI_none || !dump_phase_enabled_p (phase))
+    return 0;
+
+  dfi = get_dump_file_info (phase);
+  dump_finish (phase);
+  if (dfi->save_bump)
+    {
+      dfi->bump = dfi->save_bump;
+      dfi->save_bump = 0;
+    }
+  dfi->bump++;
+  dfi->bump_name = bump_name;
+  dump_start (phase, NULL);
+  return dfi->pstream;
+}
+
+FILE *
+gcc::dump_manager::reset_dump_bump (int phase)
+{
+  struct dump_file_info *dfi;
+  if (phase == TDI_none || !dump_phase_enabled_p (phase))
+    return 0;
+
+  dfi = get_dump_file_info (phase);
+  dump_finish (phase);
+  dfi->save_bump = dfi->bump;
+  dfi->bump = 0;
+  dfi->bump_name = NULL;
+  dump_start (phase, NULL);
+  return dfi->pstream;
 }
 
 /* Finish a tree dump for PHASE and close associated dump streams.  Also
@@ -568,6 +625,18 @@ FILE *
 dump_begin (int phase, dump_flags_t *flag_ptr)
 {
   return g->get_dumps ()->dump_begin (phase, flag_ptr);
+}
+
+FILE *
+dump_bump (int phase, const char *bump_name)
+{
+  return g->get_dumps ()->dump_bump (phase, bump_name);
+}
+
+FILE *
+reset_dump_bump (int phase)
+{
+  return g->get_dumps ()->reset_dump_bump (phase);
 }
 
 FILE *

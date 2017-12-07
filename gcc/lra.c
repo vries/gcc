@@ -121,6 +121,48 @@ along with GCC; see the file COPYING3.	If not see
 #include "lra.h"
 #include "lra-int.h"
 #include "print-rtl.h"
+#include "tree-pass.h"
+#include "tree-cfg.h"
+
+static bool first_bump;
+
+static void
+lra_dump_bump_start (void)
+{
+  if (!flag_lra_split_dump)
+    return;
+
+  first_bump = true;
+}
+
+void
+lra_dump_bump (const char *bump_name)
+{
+  if (!flag_lra_split_dump)
+    return;
+
+  if (first_bump)
+    first_bump = false;
+  else
+    {
+      fprintf (lra_dump_file, "\nlra subpass result:\n");
+      print_rtl_with_bb (lra_dump_file, get_insns (), dump_flags);
+    }
+
+  lra_dump_file = dump_bump (current_pass->static_pass_number, bump_name);
+}
+
+static void
+lra_reset_dump_bump (void)
+{
+  if (!flag_lra_split_dump)
+    return;
+
+  fprintf (lra_dump_file, "\nlra subpass result:\n");
+  print_rtl_with_bb (lra_dump_file, get_insns (), dump_flags);
+
+  lra_dump_file = reset_dump_bump (current_pass->static_pass_number);
+}
 
 /* Dump bitmap SET with TITLE and BB INDEX.  */
 void
@@ -2048,6 +2090,8 @@ remove_scratches (void)
   lra_insn_recog_data_t id;
   struct lra_static_insn_data *static_id;
 
+  lra_dump_bump ("remove_scratches");
+
   scratches.create (get_max_uid ());
   bitmap_initialize (&scratch_bitmap, &reg_obstack);
   bitmap_initialize (&scratch_operand_bitmap, &reg_obstack);
@@ -2335,6 +2379,7 @@ lra (FILE *f)
   bool live_p, inserted_p;
 
   lra_dump_file = f;
+  lra_dump_bump_start ();
 
   timevar_push (TV_LRA);
 
@@ -2525,6 +2570,7 @@ lra (FILE *f)
 	lra_bad_spill_regno_start = lra_constraint_new_regno_start;
       lra_assignment_iter_after_spill = 0;
     }
+  lra_dump_bump ("lra_finishing");
   restore_scratches ();
   lra_eliminate (true, false);
   lra_final_code_change ();
@@ -2564,6 +2610,7 @@ lra (FILE *f)
     check_rtl (true);
 
   timevar_pop (TV_LRA);
+  lra_reset_dump_bump ();
 }
 
 /* Called once per compiler to initialize LRA data once.  */

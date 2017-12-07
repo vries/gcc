@@ -548,6 +548,7 @@ lra_spill (void)
   int i, n, curr_regno;
   int *pseudo_regnos;
 
+  lra_dump_bump ("lra_spill");
   regs_num = max_reg_num ();
   spill_hard_reg = XNEWVEC (rtx, regs_num);
   pseudo_regnos = XNEWVEC (int, regs_num);
