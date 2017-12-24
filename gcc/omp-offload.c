@@ -52,6 +52,8 @@ along with GCC; see the file COPYING3.  If not see
 #include "stringpool.h"
 #include "attribs.h"
 #include "cfgloop.h"
+#include "gimple-fold.h"
+#include "tree-ssa-propagate.h"
 
 /* Describe the OpenACC looping structure of a function.  The entire
    function is held in a 'NULL' loop.  */
@@ -1451,6 +1453,116 @@ default_goacc_reduction (gcall *call)
   gsi_replace_with_seq (&gsi, seq, true);
 }
 
+/* Fold a call to __builtin_acc_on_device with constant argument.
+   The openacc standard states: if the acc_on_device routine has a
+   compile-time constant argument, it evaluates at compile time to a
+   constant.  The purpose of this is to remove non-applicable device-specific
+   code during compilation.  In the case of asm insns which are
+   device-specific, removal is even needed to be able to compile for host.  */
+
+static bool
+fold_builtin_acc_on_device_cst_arg (gimple_stmt_iterator *gsi, tree arg0)
+{
+  if (TREE_CODE (arg0) != INTEGER_CST)
+    return false;
+  HOST_WIDE_INT val = tree_to_shwi (arg0);
+
+  unsigned val_host, val_dev;
+#ifdef ACCEL_COMPILER
+  val_host = GOMP_DEVICE_NOT_HOST;
+  val_dev = ACCEL_COMPILER_acc_device;
+#else
+  val_host = GOMP_DEVICE_HOST;
+  val_dev = GOMP_DEVICE_NONE;
+#endif
+  bool res = val == val_host || val == val_dev;
+
+  tree replacement = res ? integer_one_node : integer_zero_node;
+
+  /* Propagate the acc_on_device result to its uses.  If it's propagated to a
+     condition, then TODO_cleanup_cfg will eliminate the dead code.  */
+  gimple *stmt = gsi_stmt (*gsi);
+  tree lhs = gimple_call_lhs (stmt);
+  imm_use_iterator iter;
+  gimple *use_stmt;
+  use_operand_p use_p;
+  FOR_EACH_IMM_USE_STMT (use_stmt, iter, lhs)
+    {
+      FOR_EACH_IMM_USE_ON_STMT (use_p, iter)
+	propagate_value (use_p, replacement);
+
+      update_stmt (use_stmt);
+    }
+
+  replace_call_with_value (gsi, replacement);
+  return true;
+}
+
+/* Do oacc transformations for acc_on_device calls.  */
+
+static void
+oacc_xform_acc_on_device (gimple_stmt_iterator *gsi)
+{
+  gimple *stmt = gsi_stmt (*gsi);
+  gcall *call = as_a <gcall *> (stmt);
+
+  /* Kludge: The openacc standard declares a function
+     'int acc_on_device (acc_device_t)', but we have a builtin
+     'int __builtin_acc_on_device (int)'.  When compiling for c++, these are
+     distinct functions, so here we map the former onto the latter.  */
+  tree acc_on_device_id = get_identifier ("acc_on_device");
+  tree acc_device_t_id = get_identifier ("acc_device_t");
+  tree fndecl = gimple_call_fndecl (call);
+  if (fndecl)
+    {
+      tree fntype = TREE_TYPE (fndecl);
+      tree fnrettype = TREE_TYPE (fntype);
+      tree fnargstypes = TYPE_ARG_TYPES (fntype);
+      tree fnargtype = (fnargstypes != NULL_TREE
+			? TREE_VALUE (fnargstypes)
+			: NULL_TREE);
+      bool one_arg = (fnargtype != NULL_TREE
+		      && TREE_CHAIN (fnargstypes) != NULL_TREE
+		      && VOID_TYPE_P (TREE_VALUE (TREE_CHAIN (fnargstypes))));
+      if (DECL_NAME (fndecl) == acc_on_device_id
+	  && fnrettype == integer_type_node
+	  && one_arg
+	  && TREE_CODE (fnargtype) == ENUMERAL_TYPE
+	  && TYPE_IDENTIFIER (fnargtype) == acc_device_t_id)
+	{
+	  tree builtin_fndecl
+	    = builtin_decl_explicit (BUILT_IN_ACC_ON_DEVICE);
+	  gimple_call_set_fndecl (call, builtin_fndecl);
+	}
+    }
+
+  if (gimple_call_builtin_p (call, BUILT_IN_NORMAL))
+    {
+      enum built_in_function fcode
+	= DECL_FUNCTION_CODE (gimple_call_fndecl (call));
+      if (fcode == BUILT_IN_ACC_ON_DEVICE)
+	fold_builtin_acc_on_device_cst_arg (gsi, gimple_call_arg (stmt, 0));
+    }
+}
+
+/* Do oacc transformations for the host fallback.  */
+
+static void
+oacc_device_lower_non_offloaded (void)
+{
+  basic_block bb;
+  FOR_ALL_BB_FN (bb, cfun)
+    for (gimple_stmt_iterator gsi = gsi_start_bb (bb); !gsi_end_p (gsi);
+	 gsi_next (&gsi))
+      {
+	gimple *stmt = gsi_stmt (gsi);
+	if (!is_gimple_call (stmt))
+	  continue;
+
+	oacc_xform_acc_on_device (&gsi);
+      }
+}
+
 /* Main entry point for oacc transformations which run on the device
    compiler after LTO, so we know what the target device is at this
    point (including the host fallback).  */
@@ -1461,8 +1573,11 @@ execute_oacc_device_lower ()
   tree attrs = oacc_get_fn_attrib (current_function_decl);
 
   if (!attrs)
-    /* Not an offloaded function.  */
-    return 0;
+    {
+      /* Not an offloaded function.  */
+      oacc_device_lower_non_offloaded ();
+      return 0;
+    }
 
   /* Parse the default dim argument exactly once.  */
   if ((const void *)flag_openacc_dims != &flag_openacc_dims)
@@ -1550,6 +1665,8 @@ execute_oacc_device_lower ()
 	    gsi_next (&gsi);
 	    continue;
 	  }
+
+	oacc_xform_acc_on_device (&gsi);
 
 	gcall *call = as_a <gcall *> (stmt);
 	if (!gimple_call_internal_p (call))

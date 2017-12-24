@@ -82,9 +82,7 @@ void acc_async_wait_all (void) __GOACC_NOTHROW;
 void acc_wait_all_async (int) __GOACC_NOTHROW;
 void acc_init (acc_device_t) __GOACC_NOTHROW;
 void acc_shutdown (acc_device_t) __GOACC_NOTHROW;
-#ifdef __cplusplus
-int acc_on_device (int __arg) __GOACC_NOTHROW;
-#else
+#ifndef __cplusplus
 int acc_on_device (acc_device_t __arg) __GOACC_NOTHROW;
 #endif
 void *acc_malloc (size_t) __GOACC_NOTHROW;
@@ -117,14 +115,8 @@ int acc_set_cuda_stream (int, void *) __GOACC_NOTHROW;
 
 #ifdef __cplusplus
 }
-
-/* Forwarding function with correctly typed arg.  */
-
-#pragma acc routine seq
-inline int acc_on_device (acc_device_t __arg) __GOACC_NOTHROW
-{
-  return acc_on_device ((int) __arg);
-}
+int acc_on_device (acc_device_t __arg) __GOACC_NOTHROW __attribute__((const))
+  __attribute__((leaf));
 #endif
 
 #endif /* _OPENACC_H */

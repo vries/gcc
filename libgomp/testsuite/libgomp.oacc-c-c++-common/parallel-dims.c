@@ -4,14 +4,12 @@
 #include <limits.h>
 #include <openacc.h>
 
-/* TODO: "(int) acc_device_*" casts because of the C++ acc_on_device wrapper
-   not behaving as expected for -O0.  */
 #pragma acc routine seq
 static unsigned int __attribute__ ((optimize ("O2"))) acc_gang ()
 {
-  if (acc_on_device ((int) acc_device_host))
+  if (acc_on_device (acc_device_host))
     return 0;
-  else if (acc_on_device ((int) acc_device_nvidia))
+  else if (acc_on_device (acc_device_nvidia))
     {
       unsigned int r;
       asm volatile ("mov.u32 %0,%%ctaid.x;" : "=r" (r));
@@ -24,9 +22,9 @@ static unsigned int __attribute__ ((optimize ("O2"))) acc_gang ()
 #pragma acc routine seq
 static unsigned int __attribute__ ((optimize ("O2"))) acc_worker ()
 {
-  if (acc_on_device ((int) acc_device_host))
+  if (acc_on_device (acc_device_host))
     return 0;
-  else if (acc_on_device ((int) acc_device_nvidia))
+  else if (acc_on_device (acc_device_nvidia))
     {
       unsigned int r;
       asm volatile ("mov.u32 %0,%%tid.y;" : "=r" (r));
@@ -39,9 +37,9 @@ static unsigned int __attribute__ ((optimize ("O2"))) acc_worker ()
 #pragma acc routine seq
 static unsigned int __attribute__ ((optimize ("O2"))) acc_vector ()
 {
-  if (acc_on_device ((int) acc_device_host))
+  if (acc_on_device (acc_device_host))
     return 0;
-  else if (acc_on_device ((int) acc_device_nvidia))
+  else if (acc_on_device (acc_device_nvidia))
     {
       unsigned int r;
       asm volatile ("mov.u32 %0,%%tid.x;" : "=r" (r));
