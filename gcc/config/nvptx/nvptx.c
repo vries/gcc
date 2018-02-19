@@ -2820,6 +2820,9 @@ struct parallel
   /* Next sibling parallel.  */
   parallel *next;
 
+  /* Next sibling parallel.  */
+  parallel *prev;
+
   /* First child parallel.  */
   parallel *inner;
 
@@ -2855,7 +2858,7 @@ public:
    children.  */
 
 parallel::parallel (parallel *parent_, unsigned mask_)
-  :parent (parent_), next (0), inner (0), mask (mask_), inner_mask (0)
+  :parent (parent_), next (0), prev (0), inner (0), mask (mask_), inner_mask (0)
 {
   forked_block = join_block = 0;
   forked_insn = join_insn = 0;
@@ -3078,6 +3081,20 @@ nvptx_find_par (bb_insn_map_t *map, parallel *par, basic_block block)
   return par;
 }
 
+static void
+nvptx_finalize_par (parallel *par)
+{
+  if (!par)
+    return;
+
+  nvptx_finalize_par (par->inner);
+
+  if (par->next)
+    par->next->prev = par;
+
+  nvptx_finalize_par (par->next);
+}
+
 /* DFS walk the CFG looking for fork & join markers.  Construct
    loop structures as we go.  MAP is a mapping of basic blocks
    to head & tail markers, discovered when splitting blocks.  This
@@ -3098,6 +3115,7 @@ nvptx_discover_pars (bb_insn_map_t *map)
   block->flags &= ~BB_VISITED;
 
   parallel *par = nvptx_find_par (map, 0, block);
+  nvptx_finalize_par (par);
 
   if (dump_file)
     {
@@ -4301,7 +4319,30 @@ nvptx_process_pars (parallel *par)
 	}
     }
   else if (par->mask & GOMP_DIM_MASK (GOMP_DIM_VECTOR))
-    nvptx_vpropagate (is_call, par->forked_block, par->forked_insn);
+    {
+      rtx_insn *note = NULL;
+      rtx_insn *fork = NULL;
+      bool need_prop = true;
+      parallel *a = par->next;
+      parallel *b = par;
+      if (a && b
+	  && b->forked_insn
+	  && PREV_INSN (b->forked_insn)
+	  && NOTE_INSN_BASIC_BLOCK_P (PREV_INSN (b->forked_insn)))
+	note = PREV_INSN (b->forked_insn);
+      if (note
+	  && PREV_INSN (note)
+	  && INSN_P (PREV_INSN (note))
+	  && recog_memoized (PREV_INSN (note)) == CODE_FOR_nvptx_fork)
+	fork = PREV_INSN (note);
+      if (fork
+	  && PREV_INSN (fork)
+	  && PREV_INSN (fork) == a->join_insn)
+	need_prop = false;
+
+      if (need_prop)
+	nvptx_vpropagate (is_call, par->forked_block, par->forked_insn);
+    }
 
   /* Now do siblings.  */
   if (par->next)
