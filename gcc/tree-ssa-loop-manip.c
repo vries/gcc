@@ -1430,79 +1430,99 @@ tree_unroll_loop (struct loop *loop, unsigned factor,
    induction variable MAIN_IV and insert the generated code at GSI.  */
 
 static void
-rewrite_phi_with_iv (loop_p loop,
-		     gphi_iterator *psi,
+rewrite_phi_with_iv (gphi_iterator *psi,
 		     gimple_stmt_iterator *gsi,
-		     tree main_iv)
+		     tree main_iv, affine_iv *iv)
 {
-  affine_iv iv;
   gassign *stmt;
   gphi *phi = psi->phi ();
   tree atype, mtype, val, res = PHI_RESULT (phi);
-
-  if (virtual_operand_p (res) || res == main_iv)
-    {
-      gsi_next (psi);
-      return;
-    }
-
-  if (!simple_iv (loop, loop, res, &iv, true))
-    {
-      gsi_next (psi);
-      return;
-    }
 
   remove_phi_node (psi, false);
 
   atype = TREE_TYPE (res);
   mtype = POINTER_TYPE_P (atype) ? sizetype : atype;
-  val = fold_build2 (MULT_EXPR, mtype, unshare_expr (iv.step),
+  val = fold_build2 (MULT_EXPR, mtype, unshare_expr (iv->step),
 		     fold_convert (mtype, main_iv));
   val = fold_build2 (POINTER_TYPE_P (atype)
 		     ? POINTER_PLUS_EXPR : PLUS_EXPR,
-		     atype, unshare_expr (iv.base), val);
+		     atype, unshare_expr (iv->base), val);
   val = force_gimple_operand_gsi (gsi, val, false, NULL_TREE, true,
 				  GSI_SAME_STMT);
   stmt = gimple_build_assign (res, val);
   gsi_insert_before (gsi, stmt, GSI_SAME_STMT);
 }
 
-/* Rewrite all the phi nodes of LOOP in function of the main induction
-   variable MAIN_IV.  */
+struct phi_affine_iv
+{
+  gphi *phi;
+  affine_iv iv;
+};
+
+/* Return map of phi node result to affine_iv, for all phis in LOOPS.  */
 
 static void
-rewrite_all_phi_nodes_with_iv (loop_p loop, tree main_iv)
+get_all_phi_affine_ivs (struct loop *loop,
+			auto_vec<struct phi_affine_iv> *simple_ivs)
 {
-  unsigned i;
   basic_block *bbs = get_loop_body_in_dom_order (loop);
-  gphi_iterator psi;
 
-  for (i = 0; i < loop->num_nodes; i++)
+  for (unsigned i = 0; i < loop->num_nodes; i++)
     {
       basic_block bb = bbs[i];
-      gimple_stmt_iterator gsi = gsi_after_labels (bb);
-
       if (bb->loop_father != loop)
 	continue;
 
-      for (psi = gsi_start_phis (bb); !gsi_end_p (psi); )
-	rewrite_phi_with_iv (loop, &psi, &gsi, main_iv);
+      for (gphi_iterator psi = gsi_start_phis (bb); !gsi_end_p (psi);
+	   gsi_next (&psi))
+	{
+	  gphi *phi = psi.phi ();
+	  tree res = PHI_RESULT (phi);
+	  if (virtual_operand_p (res))
+	    continue;
+
+	  affine_iv iv;
+	  if (!simple_iv (loop, loop, res, &iv, true))
+	    continue;
+
+	  struct phi_affine_iv elem;
+	  elem.phi = phi;
+	  elem.iv = iv;
+	  simple_ivs->safe_push (elem);
+	}
     }
 
   free (bbs);
 }
 
-/* Bases all the induction variables in LOOP on a single induction variable
-   (with base 0 and step 1), whose final value is compared with *NIT.  When the
-   IV type precision has to be larger than *NIT type precision, *NIT is
-   converted to the larger type, the conversion code is inserted before the
-   loop, and *NIT is updated to the new definition.  When BUMP_IN_LATCH is true,
-   the induction variable is incremented in the loop latch, otherwise it is
-   incremented in the loop header.  Return the induction variable that was
-   created.  */
+/* Rewrite all the phi nodes in SIMPLE_IVS in function of the main induction
+   variable MAIN_IV.  */
+
+static void
+rewrite_all_phi_nodes_with_iv (tree main_iv,
+			       auto_vec<struct phi_affine_iv> *simple_ivs)
+{
+  gimple_stmt_iterator gsi;
+  unsigned i;
+  struct phi_affine_iv *elem;
+
+  FOR_EACH_VEC_ELT (*simple_ivs, i, elem)
+    {
+      gphi *phi = elem->phi;
+      basic_block phi_bb = gimple_bb (phi);
+      if (i == 0 || gsi_bb (gsi) != phi_bb)
+	gsi = gsi_after_labels (phi_bb);
+      gphi_iterator psi = gsi_for_phi (phi);
+      rewrite_phi_with_iv (&psi, &gsi, main_iv, &elem->iv);
+    }
+}
+
+/* As canonicalize_loop_ivs, but with SIMPLE_IVS containing the phis that need
+   rewriting.  */
 
 tree
-canonicalize_loop_ivs (struct loop *loop, tree *nit, bool bump_in_latch)
+canonicalize_loop_ivs_1 (struct loop *loop, tree *nit, bool bump_in_latch,
+			 auto_vec<struct phi_affine_iv> *simple_ivs)
 {
   unsigned precision = TYPE_PRECISION (TREE_TYPE (*nit));
   unsigned original_precision = precision;
@@ -1557,7 +1577,7 @@ canonicalize_loop_ivs (struct loop *loop, tree *nit, bool bump_in_latch)
   create_iv (build_int_cst_type (type, 0), build_int_cst (type, 1), NULL_TREE,
 	     loop, &gsi, bump_in_latch, &var_before, NULL);
 
-  rewrite_all_phi_nodes_with_iv (loop, var_before);
+  rewrite_all_phi_nodes_with_iv (var_before, simple_ivs);
 
   stmt = as_a <gcond *> (last_stmt (exit->src));
   /* Make the loop exit if the control condition is not satisfied.  */
@@ -1575,4 +1595,22 @@ canonicalize_loop_ivs (struct loop *loop, tree *nit, bool bump_in_latch)
   update_stmt (stmt);
 
   return var_before;
+}
+
+/* Bases all the induction variables in LOOP on a single induction variable
+   (with base 0 and step 1), whose final value is compared with *NIT.  When the
+   IV type precision has to be larger than *NIT type precision, *NIT is
+   converted to the larger type, the conversion code is inserted before the
+   loop, and *NIT is updated to the new definition.  When BUMP_IN_LATCH is true,
+   the induction variable is incremented in the loop latch, otherwise it is
+   incremented in the loop header.  Return the induction variable that was
+   created.  */
+
+tree
+canonicalize_loop_ivs (struct loop *loop, tree *nit, bool bump_in_latch)
+{
+  auto_vec<struct phi_affine_iv> simple_ivs;
+  get_all_phi_affine_ivs (loop, &simple_ivs);
+
+  return canonicalize_loop_ivs_1 (loop, nit, bump_in_latch, &simple_ivs);
 }
