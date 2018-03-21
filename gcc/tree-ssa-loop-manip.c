@@ -1453,15 +1453,9 @@ rewrite_phi_with_iv (gphi_iterator *psi,
   gsi_insert_before (gsi, stmt, GSI_SAME_STMT);
 }
 
-struct phi_affine_iv
-{
-  gphi *phi;
-  affine_iv iv;
-};
-
 /* Return map of phi node result to affine_iv, for all phis in LOOPS.  */
 
-static void
+void
 get_all_phi_affine_ivs (struct loop *loop,
 			auto_vec<struct phi_affine_iv> *simple_ivs)
 {

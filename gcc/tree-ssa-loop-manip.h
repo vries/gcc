@@ -19,6 +19,7 @@ along with GCC; see the file COPYING3.  If not see
 
 #ifndef GCC_TREE_SSA_LOOP_MANIP_H
 #define GCC_TREE_SSA_LOOP_MANIP_H
+#include "tree-ssa-loop.h"
 
 typedef void (*transform_callback)(struct loop *, void *);
 
@@ -56,6 +57,15 @@ extern void tree_unroll_loop (struct loop *, unsigned,
 			      edge, struct tree_niter_desc *);
 extern tree canonicalize_loop_ivs (struct loop *, tree *, bool);
 
+struct phi_affine_iv
+{
+  gphi *phi;
+  affine_iv iv;
+};
+extern void get_all_phi_affine_ivs (struct loop *,
+				    auto_vec<struct phi_affine_iv> *);
+extern tree canonicalize_loop_ivs_1 (struct loop *, tree *, bool,
+				     auto_vec<struct phi_affine_iv> *);
 
 
 #endif /* GCC_TREE_SSA_LOOP_MANIP_H */

@@ -2339,6 +2339,9 @@ gen_parallel_loop (struct loop *loop,
     we should compute nit = n * m, not nit = n.  
     Also may_be_zero handling would need to be adjusted.  */
 
+  auto_vec<struct phi_affine_iv> simple_ivs;
+  get_all_phi_affine_ivs (loop, &simple_ivs);
+
   type = TREE_TYPE (niter->niter);
   nit = force_gimple_operand (unshare_expr (niter->niter), &stmts, true,
 			      NULL_TREE);
@@ -2388,27 +2391,9 @@ gen_parallel_loop (struct loop *loop,
     }
 
   /* Base all the induction variables in LOOP on a single control one.  */
-  canonicalize_loop_ivs (loop, &nit, true);
-  if (num_phis (loop->header, false) != reduction_list->elements () + 1)
-    {
-      /* The call to canonicalize_loop_ivs above failed to "base all the
-	 induction variables in LOOP on a single control one".  Do damage
-	 control.  */
-      basic_block preheader = loop_preheader_edge (loop)->src;
-      basic_block cond_bb = single_pred (preheader);
-      gcond *cond = as_a <gcond *> (gsi_stmt (gsi_last_bb (cond_bb)));
-      gimple_cond_make_true (cond);
-      update_stmt (cond);
-      /* We've gotten rid of the duplicate loop created by loop_version, but
-	 we can't undo whatever canonicalize_loop_ivs has done.
-	 TODO: Fix this properly by ensuring that the call to
-	 canonicalize_loop_ivs succeeds.  */
-      if (dump_file
-	  && (dump_flags & TDF_DETAILS))
-	fprintf (dump_file, "canonicalize_loop_ivs failed for loop %d,"
-		 " aborting transformation\n", loop->num);
-      return;
-    }
+  canonicalize_loop_ivs_1 (loop, &nit, true, &simple_ivs);
+  gcc_assert (num_phis (loop->header, false)
+	      == reduction_list->elements () + 1);
 
   /* Ensure that the exit condition is the first statement in the loop.
      The common case is that latch of the loop is empty (apart from the
