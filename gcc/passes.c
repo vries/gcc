@@ -1761,7 +1761,10 @@ execute_function_dump (function *fn, void *data)
       if (fn->curr_properties & PROP_trees)
         dump_function_to_file (fn->decl, dump_file, dump_flags);
       else
-	print_rtl_with_bb (dump_file, get_insns (), dump_flags);
+	{
+	  dump_function_attributes (fn->decl, dump_file, true);
+	  print_rtl_with_bb (dump_file, get_insns (), dump_flags);
+	}
 
       /* Flush the file.  If verification fails, we won't be able to
 	 close the file before aborting.  */

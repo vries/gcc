@@ -7963,6 +7963,45 @@ print_no_sanitize_attr_value (FILE *file, tree value)
     }
 }
 
+/* Dump function attributes of function FNDECL to FILE.  Print prefix showing
+   the function name if PRINT_PREFIX.  */
+
+void
+dump_function_attributes (tree fndecl, FILE *file, bool print_prefix)
+{
+  if (DECL_ATTRIBUTES (fndecl) == NULL_TREE)
+    return;
+
+  if (print_prefix)
+    fprintf (file, "function %s attributes: ", fndecl_name (fndecl));
+
+  fprintf (file, "__attribute__((");
+
+  bool first = true;
+  tree chain;
+  for (chain = DECL_ATTRIBUTES (fndecl); chain;
+       first = false, chain = TREE_CHAIN (chain))
+    {
+      if (!first)
+	fprintf (file, ", ");
+
+      tree name = get_attribute_name (chain);
+      print_generic_expr (file, name, dump_flags);
+      if (TREE_VALUE (chain) != NULL_TREE)
+	{
+	  fprintf (file, " (");
+
+	  if (strstr (IDENTIFIER_POINTER (name), "no_sanitize"))
+	    print_no_sanitize_attr_value (file, TREE_VALUE (chain));
+	  else
+	    print_generic_expr (file, TREE_VALUE (chain), dump_flags);
+	  fprintf (file, ")");
+	}
+    }
+
+  fprintf (file, "))\n");
+}
+
 /* Dump FUNCTION_DECL FN to file FILE using FLAGS (see TDF_* in dumpfile.h)
    */
 
@@ -7978,34 +8017,7 @@ dump_function_to_file (tree fndecl, FILE *file, dump_flags_t flags)
 		  && decl_is_tm_clone (fndecl));
   struct function *fun = DECL_STRUCT_FUNCTION (fndecl);
 
-  if (DECL_ATTRIBUTES (fndecl) != NULL_TREE)
-    {
-      fprintf (file, "__attribute__((");
-
-      bool first = true;
-      tree chain;
-      for (chain = DECL_ATTRIBUTES (fndecl); chain;
-	   first = false, chain = TREE_CHAIN (chain))
-	{
-	  if (!first)
-	    fprintf (file, ", ");
-
-	  tree name = get_attribute_name (chain);
-	  print_generic_expr (file, name, dump_flags);
-	  if (TREE_VALUE (chain) != NULL_TREE)
-	    {
-	      fprintf (file, " (");
-
-	      if (strstr (IDENTIFIER_POINTER (name), "no_sanitize"))
-		print_no_sanitize_attr_value (file, TREE_VALUE (chain));
-	      else
-		print_generic_expr (file, TREE_VALUE (chain), dump_flags);
-	      fprintf (file, ")");
-	    }
-	}
-
-      fprintf (file, "))\n");
-    }
+  dump_function_attributes (fndecl, file, false);
 
   current_function_decl = fndecl;
   if (flags & TDF_GIMPLE)
