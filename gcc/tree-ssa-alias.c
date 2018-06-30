@@ -1368,6 +1368,10 @@ refs_may_alias_p_1 (ao_ref *ref1, ao_ref *ref2, bool tbaa_p)
   poly_int64 max_size1 = -1, max_size2 = -1;
   bool var1_p, var2_p, ind1_p, ind2_p;
 
+  if ((ref1->ref && TREE_CLOBBER_P (ref1->ref))
+      || (ref2->ref && TREE_CLOBBER_P (ref2->ref)))
+    return false;
+
   gcc_checking_assert ((!ref1->ref
 			|| TREE_CODE (ref1->ref) == SSA_NAME
 			|| DECL_P (ref1->ref)

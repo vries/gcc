@@ -4484,6 +4484,7 @@ verify_gimple_assign_single (gassign *stmt)
     case PARM_DECL:
       if (!is_gimple_reg (lhs)
 	  && !is_gimple_reg (rhs1)
+	  && !TREE_CLOBBER_P (lhs)
 	  && is_gimple_reg_type (TREE_TYPE (lhs)))
 	{
 	  error ("invalid rhs for gimple memory store");

@@ -4883,7 +4883,8 @@ find_func_aliases (struct function *fn, gimple *origt)
       tree lhsop = gimple_assign_lhs (t);
       tree rhsop = (gimple_num_ops (t) == 2) ? gimple_assign_rhs1 (t) : NULL;
 
-      if (rhsop && TREE_CLOBBER_P (rhsop))
+      if ((rhsop && TREE_CLOBBER_P (rhsop))
+	  || (lhsop && TREE_CLOBBER_P (lhsop)))
 	/* Ignore clobbers, they don't actually store anything into
 	   the LHS.  */
 	;

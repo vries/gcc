@@ -1264,6 +1264,25 @@ asan_poison_variables (hash_set<tree> *variables, bool poison, gimple_seq *seq_p
     }
 }
 
+/* Return clobber uses for VARS.  */
+
+static gimple_seq
+gimple_build_uses (tree vars)
+{
+  gimple_seq seq = NULL;
+
+  for (tree var = vars; var; var = DECL_CHAIN (var))
+    {
+      if (DECL_ARTIFICIAL (var))
+	continue;
+
+      gimple *stmt = gimple_build_assign (build_clobber (TREE_TYPE (var)), var);
+      gimple_seq_add_stmt (&seq, stmt);
+    }
+
+  return seq;
+}
+
 /* Gimplify a BIND_EXPR.  Just voidify and recurse.  */
 
 static enum gimplify_status
@@ -1363,7 +1382,7 @@ gimplify_bind_expr (tree *expr_p, gimple_seq *pre_p)
       gimplify_seq_add_stmt (&cleanup, stack_restore);
     }
 
-  /* Add clobbers for all variables that go out of scope.  */
+  /* Add clobbers/uses for all variables that go out of scope.  */
   for (t = BIND_EXPR_VARS (bind_expr); t ; t = DECL_CHAIN (t))
     {
       if (VAR_P (t)
@@ -1376,14 +1395,17 @@ gimplify_bind_expr (tree *expr_p, gimple_seq *pre_p)
 	      /* Only care for variables that have to be in memory.  Others
 		 will be rewritten into SSA names, hence moved to the
 		 top-level.  */
-	      && !is_gimple_reg (t)
+	      && (flag_keep_vars_live || !is_gimple_reg (t))
 	      && flag_stack_reuse != SR_NONE)
 	    {
 	      tree clobber = build_clobber (TREE_TYPE (t));
-	      gimple *clobber_stmt;
-	      clobber_stmt = gimple_build_assign (t, clobber);
-	      gimple_set_location (clobber_stmt, end_locus);
-	      gimplify_seq_add_stmt (&cleanup, clobber_stmt);
+	      gimple *stmt;
+	      if (is_gimple_reg (t))
+		stmt = gimple_build_assign (clobber, t);
+	      else
+		stmt = gimple_build_assign (t, clobber);
+	      gimple_set_location (stmt, end_locus);
+	      gimplify_seq_add_stmt (&cleanup, stmt);
 	    }
 
 	  if (flag_openacc && oacc_declare_returns != NULL)
@@ -12763,6 +12785,10 @@ gimplify_body (tree fndecl, bool do_parms)
   gimple *outer_stmt;
   gbind *outer_bind;
 
+  gimple_seq cleanup = NULL;
+  if (flag_keep_vars_live)
+    cleanup = gimple_build_uses (DECL_ARGUMENTS (fndecl));
+
   timevar_push (TV_TREE_GIMPLIFY);
 
   init_tree_ssa (cfun);
@@ -12798,6 +12824,14 @@ gimplify_body (tree fndecl, bool do_parms)
   /* Gimplify the function's body.  */
   seq = NULL;
   gimplify_stmt (&DECL_SAVED_TREE (fndecl), &seq);
+
+  if (cleanup)
+    {
+      gtry *gs = gimple_build_try (seq, cleanup, GIMPLE_TRY_FINALLY);
+      seq = NULL;
+      gimplify_seq_add_stmt (&seq, gs);
+    }
+
   outer_stmt = gimple_seq_first_stmt (seq);
   if (!outer_stmt)
     {

@@ -3533,6 +3533,15 @@ expand_clobber (tree lhs)
     }
 }
 
+/* Expand a use of RHS.  */
+
+static void
+expand_use (tree rhs)
+{
+  rtx target = expand_expr (rhs, NULL_RTX, VOIDmode, EXPAND_NORMAL);
+  emit_use (target);
+}
+
 /* A subroutine of expand_gimple_stmt, expanding one gimple statement
    STMT that doesn't require special handling for outgoing edges.  That
    is no tailcalls and no GIMPLE_COND.  */
@@ -3632,6 +3641,8 @@ expand_gimple_stmt_1 (gimple *stmt)
 	      /* This is a clobber to mark the going out of scope for
 		 this LHS.  */
 	      expand_clobber (lhs);
+	    else if (TREE_CLOBBER_P (lhs))
+	      expand_use (rhs);
 	    else
 	      expand_assignment (lhs, rhs,
 				 gimple_assign_nontemporal_move_p (

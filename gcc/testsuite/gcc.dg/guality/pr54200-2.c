@@ -1,6 +1,5 @@
 /* { dg-do run } */
-/* { dg-skip-if "" { *-*-* }  { "*" } { "-Og" "-Os" "-O0" } } */
-/* { dg-options "-g -fdebug-nops -DMAIN" } */
+/* { dg-options "-g -fdebug-nops -fkeep-vars-live -DMAIN" } */
 
 #include "prevent-optimization.h"
 

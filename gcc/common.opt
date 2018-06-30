@@ -1496,6 +1496,10 @@ fdebug-nops
 Common Report Var(flag_debug_nops) Optimization
 Insert nops if that might improve debugging of optimized code.
 
+fkeep-vars-live
+Common Report Var(flag_keep_vars_live) Optimization
+Add artificial uses of local vars at end of scope.
+
 fkeep-gc-roots-live
 Common Undocumented Report Var(flag_keep_gc_roots_live) Optimization
 ; Always keep a pointer to a live memory block

@@ -3536,6 +3536,13 @@ sra_modify_assign (gimple *stmt, gimple_stmt_iterator *gsi)
       sra_stats.exprs++;
     }
 
+  if (modify_this_stmt && TREE_CLOBBER_P (gimple_assign_lhs (stmt)))
+    {
+      gimple_assign_set_rhs1 (stmt, rhs);
+      gimple_assign_set_lhs (stmt, build_clobber (TREE_TYPE (rhs)));
+      return SRA_AM_MODIFIED;
+    }
+
   if (modify_this_stmt)
     {
       if (!useless_type_conversion_p (TREE_TYPE (lhs), TREE_TYPE (rhs)))

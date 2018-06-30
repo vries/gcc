@@ -132,6 +132,9 @@ warn_uninit (enum opt_code wc, tree t, tree expr, tree var,
   if (is_gimple_assign (context)
       && gimple_assign_rhs_code (context) == COMPLEX_EXPR)
     return;
+  if (gimple_assign_single_p (context)
+      && TREE_CLOBBER_P (gimple_assign_lhs (context)))
+    return;
   if (!has_undefined_value_p (t))
     return;
 
