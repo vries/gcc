@@ -10559,3 +10559,94 @@ make_pass_variable_tracking (gcc::context *ctxt)
 {
   return new pass_variable_tracking (ctxt);
 }
+
+/* Insert nop after debug marker insn, if that insn is not followed by a real
+   insn on the same line.  */
+
+static void
+insert_debug_nops (void)
+{
+  rtx_insn *debug_marker = NULL;
+
+  for (rtx_insn *insn = get_insns (); insn; insn = NEXT_INSN (insn))
+    {
+      bool use_p = INSN_P (insn) && GET_CODE (PATTERN (insn)) == USE;
+      bool clobber_p = INSN_P (insn) && GET_CODE (PATTERN (insn)) == CLOBBER;
+
+      if (!debug_marker)
+	{
+	  if (DEBUG_MARKER_INSN_P (insn))
+	    debug_marker = insn;
+	  continue;
+	}
+
+      if (LABEL_P (insn) || BARRIER_P (insn) || DEBUG_MARKER_INSN_P (insn))
+	;
+      else if (use_p || clobber_p || NOTE_P (insn) || DEBUG_INSN_P (insn)
+	       || JUMP_TABLE_DATA_P (insn))
+	continue;
+      else if (INSN_P (insn))
+	{
+	  unsigned int debug_marker_loc = INSN_LOCATION (debug_marker);
+	  unsigned int insn_loc = INSN_LOCATION (insn);
+
+	  if (LOCATION_FILE (insn_loc) == LOCATION_FILE (debug_marker_loc)
+	      && LOCATION_LINE (insn_loc) == LOCATION_LINE (debug_marker_loc))
+	    {
+	      debug_marker = NULL;
+	      continue;
+	    }
+	}
+      else
+	gcc_unreachable ();
+
+      emit_insn_after_setloc (gen_nop (), debug_marker,
+			      INSN_LOCATION (debug_marker));
+      debug_marker = DEBUG_MARKER_INSN_P (insn) ? insn : NULL;
+    }
+}
+
+namespace {
+
+const pass_data pass_data_debug_nops =
+{
+  RTL_PASS, /* type */
+  "debugnops", /* name */
+  OPTGROUP_NONE, /* optinfo_flags */
+  TV_VAR_DEBUG_NOPS, /* tv_id */
+  0, /* properties_required */
+  0, /* properties_provided */
+  0, /* properties_destroyed */
+  0, /* todo_flags_start */
+  0, /* todo_flags_finish */
+};
+
+class pass_debug_nops : public rtl_opt_pass
+{
+public:
+  pass_debug_nops (gcc::context *ctxt)
+    : rtl_opt_pass (pass_data_debug_nops, ctxt)
+  {}
+
+  /* opt_pass methods: */
+  virtual bool gate (function *)
+    {
+      return flag_debug_nops;
+    }
+
+  virtual unsigned int execute (function *)
+    {
+      insert_debug_nops ();
+      /* If !debug_nonbind_markers_p, we can drop those insn here.  */
+      return 0;
+    }
+
+}; // class pass_debug_nops
+
+} // anon namespace
+
+rtl_opt_pass *
+make_pass_debug_nops (gcc::context *ctxt)
+{
+  return new pass_debug_nops (ctxt);
+}

@@ -603,6 +603,7 @@ extern rtl_opt_pass *make_pass_stack_regs_run (gcc::context *ctxt);
 extern rtl_opt_pass *make_pass_df_finish (gcc::context *ctxt);
 extern rtl_opt_pass *make_pass_compute_alignments (gcc::context *ctxt);
 extern rtl_opt_pass *make_pass_duplicate_computed_gotos (gcc::context *ctxt);
+extern rtl_opt_pass *make_pass_debug_nops (gcc::context *ctxt);
 extern rtl_opt_pass *make_pass_variable_tracking (gcc::context *ctxt);
 extern rtl_opt_pass *make_pass_free_cfg (gcc::context *ctxt);
 extern rtl_opt_pass *make_pass_machine_reorg (gcc::context *ctxt);

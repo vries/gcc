@@ -487,6 +487,7 @@ along with GCC; see the file COPYING3.  If not see
       NEXT_PASS (pass_late_compilation);
       PUSH_INSERT_PASSES_WITHIN (pass_late_compilation)
 	  NEXT_PASS (pass_compute_alignments);
+	  NEXT_PASS (pass_debug_nops);
 	  NEXT_PASS (pass_variable_tracking);
 	  NEXT_PASS (pass_free_cfg);
 	  NEXT_PASS (pass_machine_reorg);
