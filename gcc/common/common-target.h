@@ -34,6 +34,7 @@ enum opt_levels
   OPT_LEVELS_1_PLUS, /* -O1 and above, including -Os and -Og.  */
   OPT_LEVELS_1_PLUS_SPEED_ONLY, /* -O1 and above, but not -Os or -Og.  */
   OPT_LEVELS_1_PLUS_NOT_DEBUG, /* -O1 and above, but not -Og.  */
+  OPT_LEVELS_1_DEBUG, /* -Og.  */
   OPT_LEVELS_2_PLUS, /* -O2 and above, including -Os.  */
   OPT_LEVELS_2_PLUS_SPEED_ONLY, /* -O2 and above, but not -Os or -Og.  */
   OPT_LEVELS_3_PLUS, /* -O3 and above.  */

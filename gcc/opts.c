@@ -370,6 +370,10 @@ maybe_default_option (struct gcc_options *opts,
       enabled = (level >= 1 && !debug);
       break;
 
+    case OPT_LEVELS_1_DEBUG:
+      enabled = (level == 1 && debug);
+      break;
+
     case OPT_LEVELS_2_PLUS:
       enabled = (level >= 2);
       break;
@@ -477,6 +481,8 @@ static const struct default_options default_options_table[] =
     { OPT_LEVELS_1_PLUS_NOT_DEBUG, OPT_fssa_phiopt, NULL, 1 },
     { OPT_LEVELS_1_PLUS, OPT_ftree_builtin_call_dce, NULL, 1 },
     { OPT_LEVELS_1_PLUS, OPT_fomit_frame_pointer, NULL, 1 },
+    { OPT_LEVELS_1_DEBUG, OPT_fdebug_nops, NULL, 1 },
+    { OPT_LEVELS_1_DEBUG, OPT_fkeep_vars_live, NULL, 1 },
 
     /* -O2 optimizations.  */
     { OPT_LEVELS_2_PLUS, OPT_finline_small_functions, NULL, 1 },
