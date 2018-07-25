@@ -2598,7 +2598,7 @@ fi
 case $enable_bootstrap in
   yes)
     bootstrap_suffix=bootstrap
-    BUILD_CONFIG=bootstrap-debug
+    BUILD_CONFIG=bootstrap-Og
     ;;
   no)
     bootstrap_suffix=no-bootstrap
