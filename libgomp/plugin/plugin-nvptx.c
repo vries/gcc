@@ -48,106 +48,13 @@
 #include <unistd.h>
 #include <assert.h>
 #include <errno.h>
-
-#if PLUGIN_NVPTX_DYNAMIC
-# include <dlfcn.h>
-
-# define CUDA_ONE_CALL(call) \
-  __typeof (call) *call;
-struct cuda_lib_s {
-#include "cuda-lib.def"
-} cuda_lib;
-
-/* -1 if init_cuda_lib has not been called yet, false
-   if it has been and failed, true if it has been and succeeded.  */
-static signed char cuda_lib_inited = -1;
-
-/* Dynamically load the CUDA runtime library and initialize function
-   pointers, return false if unsuccessful, true if successful.  */
-static bool
-init_cuda_lib (void)
-{
-  if (cuda_lib_inited != -1)
-    return cuda_lib_inited;
-  const char *cuda_runtime_lib = "libcuda.so.1";
-  void *h = dlopen (cuda_runtime_lib, RTLD_LAZY);
-  cuda_lib_inited = false;
-  if (h == NULL)
-    return false;
-# undef CUDA_ONE_CALL
-# define CUDA_ONE_CALL(call) CUDA_ONE_CALL_1 (call)
-# define CUDA_ONE_CALL_1(call) \
-  cuda_lib.call = dlsym (h, #call);	\
-  if (cuda_lib.call == NULL)		\
-    return false;
-#include "cuda-lib.def"
-  cuda_lib_inited = true;
-  return true;
-}
-# undef CUDA_ONE_CALL
-# undef CUDA_ONE_CALL_1
-# define CUDA_CALL_PREFIX cuda_lib.
-#else
-# define CUDA_CALL_PREFIX
-# define init_cuda_lib() true
-#endif
-
+#include "cuda-lib.h"
 #include "secure_getenv.h"
 
 #undef MIN
 #undef MAX
 #define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
 #define MAX(X,Y) ((X) > (Y) ? (X) : (Y))
-
-/* Convenience macros for the frequently used CUDA library call and
-   error handling sequence as well as CUDA library calls that
-   do the error checking themselves or don't do it at all.  */
-
-#define CUDA_CALL_ERET(ERET, FN, ...)		\
-  do {						\
-    unsigned __r				\
-      = CUDA_CALL_PREFIX FN (__VA_ARGS__);	\
-    if (__r != CUDA_SUCCESS)			\
-      {						\
-	GOMP_PLUGIN_error (#FN " error: %s",	\
-			   cuda_error (__r));	\
-	return ERET;				\
-      }						\
-  } while (0)
-
-#define CUDA_CALL(FN, ...)			\
-  CUDA_CALL_ERET (false, FN, __VA_ARGS__)
-
-#define CUDA_CALL_ASSERT(FN, ...)		\
-  do {						\
-    unsigned __r				\
-      = CUDA_CALL_PREFIX FN (__VA_ARGS__);	\
-    if (__r != CUDA_SUCCESS)			\
-      {						\
-	GOMP_PLUGIN_fatal (#FN " error: %s",	\
-			   cuda_error (__r));	\
-      }						\
-  } while (0)
-
-#define CUDA_CALL_NOCHECK(FN, ...)		\
-  CUDA_CALL_PREFIX FN (__VA_ARGS__)
-
-static const char *
-cuda_error (CUresult r)
-{
-#if CUDA_VERSION < 7000
-  /* Specified in documentation and present in library from at least
-     5.5.  Not declared in header file prior to 7.0.  */
-  extern CUresult cuGetErrorString (CUresult, const char **);
-#endif
-  const char *desc;
-
-  r = CUDA_CALL_NOCHECK (cuGetErrorString, r, &desc);
-  if (r != CUDA_SUCCESS)
-    desc = "unknown cuda error";
-
-  return desc;
-}
 
 static unsigned int instantiated_devices = 0;
 static pthread_mutex_t ptx_dev_lock = PTHREAD_MUTEX_INITIALIZER;

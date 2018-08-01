@@ -30,7 +30,7 @@ if PLUGIN_NVPTX
 # Nvidia PTX OpenACC plugin.
 libgomp_plugin_nvptx_version_info = -version-info $(libtool_VERSION)
 toolexeclib_LTLIBRARIES += libgomp-plugin-nvptx.la
-libgomp_plugin_nvptx_la_SOURCES = plugin/plugin-nvptx.c
+libgomp_plugin_nvptx_la_SOURCES = plugin/plugin-nvptx.c plugin/cuda-lib.c
 libgomp_plugin_nvptx_la_CPPFLAGS = $(AM_CPPFLAGS) $(PLUGIN_NVPTX_CPPFLAGS)
 libgomp_plugin_nvptx_la_LDFLAGS = $(libgomp_plugin_nvptx_version_info) \
 	$(lt_host_flags)
