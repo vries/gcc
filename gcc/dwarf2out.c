@@ -16852,7 +16852,7 @@ dw_loc_list_1 (tree loc, rtx varloc, int want_address,
   if (!descr)
     return 0;
 
-  if (want_address == 2 && !have_address
+  if (want_address != 0 && !have_address
       && (dwarf_version >= 4 || !dwarf_strict))
     {
       if (int_size_in_bytes (TREE_TYPE (loc)) > DWARF2_ADDR_SIZE)
@@ -20684,6 +20684,24 @@ add_scalar_info (dw_die_ref die, enum dwarf_attribute attr, tree value,
 	     later parameter.  */
 	  if (decl_die != NULL)
 	    {
+	      if (attr == DW_AT_upper_bound)
+		{
+		  list = loc_list_from_tree (decl, 1, context);
+		  if (list != NULL)
+		    {
+		      if (single_element_loc_list_p (list)
+			  && (forms & dw_scalar_form_exprloc) != 0)
+			{
+			  list = loc_list_from_tree (decl, 0, context);
+			  add_AT_loc (die, attr, list->expr);
+			  return;
+			}
+
+		      if (!get_AT (decl_die, DW_AT_location))
+			add_AT_location_description (decl_die, DW_AT_location, list);
+		    }
+		}
+
 	      add_AT_die_ref (die, attr, decl_die);
 	      return;
 	    }
