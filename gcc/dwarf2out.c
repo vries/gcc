@@ -20775,7 +20775,8 @@ add_scalar_info (dw_die_ref die, enum dwarf_attribute attr, tree value,
       placeholder_seen = context->placeholder_seen;
       context->placeholder_seen = false;
     }
-  if (list == NULL || single_element_loc_list_p (list))
+  if ((decl_die == NULL || !flag_gnu_variable_value)
+       && (list == NULL || single_element_loc_list_p (list)))
     {
       /* If this attribute is not a reference nor constant, it is
 	 a DWARF expression rather than location description.  For that
@@ -23752,7 +23753,8 @@ gen_variable_die (tree decl, tree origin, dw_die_ref context_die)
 	     reference to them but beware of -g0 compile and -g link
 	     in which case the reference will be already present.  */
 	  tree type = TREE_TYPE (decl_or_origin);
-	  if (in_lto_p
+	  if (! flag_gnu_variable_value
+	      && in_lto_p
 	      && ! get_AT (var_die, DW_AT_type)
 	      && variably_modified_type_p
 		   (type, decl_function_context (decl_or_origin)))
@@ -26341,8 +26343,9 @@ gen_decl_die (tree decl, tree origin, struct vlr_context *ctx,
 	     which copies both the decl and the types.  */
 	  /* ???  And even non-LTO needs to re-visit type DIEs to fill
 	     in VLA bound information for example.  */
-	  || (decl && variably_modified_type_p (TREE_TYPE (decl),
-						current_function_decl)))
+	  || (! flag_gnu_variable_value && decl
+	      && variably_modified_type_p (TREE_TYPE (decl),
+					   current_function_decl)))
 	{
 	  /* Output any DIEs that are needed to specify the type of this data
 	     object.  */

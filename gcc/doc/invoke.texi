@@ -374,6 +374,7 @@ Objective-C and Objective-C++ Dialects}.
 -ginline-points  -gno-inline-points @gol
 -gvms  -gxcoff  -gxcoff+  -gz@r{[}=@var{type}@r{]} @gol
 -gsplit-dwarf -gdescribe-dies -gno-describe-dies @gol
+-ggnu-variable-value -gno-gnu-variable-value @gol
 -fdebug-prefix-map=@var{old}=@var{new}  -fdebug-types-section @gol
 -fno-eliminate-unused-debug-types @gol
 -femit-struct-debug-baseonly  -femit-struct-debug-reduced @gol
@@ -7471,6 +7472,11 @@ files.
 Add description attributes to some DWARF DIEs that have no name attribute,
 such as artificial variables, external references and call site
 parameter DIEs.
+
+@item -ggnu-variable-value
+@opindex ggnu-variable-value
+Use the DW_OP_GNU_variable_value DWARF stack to reduce the size of the
+DWARF info.
 
 @item -gpubnames
 @opindex gpubnames
