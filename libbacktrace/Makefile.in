@@ -125,11 +125,12 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3)
 @NATIVE_TRUE@	test_pecoff test_unknown unittest unittest_alloc \
 @NATIVE_TRUE@	btest btest_alloc stest stest_alloc ztest \
 @NATIVE_TRUE@	ztest_alloc edtest edtest_alloc
-@HAVE_ZLIB_TRUE@@NATIVE_TRUE@am__append_2 = -lz
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@am__append_2 = btest_dwz
 @HAVE_ZLIB_TRUE@@NATIVE_TRUE@am__append_3 = -lz
-@HAVE_PTHREAD_TRUE@@NATIVE_TRUE@am__append_4 = ttest ttest_alloc
-@HAVE_OBJCOPY_DEBUGLINK_TRUE@@NATIVE_TRUE@am__append_5 = dtest
-@HAVE_COMPRESSED_DEBUG_TRUE@@NATIVE_TRUE@am__append_6 = ctestg ctesta \
+@HAVE_ZLIB_TRUE@@NATIVE_TRUE@am__append_4 = -lz
+@HAVE_PTHREAD_TRUE@@NATIVE_TRUE@am__append_5 = ttest ttest_alloc
+@HAVE_OBJCOPY_DEBUGLINK_TRUE@@NATIVE_TRUE@am__append_6 = dtest
+@HAVE_COMPRESSED_DEBUG_TRUE@@NATIVE_TRUE@am__append_7 = ctestg ctesta \
 @HAVE_COMPRESSED_DEBUG_TRUE@@NATIVE_TRUE@	ctestg_alloc \
 @HAVE_COMPRESSED_DEBUG_TRUE@@NATIVE_TRUE@	ctesta_alloc
 subdir = .
@@ -620,6 +621,7 @@ CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
+DWZ = @DWZ@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
@@ -774,7 +776,7 @@ libbacktrace_la_LIBADD = \
 	$(ALLOC_FILE)
 
 libbacktrace_la_DEPENDENCIES = $(libbacktrace_la_LIBADD)
-TESTS = $(check_PROGRAMS) $(am__append_5)
+TESTS = $(check_PROGRAMS) $(am__append_2) $(am__append_6)
 @NATIVE_TRUE@check_LTLIBRARIES = libbacktrace_alloc.la \
 @NATIVE_TRUE@	libbacktrace_noformat.la
 @NATIVE_TRUE@libbacktrace_alloc_la_SOURCES = $(libbacktrace_la_SOURCES)
@@ -809,9 +811,9 @@ TESTS = $(check_PROGRAMS) $(am__append_5)
 @NATIVE_TRUE@stest_alloc_LDADD = libbacktrace_alloc.la
 @NATIVE_TRUE@ztest_SOURCES = ztest.c testlib.c
 @NATIVE_TRUE@ztest_CFLAGS = -DSRCDIR=\"$(srcdir)\"
-@NATIVE_TRUE@ztest_LDADD = libbacktrace.la $(am__append_2) \
+@NATIVE_TRUE@ztest_LDADD = libbacktrace.la $(am__append_3) \
 @NATIVE_TRUE@	$(CLOCK_GETTIME_LINK)
-@NATIVE_TRUE@ztest_alloc_LDADD = libbacktrace_alloc.la $(am__append_3) \
+@NATIVE_TRUE@ztest_alloc_LDADD = libbacktrace_alloc.la $(am__append_4) \
 @NATIVE_TRUE@	$(CLOCK_GETTIME_LINK)
 @NATIVE_TRUE@ztest_alloc_SOURCES = $(ztest_SOURCES)
 @NATIVE_TRUE@ztest_alloc_CFLAGS = $(ztest_CFLAGS)
@@ -1532,6 +1534,13 @@ ctesta_alloc.log: ctesta_alloc$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+btest_dwz.log: btest_dwz
+	@p='btest_dwz'; \
+	b='btest_dwz'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 dtest.log: dtest
 	@p='dtest'; \
 	b='dtest'; \
@@ -1694,6 +1703,12 @@ uninstall-am:
 @NATIVE_TRUE@	$(SED) "s/^$$SEARCH\$$/$$REPLACE $*/" \
 @NATIVE_TRUE@		$(srcdir)/xcoff.c \
 @NATIVE_TRUE@		> $@
+
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@%_dwz: %
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@	rm -f $@_common.debug
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@	cp $< $@
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@	cp $< $@_2
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@	$(DWZ) -m $@_common.debug $@ $@_2
 
 @NATIVE_TRUE@edtest2_build.c: gen_edtest2_build; @true
 @NATIVE_TRUE@gen_edtest2_build: $(srcdir)/edtest2.c
