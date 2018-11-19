@@ -126,6 +126,9 @@ check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3)
 @NATIVE_TRUE@	allocfail btest btest_alloc stest stest_alloc \
 @NATIVE_TRUE@	ztest ztest_alloc edtest edtest_alloc
 @NATIVE_TRUE@am__append_2 = allocfail.sh
+@NATIVE_TRUE@	btest btest_alloc stest stest_alloc ztest \
+@NATIVE_TRUE@	ztest_alloc edtest edtest_alloc
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@am__append_2 = btest_dwz
 @HAVE_ZLIB_TRUE@@NATIVE_TRUE@am__append_3 = -lz
 @HAVE_ZLIB_TRUE@@NATIVE_TRUE@am__append_4 = -lz
 @HAVE_PTHREAD_TRUE@@NATIVE_TRUE@am__append_5 = ttest ttest_alloc
@@ -632,6 +635,7 @@ CYGPATH_W = @CYGPATH_W@
 DEFS = @DEFS@
 DSYMUTIL = @DSYMUTIL@
 DUMPBIN = @DUMPBIN@
+DWZ = @DWZ@
 ECHO_C = @ECHO_C@
 ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
