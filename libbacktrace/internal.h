@@ -301,6 +301,7 @@ extern int backtrace_dwarf_add (struct backtrace_state *state,
 				const unsigned char *dwarf_str,
 				size_t dwarf_str_size,
 				int is_bigendian,
+				void *fileline_altlink,
 				backtrace_error_callback error_callback,
 				void *data, fileline *fileline_fn,
 				void **fileline_entry);
