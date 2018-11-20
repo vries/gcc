@@ -302,7 +302,9 @@ extern int backtrace_dwarf_add (struct backtrace_state *state,
 				size_t dwarf_str_size,
 				int is_bigendian,
 				backtrace_error_callback error_callback,
-				void *data, fileline *fileline_fn);
+				void *data, fileline *fileline_fn,
+				void **fileline_entry,
+				void *fileline_altlink);
 
 /* A test-only hook for elf_uncompress_zdebug.  */
 
