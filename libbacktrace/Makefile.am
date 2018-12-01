@@ -188,6 +188,17 @@ if HAVE_DWZ
 
 TESTS += btest_dwz
 
+printdwarftest.lo: dwarf.c
+
+printdwarftest_SOURCES = printdwarftest.c testlib.c
+printdwarftest_LDADD = libbacktrace.la
+
+check_PROGRAMS += printdwarftest
+
+printdwarftest_dwz_cmp.sh: printdwarftest_dwz
+
+TESTS += printdwarftest_dwz_cmp.sh
+
 endif HAVE_DWZ
 
 stest_SOURCES = stest.c
