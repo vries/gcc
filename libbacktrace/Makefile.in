@@ -120,17 +120,21 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3)
+check_PROGRAMS = $(am__EXEEXT_1) $(am__EXEEXT_2) $(am__EXEEXT_3) \
+	$(am__EXEEXT_4) $(am__EXEEXT_5)
 @NATIVE_TRUE@am__append_1 = test_elf test_xcoff_32 test_xcoff_64 \
 @NATIVE_TRUE@	test_pecoff test_unknown unittest unittest_alloc \
-@NATIVE_TRUE@	btest btest_alloc stest stest_alloc ztest \
-@NATIVE_TRUE@	ztest_alloc edtest edtest_alloc
-@HAVE_DWZ_TRUE@@NATIVE_TRUE@am__append_2 = btest_dwz
-@HAVE_ZLIB_TRUE@@NATIVE_TRUE@am__append_3 = -lz
-@HAVE_ZLIB_TRUE@@NATIVE_TRUE@am__append_4 = -lz
-@HAVE_PTHREAD_TRUE@@NATIVE_TRUE@am__append_5 = ttest ttest_alloc
-@HAVE_OBJCOPY_DEBUGLINK_TRUE@@NATIVE_TRUE@am__append_6 = dtest
-@HAVE_COMPRESSED_DEBUG_TRUE@@NATIVE_TRUE@am__append_7 = ctestg ctesta \
+@NATIVE_TRUE@	btest btest_alloc
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@am__append_2 = btest_dwz \
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@	printdwarftest_dwz_cmp.sh
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@am__append_3 = printdwarftest
+@NATIVE_TRUE@am__append_4 = stest stest_alloc ztest ztest_alloc edtest \
+@NATIVE_TRUE@	edtest_alloc
+@HAVE_ZLIB_TRUE@@NATIVE_TRUE@am__append_5 = -lz
+@HAVE_ZLIB_TRUE@@NATIVE_TRUE@am__append_6 = -lz
+@HAVE_PTHREAD_TRUE@@NATIVE_TRUE@am__append_7 = ttest ttest_alloc
+@HAVE_OBJCOPY_DEBUGLINK_TRUE@@NATIVE_TRUE@am__append_8 = dtest
+@HAVE_COMPRESSED_DEBUG_TRUE@@NATIVE_TRUE@am__append_9 = ctestg ctesta \
 @HAVE_COMPRESSED_DEBUG_TRUE@@NATIVE_TRUE@	ctestg_alloc \
 @HAVE_COMPRESSED_DEBUG_TRUE@@NATIVE_TRUE@	ctesta_alloc
 subdir = .
@@ -178,13 +182,14 @@ libbacktrace_noformat_la_OBJECTS =  \
 @NATIVE_TRUE@	test_xcoff_64$(EXEEXT) test_pecoff$(EXEEXT) \
 @NATIVE_TRUE@	test_unknown$(EXEEXT) unittest$(EXEEXT) \
 @NATIVE_TRUE@	unittest_alloc$(EXEEXT) btest$(EXEEXT) \
-@NATIVE_TRUE@	btest_alloc$(EXEEXT) stest$(EXEEXT) \
-@NATIVE_TRUE@	stest_alloc$(EXEEXT) ztest$(EXEEXT) \
-@NATIVE_TRUE@	ztest_alloc$(EXEEXT) edtest$(EXEEXT) \
-@NATIVE_TRUE@	edtest_alloc$(EXEEXT)
-@HAVE_PTHREAD_TRUE@@NATIVE_TRUE@am__EXEEXT_2 = ttest$(EXEEXT) \
+@NATIVE_TRUE@	btest_alloc$(EXEEXT)
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@am__EXEEXT_2 = printdwarftest$(EXEEXT)
+@NATIVE_TRUE@am__EXEEXT_3 = stest$(EXEEXT) stest_alloc$(EXEEXT) \
+@NATIVE_TRUE@	ztest$(EXEEXT) ztest_alloc$(EXEEXT) \
+@NATIVE_TRUE@	edtest$(EXEEXT) edtest_alloc$(EXEEXT)
+@HAVE_PTHREAD_TRUE@@NATIVE_TRUE@am__EXEEXT_4 = ttest$(EXEEXT) \
 @HAVE_PTHREAD_TRUE@@NATIVE_TRUE@	ttest_alloc$(EXEEXT)
-@HAVE_COMPRESSED_DEBUG_TRUE@@NATIVE_TRUE@am__EXEEXT_3 =  \
+@HAVE_COMPRESSED_DEBUG_TRUE@@NATIVE_TRUE@am__EXEEXT_5 =  \
 @HAVE_COMPRESSED_DEBUG_TRUE@@NATIVE_TRUE@	ctestg$(EXEEXT) \
 @HAVE_COMPRESSED_DEBUG_TRUE@@NATIVE_TRUE@	ctesta$(EXEEXT) \
 @HAVE_COMPRESSED_DEBUG_TRUE@@NATIVE_TRUE@	ctestg_alloc$(EXEEXT) \
@@ -247,6 +252,12 @@ edtest_OBJECTS = $(am_edtest_OBJECTS)
 @NATIVE_TRUE@am_edtest_alloc_OBJECTS = $(am__objects_5)
 edtest_alloc_OBJECTS = $(am_edtest_alloc_OBJECTS)
 @NATIVE_TRUE@edtest_alloc_DEPENDENCIES = libbacktrace_alloc.la
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@am_printdwarftest_OBJECTS =  \
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@	printdwarftest.$(OBJEXT) \
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@	testlib.$(OBJEXT)
+printdwarftest_OBJECTS = $(am_printdwarftest_OBJECTS)
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@printdwarftest_DEPENDENCIES =  \
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@	libbacktrace.la
 @NATIVE_TRUE@am_stest_OBJECTS = stest.$(OBJEXT)
 stest_OBJECTS = $(am_stest_OBJECTS)
 @NATIVE_TRUE@stest_DEPENDENCIES = libbacktrace.la
@@ -361,8 +372,8 @@ SOURCES = $(libbacktrace_la_SOURCES) $(EXTRA_libbacktrace_la_SOURCES) \
 	$(btest_alloc_SOURCES) $(ctesta_SOURCES) \
 	$(ctesta_alloc_SOURCES) $(ctestg_SOURCES) \
 	$(ctestg_alloc_SOURCES) $(edtest_SOURCES) \
-	$(edtest_alloc_SOURCES) $(stest_SOURCES) \
-	$(stest_alloc_SOURCES) $(test_elf_SOURCES) \
+	$(edtest_alloc_SOURCES) $(printdwarftest_SOURCES) \
+	$(stest_SOURCES) $(stest_alloc_SOURCES) $(test_elf_SOURCES) \
 	$(test_pecoff_SOURCES) $(test_unknown_SOURCES) \
 	$(test_xcoff_32_SOURCES) $(test_xcoff_64_SOURCES) \
 	$(ttest_SOURCES) $(ttest_alloc_SOURCES) $(unittest_SOURCES) \
@@ -776,7 +787,7 @@ libbacktrace_la_LIBADD = \
 	$(ALLOC_FILE)
 
 libbacktrace_la_DEPENDENCIES = $(libbacktrace_la_LIBADD)
-TESTS = $(check_PROGRAMS) $(am__append_2) $(am__append_6)
+TESTS = $(check_PROGRAMS) $(am__append_2) $(am__append_8)
 @NATIVE_TRUE@check_LTLIBRARIES = libbacktrace_alloc.la \
 @NATIVE_TRUE@	libbacktrace_noformat.la
 @NATIVE_TRUE@libbacktrace_alloc_la_SOURCES = $(libbacktrace_la_SOURCES)
@@ -805,15 +816,17 @@ TESTS = $(check_PROGRAMS) $(am__append_2) $(am__append_6)
 @NATIVE_TRUE@btest_alloc_SOURCES = $(btest_SOURCES)
 @NATIVE_TRUE@btest_alloc_CFLAGS = $(btest_CFLAGS)
 @NATIVE_TRUE@btest_alloc_LDADD = libbacktrace_alloc.la
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@printdwarftest_SOURCES = printdwarftest.c testlib.c
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@printdwarftest_LDADD = libbacktrace.la
 @NATIVE_TRUE@stest_SOURCES = stest.c
 @NATIVE_TRUE@stest_LDADD = libbacktrace.la
 @NATIVE_TRUE@stest_alloc_SOURCES = $(stest_SOURCES)
 @NATIVE_TRUE@stest_alloc_LDADD = libbacktrace_alloc.la
 @NATIVE_TRUE@ztest_SOURCES = ztest.c testlib.c
 @NATIVE_TRUE@ztest_CFLAGS = -DSRCDIR=\"$(srcdir)\"
-@NATIVE_TRUE@ztest_LDADD = libbacktrace.la $(am__append_3) \
+@NATIVE_TRUE@ztest_LDADD = libbacktrace.la $(am__append_5) \
 @NATIVE_TRUE@	$(CLOCK_GETTIME_LINK)
-@NATIVE_TRUE@ztest_alloc_LDADD = libbacktrace_alloc.la $(am__append_4) \
+@NATIVE_TRUE@ztest_alloc_LDADD = libbacktrace_alloc.la $(am__append_6) \
 @NATIVE_TRUE@	$(CLOCK_GETTIME_LINK)
 @NATIVE_TRUE@ztest_alloc_SOURCES = $(ztest_SOURCES)
 @NATIVE_TRUE@ztest_alloc_CFLAGS = $(ztest_CFLAGS)
@@ -990,6 +1003,10 @@ edtest$(EXEEXT): $(edtest_OBJECTS) $(edtest_DEPENDENCIES) $(EXTRA_edtest_DEPENDE
 edtest_alloc$(EXEEXT): $(edtest_alloc_OBJECTS) $(edtest_alloc_DEPENDENCIES) $(EXTRA_edtest_alloc_DEPENDENCIES) 
 	@rm -f edtest_alloc$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(edtest_alloc_OBJECTS) $(edtest_alloc_LDADD) $(LIBS)
+
+printdwarftest$(EXEEXT): $(printdwarftest_OBJECTS) $(printdwarftest_DEPENDENCIES) $(EXTRA_printdwarftest_DEPENDENCIES) 
+	@rm -f printdwarftest$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(printdwarftest_OBJECTS) $(printdwarftest_LDADD) $(LIBS)
 
 stest$(EXEEXT): $(stest_OBJECTS) $(stest_DEPENDENCIES) $(EXTRA_stest_DEPENDENCIES) 
 	@rm -f stest$(EXEEXT)
@@ -1450,6 +1467,13 @@ btest_alloc.log: btest_alloc$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+printdwarftest.log: printdwarftest$(EXEEXT)
+	@p='printdwarftest$(EXEEXT)'; \
+	b='printdwarftest'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 stest.log: stest$(EXEEXT)
 	@p='stest$(EXEEXT)'; \
 	b='stest'; \
@@ -1537,6 +1561,13 @@ ctesta_alloc.log: ctesta_alloc$(EXEEXT)
 btest_dwz.log: btest_dwz
 	@p='btest_dwz'; \
 	b='btest_dwz'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+printdwarftest_dwz_cmp.sh.log: printdwarftest_dwz_cmp.sh
+	@p='printdwarftest_dwz_cmp.sh'; \
+	b='printdwarftest_dwz_cmp.sh'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -1709,6 +1740,10 @@ uninstall-am:
 @HAVE_DWZ_TRUE@@NATIVE_TRUE@	cp $< $@
 @HAVE_DWZ_TRUE@@NATIVE_TRUE@	cp $< $@_2
 @HAVE_DWZ_TRUE@@NATIVE_TRUE@	$(DWZ) -m $@_common.debug $@ $@_2
+
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@printdwarftest.lo: dwarf.c
+
+@HAVE_DWZ_TRUE@@NATIVE_TRUE@printdwarftest_dwz_cmp.sh: printdwarftest_dwz
 
 @NATIVE_TRUE@edtest2_build.c: gen_edtest2_build; @true
 @NATIVE_TRUE@gen_edtest2_build: $(srcdir)/edtest2.c
