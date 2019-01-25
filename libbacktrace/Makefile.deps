@@ -1,20 +1,102 @@
 alloc.lo: backtrace.h config.h internal.h
+atomic.lo: backtrace.h backtrace-supported.h config.h internal.h
 backtrace.lo: backtrace.h config.h internal.h
-btest.lo: backtrace.h backtrace-supported.h (INCDIR)/filenames.h
 dwarf.lo: backtrace.h config.h $(INCDIR)/dwarf2.h $(INCDIR)/dwarf2.def \
 	$(INCDIR)/filenames.h internal.h
 elf.lo: backtrace.h config.h internal.h
 fileline.lo: backtrace.h config.h internal.h
-mmap.lo: backtrace.h config.h internal.h
+instrumented_alloc.lo: alloc.c backtrace.h config.h internal.h
 mmapio.lo: backtrace.h config.h internal.h
-nounwind.lo: config.h internal.h
+mmap.lo: backtrace.h config.h internal.h
+nounwind.lo: backtrace.h config.h internal.h
 pecoff.lo: backtrace.h config.h internal.h
 posix.lo: backtrace.h config.h internal.h
 print.lo: backtrace.h config.h internal.h
 read.lo: backtrace.h config.h internal.h
-simple.lo: backtrace.h config.h internal.h
+simple.lo: backtrace.h config.h
 sort.lo: backtrace.h config.h internal.h
-stest.lo: backtrace.h config.h internal.h
 state.lo: backtrace.h backtrace-supported.h config.h internal.h
 unknown.lo: backtrace.h config.h internal.h
+xcoff_32.lo: backtrace.h config.h internal.h
+xcoff_64.lo: backtrace.h config.h internal.h
 xcoff.lo: backtrace.h config.h internal.h
+allocfail.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+allocfail.obj: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+edtest2_build.o:
+edtest2_build.obj:
+edtest.o: backtrace.h backtrace-supported.h config.h internal.h testlib.h
+edtest.obj: backtrace.h backtrace-supported.h config.h internal.h testlib.h
+stest.o: backtrace.h config.h internal.h
+stest.obj: backtrace.h config.h internal.h
+test_format.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+test_format.obj: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+unittest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	internal.h testlib.h
+unittest.obj: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	internal.h testlib.h
+btest-btest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+btest-btest.obj: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+btest-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+btest-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+btest_alloc-btest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+btest_alloc-btest.obj: backtrace.h backtrace-supported.h \
+	$(INCDIR)/filenames.h testlib.h
+btest_alloc-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+btest_alloc-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ztest-ztest.o: backtrace.h backtrace-supported.h config.h internal.h \
+	testlib.h
+ztest-ztest.obj: backtrace.h backtrace-supported.h config.h internal.h \
+	testlib.h
+ztest-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ztest-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ztest_alloc-ztest.o: backtrace.h backtrace-supported.h config.h internal.h \
+	testlib.h
+ztest_alloc-ztest.obj: backtrace.h backtrace-supported.h config.h internal.h \
+	testlib.h
+ztest_alloc-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ztest_alloc-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ttest-ttest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ttest-ttest.obj: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ttest-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ttest-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ttest_alloc-ttest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ttest_alloc-ttest.obj: backtrace.h backtrace-supported.h \
+	$(INCDIR)/filenames.h testlib.h
+ttest_alloc-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ttest_alloc-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctestg-btest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ctestg-btest.obj: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ctestg-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctestg-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctesta-btest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ctesta-btest.obj: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ctesta-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctesta-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctestg_alloc-btest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ctestg_alloc-btest.obj: backtrace.h backtrace-supported.h \
+	$(INCDIR)/filenames.h testlib.h
+ctestg_alloc-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctestg_alloc-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctesta_alloc-btest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ctesta_alloc-btest.obj: backtrace.h backtrace-supported.h \
+	$(INCDIR)/filenames.h testlib.h
+ctesta_alloc-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctesta_alloc-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h

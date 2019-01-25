@@ -1089,126 +1089,6 @@ distclean-compile:
 .c.lo:
 	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $<
 
-btest-btest.o: btest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(btest_CFLAGS) $(CFLAGS) -c -o btest-btest.o `test -f 'btest.c' || echo '$(srcdir)/'`btest.c
-
-btest-btest.obj: btest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(btest_CFLAGS) $(CFLAGS) -c -o btest-btest.obj `if test -f 'btest.c'; then $(CYGPATH_W) 'btest.c'; else $(CYGPATH_W) '$(srcdir)/btest.c'; fi`
-
-btest-testlib.o: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(btest_CFLAGS) $(CFLAGS) -c -o btest-testlib.o `test -f 'testlib.c' || echo '$(srcdir)/'`testlib.c
-
-btest-testlib.obj: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(btest_CFLAGS) $(CFLAGS) -c -o btest-testlib.obj `if test -f 'testlib.c'; then $(CYGPATH_W) 'testlib.c'; else $(CYGPATH_W) '$(srcdir)/testlib.c'; fi`
-
-btest_alloc-btest.o: btest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(btest_alloc_CFLAGS) $(CFLAGS) -c -o btest_alloc-btest.o `test -f 'btest.c' || echo '$(srcdir)/'`btest.c
-
-btest_alloc-btest.obj: btest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(btest_alloc_CFLAGS) $(CFLAGS) -c -o btest_alloc-btest.obj `if test -f 'btest.c'; then $(CYGPATH_W) 'btest.c'; else $(CYGPATH_W) '$(srcdir)/btest.c'; fi`
-
-btest_alloc-testlib.o: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(btest_alloc_CFLAGS) $(CFLAGS) -c -o btest_alloc-testlib.o `test -f 'testlib.c' || echo '$(srcdir)/'`testlib.c
-
-btest_alloc-testlib.obj: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(btest_alloc_CFLAGS) $(CFLAGS) -c -o btest_alloc-testlib.obj `if test -f 'testlib.c'; then $(CYGPATH_W) 'testlib.c'; else $(CYGPATH_W) '$(srcdir)/testlib.c'; fi`
-
-ctesta-btest.o: btest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctesta_CFLAGS) $(CFLAGS) -c -o ctesta-btest.o `test -f 'btest.c' || echo '$(srcdir)/'`btest.c
-
-ctesta-btest.obj: btest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctesta_CFLAGS) $(CFLAGS) -c -o ctesta-btest.obj `if test -f 'btest.c'; then $(CYGPATH_W) 'btest.c'; else $(CYGPATH_W) '$(srcdir)/btest.c'; fi`
-
-ctesta-testlib.o: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctesta_CFLAGS) $(CFLAGS) -c -o ctesta-testlib.o `test -f 'testlib.c' || echo '$(srcdir)/'`testlib.c
-
-ctesta-testlib.obj: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctesta_CFLAGS) $(CFLAGS) -c -o ctesta-testlib.obj `if test -f 'testlib.c'; then $(CYGPATH_W) 'testlib.c'; else $(CYGPATH_W) '$(srcdir)/testlib.c'; fi`
-
-ctesta_alloc-btest.o: btest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctesta_alloc_CFLAGS) $(CFLAGS) -c -o ctesta_alloc-btest.o `test -f 'btest.c' || echo '$(srcdir)/'`btest.c
-
-ctesta_alloc-btest.obj: btest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctesta_alloc_CFLAGS) $(CFLAGS) -c -o ctesta_alloc-btest.obj `if test -f 'btest.c'; then $(CYGPATH_W) 'btest.c'; else $(CYGPATH_W) '$(srcdir)/btest.c'; fi`
-
-ctesta_alloc-testlib.o: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctesta_alloc_CFLAGS) $(CFLAGS) -c -o ctesta_alloc-testlib.o `test -f 'testlib.c' || echo '$(srcdir)/'`testlib.c
-
-ctesta_alloc-testlib.obj: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctesta_alloc_CFLAGS) $(CFLAGS) -c -o ctesta_alloc-testlib.obj `if test -f 'testlib.c'; then $(CYGPATH_W) 'testlib.c'; else $(CYGPATH_W) '$(srcdir)/testlib.c'; fi`
-
-ctestg-btest.o: btest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctestg_CFLAGS) $(CFLAGS) -c -o ctestg-btest.o `test -f 'btest.c' || echo '$(srcdir)/'`btest.c
-
-ctestg-btest.obj: btest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctestg_CFLAGS) $(CFLAGS) -c -o ctestg-btest.obj `if test -f 'btest.c'; then $(CYGPATH_W) 'btest.c'; else $(CYGPATH_W) '$(srcdir)/btest.c'; fi`
-
-ctestg-testlib.o: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctestg_CFLAGS) $(CFLAGS) -c -o ctestg-testlib.o `test -f 'testlib.c' || echo '$(srcdir)/'`testlib.c
-
-ctestg-testlib.obj: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctestg_CFLAGS) $(CFLAGS) -c -o ctestg-testlib.obj `if test -f 'testlib.c'; then $(CYGPATH_W) 'testlib.c'; else $(CYGPATH_W) '$(srcdir)/testlib.c'; fi`
-
-ctestg_alloc-btest.o: btest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctestg_alloc_CFLAGS) $(CFLAGS) -c -o ctestg_alloc-btest.o `test -f 'btest.c' || echo '$(srcdir)/'`btest.c
-
-ctestg_alloc-btest.obj: btest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctestg_alloc_CFLAGS) $(CFLAGS) -c -o ctestg_alloc-btest.obj `if test -f 'btest.c'; then $(CYGPATH_W) 'btest.c'; else $(CYGPATH_W) '$(srcdir)/btest.c'; fi`
-
-ctestg_alloc-testlib.o: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctestg_alloc_CFLAGS) $(CFLAGS) -c -o ctestg_alloc-testlib.o `test -f 'testlib.c' || echo '$(srcdir)/'`testlib.c
-
-ctestg_alloc-testlib.obj: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ctestg_alloc_CFLAGS) $(CFLAGS) -c -o ctestg_alloc-testlib.obj `if test -f 'testlib.c'; then $(CYGPATH_W) 'testlib.c'; else $(CYGPATH_W) '$(srcdir)/testlib.c'; fi`
-
-ttest-ttest.o: ttest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ttest_CFLAGS) $(CFLAGS) -c -o ttest-ttest.o `test -f 'ttest.c' || echo '$(srcdir)/'`ttest.c
-
-ttest-ttest.obj: ttest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ttest_CFLAGS) $(CFLAGS) -c -o ttest-ttest.obj `if test -f 'ttest.c'; then $(CYGPATH_W) 'ttest.c'; else $(CYGPATH_W) '$(srcdir)/ttest.c'; fi`
-
-ttest-testlib.o: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ttest_CFLAGS) $(CFLAGS) -c -o ttest-testlib.o `test -f 'testlib.c' || echo '$(srcdir)/'`testlib.c
-
-ttest-testlib.obj: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ttest_CFLAGS) $(CFLAGS) -c -o ttest-testlib.obj `if test -f 'testlib.c'; then $(CYGPATH_W) 'testlib.c'; else $(CYGPATH_W) '$(srcdir)/testlib.c'; fi`
-
-ttest_alloc-ttest.o: ttest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ttest_alloc_CFLAGS) $(CFLAGS) -c -o ttest_alloc-ttest.o `test -f 'ttest.c' || echo '$(srcdir)/'`ttest.c
-
-ttest_alloc-ttest.obj: ttest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ttest_alloc_CFLAGS) $(CFLAGS) -c -o ttest_alloc-ttest.obj `if test -f 'ttest.c'; then $(CYGPATH_W) 'ttest.c'; else $(CYGPATH_W) '$(srcdir)/ttest.c'; fi`
-
-ttest_alloc-testlib.o: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ttest_alloc_CFLAGS) $(CFLAGS) -c -o ttest_alloc-testlib.o `test -f 'testlib.c' || echo '$(srcdir)/'`testlib.c
-
-ttest_alloc-testlib.obj: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ttest_alloc_CFLAGS) $(CFLAGS) -c -o ttest_alloc-testlib.obj `if test -f 'testlib.c'; then $(CYGPATH_W) 'testlib.c'; else $(CYGPATH_W) '$(srcdir)/testlib.c'; fi`
-
-ztest-ztest.o: ztest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ztest_CFLAGS) $(CFLAGS) -c -o ztest-ztest.o `test -f 'ztest.c' || echo '$(srcdir)/'`ztest.c
-
-ztest-ztest.obj: ztest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ztest_CFLAGS) $(CFLAGS) -c -o ztest-ztest.obj `if test -f 'ztest.c'; then $(CYGPATH_W) 'ztest.c'; else $(CYGPATH_W) '$(srcdir)/ztest.c'; fi`
-
-ztest-testlib.o: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ztest_CFLAGS) $(CFLAGS) -c -o ztest-testlib.o `test -f 'testlib.c' || echo '$(srcdir)/'`testlib.c
-
-ztest-testlib.obj: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ztest_CFLAGS) $(CFLAGS) -c -o ztest-testlib.obj `if test -f 'testlib.c'; then $(CYGPATH_W) 'testlib.c'; else $(CYGPATH_W) '$(srcdir)/testlib.c'; fi`
-
-ztest_alloc-ztest.o: ztest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ztest_alloc_CFLAGS) $(CFLAGS) -c -o ztest_alloc-ztest.o `test -f 'ztest.c' || echo '$(srcdir)/'`ztest.c
-
-ztest_alloc-ztest.obj: ztest.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ztest_alloc_CFLAGS) $(CFLAGS) -c -o ztest_alloc-ztest.obj `if test -f 'ztest.c'; then $(CYGPATH_W) 'ztest.c'; else $(CYGPATH_W) '$(srcdir)/ztest.c'; fi`
-
-ztest_alloc-testlib.o: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ztest_alloc_CFLAGS) $(CFLAGS) -c -o ztest_alloc-testlib.o `test -f 'testlib.c' || echo '$(srcdir)/'`testlib.c
-
-ztest_alloc-testlib.obj: testlib.c
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(ztest_alloc_CFLAGS) $(CFLAGS) -c -o ztest_alloc-testlib.obj `if test -f 'testlib.c'; then $(CYGPATH_W) 'testlib.c'; else $(CYGPATH_W) '$(srcdir)/testlib.c'; fi`
-
 mostlyclean-libtool:
 	-rm -f *.lo
 
@@ -1772,25 +1652,107 @@ uninstall-am:
 @HAVE_OBJCOPY_DEBUGLINK_TRUE@@NATIVE_TRUE@	$(OBJCOPY) --only-keep-debug btest btest.debug
 @HAVE_OBJCOPY_DEBUGLINK_TRUE@@NATIVE_TRUE@	$(OBJCOPY) --strip-debug --add-gnu-debuglink=btest.debug btest dtest
 alloc.lo: backtrace.h config.h internal.h
+atomic.lo: backtrace.h backtrace-supported.h config.h internal.h
 backtrace.lo: backtrace.h config.h internal.h
-btest.lo: backtrace.h backtrace-supported.h (INCDIR)/filenames.h
 dwarf.lo: backtrace.h config.h $(INCDIR)/dwarf2.h $(INCDIR)/dwarf2.def \
 	$(INCDIR)/filenames.h internal.h
 elf.lo: backtrace.h config.h internal.h
 fileline.lo: backtrace.h config.h internal.h
-mmap.lo: backtrace.h config.h internal.h
+instrumented_alloc.lo: alloc.c backtrace.h config.h internal.h
 mmapio.lo: backtrace.h config.h internal.h
-nounwind.lo: config.h internal.h
+mmap.lo: backtrace.h config.h internal.h
+nounwind.lo: backtrace.h config.h internal.h
 pecoff.lo: backtrace.h config.h internal.h
 posix.lo: backtrace.h config.h internal.h
 print.lo: backtrace.h config.h internal.h
 read.lo: backtrace.h config.h internal.h
-simple.lo: backtrace.h config.h internal.h
+simple.lo: backtrace.h config.h
 sort.lo: backtrace.h config.h internal.h
-stest.lo: backtrace.h config.h internal.h
 state.lo: backtrace.h backtrace-supported.h config.h internal.h
 unknown.lo: backtrace.h config.h internal.h
+xcoff_32.lo: backtrace.h config.h internal.h
+xcoff_64.lo: backtrace.h config.h internal.h
 xcoff.lo: backtrace.h config.h internal.h
+allocfail.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+allocfail.obj: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+edtest2_build.o:
+edtest2_build.obj:
+edtest.o: backtrace.h backtrace-supported.h config.h internal.h testlib.h
+edtest.obj: backtrace.h backtrace-supported.h config.h internal.h testlib.h
+stest.o: backtrace.h config.h internal.h
+stest.obj: backtrace.h config.h internal.h
+test_format.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+test_format.obj: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+unittest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	internal.h testlib.h
+unittest.obj: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	internal.h testlib.h
+btest-btest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+btest-btest.obj: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+btest-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+btest-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+btest_alloc-btest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+btest_alloc-btest.obj: backtrace.h backtrace-supported.h \
+	$(INCDIR)/filenames.h testlib.h
+btest_alloc-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+btest_alloc-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ztest-ztest.o: backtrace.h backtrace-supported.h config.h internal.h \
+	testlib.h
+ztest-ztest.obj: backtrace.h backtrace-supported.h config.h internal.h \
+	testlib.h
+ztest-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ztest-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ztest_alloc-ztest.o: backtrace.h backtrace-supported.h config.h internal.h \
+	testlib.h
+ztest_alloc-ztest.obj: backtrace.h backtrace-supported.h config.h internal.h \
+	testlib.h
+ztest_alloc-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ztest_alloc-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ttest-ttest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ttest-ttest.obj: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ttest-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ttest-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ttest_alloc-ttest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ttest_alloc-ttest.obj: backtrace.h backtrace-supported.h \
+	$(INCDIR)/filenames.h testlib.h
+ttest_alloc-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ttest_alloc-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctestg-btest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ctestg-btest.obj: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ctestg-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctestg-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctesta-btest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ctesta-btest.obj: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ctesta-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctesta-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctestg_alloc-btest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ctestg_alloc-btest.obj: backtrace.h backtrace-supported.h \
+	$(INCDIR)/filenames.h testlib.h
+ctestg_alloc-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctestg_alloc-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctesta_alloc-btest.o: backtrace.h backtrace-supported.h $(INCDIR)/filenames.h \
+	testlib.h
+ctesta_alloc-btest.obj: backtrace.h backtrace-supported.h \
+	$(INCDIR)/filenames.h testlib.h
+ctesta_alloc-testlib.o: backtrace.h $(INCDIR)/filenames.h testlib.h
+ctesta_alloc-testlib.obj: backtrace.h $(INCDIR)/filenames.h testlib.h
 
 # GNU Make needs to see an explicit $(MAKE) variable in the command it
 # runs to enable its job server during parallel builds.  Hence the
