@@ -1,0 +1,27 @@
+#!/bin/sh
+
+sed=@SED@
+awk=@AWK@
+grep=@GREP@
+objcopy=@OBJCOPY@
+readelf=@READELF@
+mkdir_p="@MKDIR_P@"
+build_id_dir="$1"
+src="$2"
+
+buildid=$($readelf -n $src \
+	      | $grep "Build ID" \
+	      | $awk '{print $3}')
+
+prefix=$(echo $buildid \
+	     | $sed 's/.//3g')
+
+remainder=$(echo $buildid \
+		| $sed 's/^.\{2\}//')
+
+dir=$build_id_dir/$prefix
+dst=$dir/$remainder.debug
+
+$mkdir_p $dir
+
+$objcopy --only-keep-debug $src $dst
