@@ -109,14 +109,13 @@ static int SymbolizeCodePCInfoCallback(void *vdata, uintptr_t addr,
                                        const char *filename, int lineno,
                                        const char *function) {
   SymbolizeCodeCallbackArg *cdata = (SymbolizeCodeCallbackArg *)vdata;
-  if (function) {
-    AddressInfo *info = cdata->get_new_frame(addr);
+  AddressInfo *info = cdata->get_new_frame(addr);
+  if (filename)
+    info->file = internal_strdup(filename);
+  info->line = lineno;
+  if (function)
     info->function = DemangleAlloc(function, /*always_alloc*/ true);
-    if (filename)
-      info->file = internal_strdup(filename);
-    info->line = lineno;
-    cdata->frames_symbolized++;
-  }
+  cdata->frames_symbolized++;
   return 0;
 }
 
@@ -161,7 +160,11 @@ bool LibbacktraceSymbolizer::SymbolizePC(uptr addr, SymbolizedStack *stack) {
   data.frames_symbolized = 0;
   backtrace_pcinfo((backtrace_state *)state_, addr, SymbolizeCodePCInfoCallback,
                    ErrorCallback, &data);
-  if (data.frames_symbolized > 0)
+  if (data.frames_symbolized == 1 && data.last->info.function == 0)
+    /* Augment the frame by trying to fill in the missing function with
+       backtrace_syminfo.  */
+    data.frames_symbolized = 0;
+  else if (data.frames_symbolized > 0)
     return true;
   backtrace_syminfo((backtrace_state *)state_, addr, SymbolizeCodeCallback,
                     ErrorCallback, &data);
