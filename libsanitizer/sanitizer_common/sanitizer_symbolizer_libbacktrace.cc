@@ -109,9 +109,10 @@ static int SymbolizeCodePCInfoCallback(void *vdata, uintptr_t addr,
                                        const char *filename, int lineno,
                                        const char *function) {
   SymbolizeCodeCallbackArg *cdata = (SymbolizeCodeCallbackArg *)vdata;
-  if (function) {
+  if (function || filename) {
     AddressInfo *info = cdata->get_new_frame(addr);
-    info->function = DemangleAlloc(function, /*always_alloc*/ true);
+    if (function)
+      info->function = DemangleAlloc(function, /*always_alloc*/ true);
     if (filename)
       info->file = internal_strdup(filename);
     info->line = lineno;
