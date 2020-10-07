@@ -6208,11 +6208,63 @@ gimple_split_block_before_cond_jump (basic_block bb)
 }
 
 
+/* Return true if gimple stmt G can be duplicated.  */
+bool
+can_duplicate_stmt_p (gimple *g)
+{
+  /* An IFN_GOMP_SIMT_ENTER_ALLOC/IFN_GOMP_SIMT_EXIT call must be
+     duplicated as part of its group, or not at all.
+     The IFN_GOMP_SIMT_VOTE_ANY and IFN_GOMP_SIMT_XCHG_* are part of such a
+     group, so the same holds there.  */
+  if (is_gimple_call (g)
+      && (gimple_call_internal_p (g, IFN_GOMP_SIMT_ENTER_ALLOC)
+	  || gimple_call_internal_p (g, IFN_GOMP_SIMT_EXIT)
+	  || gimple_call_internal_p (g, IFN_GOMP_SIMT_VOTE_ANY)
+	  || gimple_call_internal_p (g, IFN_GOMP_SIMT_XCHG_BFLY)
+	  || gimple_call_internal_p (g, IFN_GOMP_SIMT_XCHG_IDX)))
+    return false;
+
+  return true;
+}
+
+/* Return true if last statement of BB can be duplicated.  */
+bool
+can_duplicate_last_stmt_p (const_basic_block bb)
+{
+  if (bb->index < NUM_FIXED_BLOCKS)
+    return false;
+
+  if (gimple *g = last_stmt (CONST_CAST_BB (bb)))
+    {
+      /* A transaction is a single entry multiple exit region.  It
+	 must be duplicated in its entirety or not at all.  */
+      if (gimple_code (g) == GIMPLE_TRANSACTION)
+	return false;
+
+      /* An IFN_UNIQUE call must be duplicated as part of its group,
+	 or not at all.  */
+      if (is_gimple_call (g)
+	  && gimple_call_internal_p (g)
+	  && gimple_call_internal_unique_p (g))
+	return false;
+    }
+
+  return true;
+}
+
 /* Return true if basic_block can be duplicated.  */
 
 static bool
-gimple_can_duplicate_bb_p (const_basic_block bb ATTRIBUTE_UNUSED)
+gimple_can_duplicate_bb_p (const_basic_block bb)
 {
+  if (!can_duplicate_last_stmt_p (bb))
+    return false;
+
+  for (gimple_stmt_iterator gsi = gsi_start_bb (CONST_CAST_BB (bb));
+       !gsi_end_p (gsi); gsi_next (&gsi))
+    if (!can_duplicate_stmt_p (gsi_stmt (gsi)))
+      return false;
+
   return true;
 }
 

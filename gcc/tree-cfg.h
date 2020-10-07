@@ -117,6 +117,8 @@ extern basic_block gimple_switch_label_bb (function *, gswitch *, unsigned);
 extern basic_block gimple_switch_default_bb (function *, gswitch *);
 extern edge gimple_switch_edge (function *, gswitch *, unsigned);
 extern edge gimple_switch_default_edge (function *, gswitch *);
+extern bool can_duplicate_stmt_p (gimple *);
+extern bool can_duplicate_last_stmt_p (const_basic_block);
 
 /* Return true if the LHS of a call should be removed.  */
 
