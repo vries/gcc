@@ -5408,6 +5408,8 @@ nvptx_file_start (void)
     fputs ("\t.version\t7.0\n", asm_out_file);
   else if (TARGET_PTX_6_3)
     fputs ("\t.version\t6.3\n", asm_out_file);
+  else if (TARGET_PTX_4_1)
+    fputs ("\t.version\t4.1\n", asm_out_file);
   else
     fputs ("\t.version\t3.1\n", asm_out_file);
   if (TARGET_SM80)
