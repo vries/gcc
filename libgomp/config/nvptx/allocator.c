@@ -122,7 +122,8 @@ nvptx_memspace_alloc (omp_memspace_handle_t memspace, size_t size)
 	}
 
       /* Update the free chain root and release the lock.  */
-      __atomic_store_n (&__nvptx_lowlat_heap_root, root.raw, MEMMODEL_RELEASE);
+      __atomic_exchange_n (&__nvptx_lowlat_heap_root,
+			   root.raw, MEMMODEL_RELEASE);
       return result;
     }
   else
@@ -221,7 +222,8 @@ nvptx_memspace_free (omp_memspace_handle_t memspace, void *addr, size_t size)
 	root.raw = newfreechunk.raw;
 
       /* Update the free chain root and release the lock.  */
-      __atomic_store_n (&__nvptx_lowlat_heap_root, root.raw, MEMMODEL_RELEASE);
+      __atomic_exchange_n (&__nvptx_lowlat_heap_root,
+			   root.raw, MEMMODEL_RELEASE);
     }
   else
     free (addr);
@@ -331,7 +333,8 @@ nvptx_memspace_realloc (omp_memspace_handle_t memspace, void *addr,
       /* Else realloc in-place has failed and result remains NULL.  */
 
       /* Update the free chain root and release the lock.  */
-      __atomic_store_n (&__nvptx_lowlat_heap_root, root.raw, MEMMODEL_RELEASE);
+      __atomic_exchange_n (&__nvptx_lowlat_heap_root,
+			   root.raw, MEMMODEL_RELEASE);
 
       if (result == NULL)
 	{
