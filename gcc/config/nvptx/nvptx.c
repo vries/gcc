@@ -2494,13 +2494,21 @@ nvptx_output_barrier (rtx *mem_operand, int memmodel, bool pre_p)
 
 const char *
 nvptx_output_atomic_insn (const char *asm_template, rtx *operands, int mem_pos,
-			  int memmodel_pos)
+			  int memmodel_pos, bool force_pre_p,
+			  bool force_post_p)
 {
-  nvptx_output_barrier (&operands[mem_pos], INTVAL (operands[memmodel_pos]),
-			true);
+  int memmodel;
+
+  memmodel
+    = force_pre_p ? MEMMODEL_SEQ_CST : INTVAL (operands[memmodel_pos]);
+  nvptx_output_barrier (&operands[mem_pos], memmodel, true);
+
   output_asm_insn (asm_template, operands);
-  nvptx_output_barrier (&operands[mem_pos], INTVAL (operands[memmodel_pos]),
-			false);
+
+  memmodel
+    = force_post_p ? MEMMODEL_SEQ_CST : INTVAL (operands[memmodel_pos]);
+  nvptx_output_barrier (&operands[mem_pos], memmodel, false);
+
   return "";
 }
 
@@ -2677,6 +2685,13 @@ static void
 nvptx_print_operand_address (FILE *file, machine_mode mode, rtx addr)
 {
   nvptx_print_address_operand (file, addr, mode);
+}
+
+bool
+nvptx_shared_mem_p (rtx x)
+{
+  return (SYMBOL_REF_P (XEXP (x, 0))
+	  && SYMBOL_DATA_AREA (XEXP (x, 0)) == DATA_AREA_SHARED);
 }
 
 /* Print an operand, X, to FILE, with an optional modifier in CODE.
