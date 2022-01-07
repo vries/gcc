@@ -55,7 +55,6 @@
    UNSPECV_LOCK
    UNSPECV_CAS
    UNSPECV_XCHG
-   UNSPECV_ST
    UNSPECV_BARSYNC
    UNSPECV_MEMBAR
    UNSPECV_MEMBAR_CTA
@@ -1785,7 +1784,7 @@
   {
     const char *t
       = "%.\\tatom%A1.cas.b%T0\\t%0, %1, %2, %3;";
-    return nvptx_output_atomic_insn (t, operands, 1, 4, false, false);
+    return nvptx_output_atomic_insn (t, operands, 1, 4);
   }
   [(set_attr "atomic" "true")])
 
@@ -1801,22 +1800,7 @@
   {
     const char *t
       = "%.\tatom%A1.exch.b%T0\t%0, %1, %2;";
-    return nvptx_output_atomic_insn (t, operands, 1, 3, false, false);
-  }
-  [(set_attr "atomic" "true")])
-
-(define_insn "atomic_store<mode>"
-  [(set (match_operand:SDIM 0 "memory_operand" "=m")                     ;; memory
-    (unspec_volatile:SDIM
-      [(match_operand:SDIM 1 "nvptx_nonmemory_operand" "Ri")            ;; input
-       (match_operand:SI 2 "const_int_operand")]			;; model
-      UNSPECV_ST))]
-  "!TARGET_SM70"
-  {
-    const char *t
-      = "%.\tst%A0.b%T0\t%0, %1;";
-    bool force_p = nvptx_shared_mem_p (operands[0]);
-    return nvptx_output_atomic_insn (t, operands, 0, 2, force_p, force_p);
+    return nvptx_output_atomic_insn (t, operands, 1, 3);
   }
   [(set_attr "atomic" "true")])
 
@@ -1833,7 +1817,7 @@
   {
     const char *t
       = "%.\\tatom%A1.add%t0\\t%0, %1, %2;";
-    return nvptx_output_atomic_insn (t, operands, 1, 3, false, false);
+    return nvptx_output_atomic_insn (t, operands, 1, 3);
   }
   [(set_attr "atomic" "true")])
 
@@ -1850,7 +1834,7 @@
   {
     const char *t
       = "%.\\tatom%A1.add%t0\\t%0, %1, %2;";
-    return nvptx_output_atomic_insn (t, operands, 1, 3, false, false);
+    return nvptx_output_atomic_insn (t, operands, 1, 3);
   }
   [(set_attr "atomic" "true")])
 
@@ -1870,7 +1854,7 @@
   {
     const char *t
       = "%.\\tatom%A1.b%T0.<logic>\\t%0, %1, %2;";
-    return nvptx_output_atomic_insn (t, operands, 1, 3, false, false);
+    return nvptx_output_atomic_insn (t, operands, 1, 3);
   }
 
   [(set_attr "atomic" "true")])
