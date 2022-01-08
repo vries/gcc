@@ -84,7 +84,8 @@ gomp_nvptx_main (void (*fn) (void *), void *fn_data)
       } root;
       root.desc.offset = 0;		 /* The first byte is free.  */
       root.desc.size = shared_pool_size; /* The whole space is free.  */
-      __nvptx_lowlat_heap_root = root.raw;
+      //__nvptx_lowlat_heap_root = root.raw;
+      __atomic_store_n (&__nvptx_lowlat_heap_root, root.raw, MEMMODEL_RELAXED);
       shared_pool[0] = 0;		 /* Terminate free chain.  */
 
       /* Initialize the thread pool.  */

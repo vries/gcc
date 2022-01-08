@@ -2679,6 +2679,13 @@ nvptx_print_operand_address (FILE *file, machine_mode mode, rtx addr)
   nvptx_print_address_operand (file, addr, mode);
 }
 
+bool
+nvptx_shared_mem_p (rtx x)
+{
+  return (SYMBOL_REF_P (XEXP (x, 0))
+	  && SYMBOL_DATA_AREA (XEXP (x, 0)) == DATA_AREA_SHARED);
+}
+
 /* Print an operand, X, to FILE, with an optional modifier in CODE.
 
    Meaning of CODE:

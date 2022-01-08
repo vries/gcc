@@ -1804,17 +1804,32 @@
   }
   [(set_attr "atomic" "true")])
 
+;; If we don't define atomic_store, expand_atomic_store will generate a
+;; regular store (effectively assuming stores are atomic), with barriers
+;; according to the memory model.
+;; However, on sm_6x architectures and before, an atomic operation on
+;; .shared state space is not atomic with respect to regular stores.
+;; So for atomic stores to .shared state space where sm < sm_70, we use
+;; atomic exchange, and fall back to expand_atomic_store otherwise.
+;; There is also the option to, instead of using atomic exchange, insert
+;; barriers between normal stores and atomic operations, but from
+;; experimentation it seems that these need to be membar.gl, which seems
+;; more expensive to used than a .shared atomic exchange.
 (define_expand "atomic_store<mode>"
-  [(match_operand:SDIM 0 "memory_operand" "=m")           ;; memory
+  [(match_operand:SDIM 0 "memory_operand" "=m")		  ;; memory
    (match_operand:SDIM 1 "nvptx_nonmemory_operand" "Ri")  ;; input
-   (match_operand:SI 2 "const_int_operand")]              ;; model
-  ""
+   (match_operand:SI 2 "const_int_operand")]		  ;; model
+  "!TARGET_SM70"
 {
+  bool shared_p = nvptx_shared_mem_p (operands[0]);
+  if (!shared_p)
+    /* Fall back to expand_atomic_store.  */
+    FAIL;
   rtx tmpreg = gen_reg_rtx (<MODE>mode);
-  gen_atomic_exchange<mode> (tmpreg, operands[0], operands[1], operands[2]);
+  emit_insn (gen_atomic_exchange<mode> (tmpreg, operands[0], operands[1],
+					operands[2]));
   DONE;
 })
-
 
 (define_insn "atomic_fetch_add<mode>"
   [(set (match_operand:SDIM 1 "memory_operand" "+m")
