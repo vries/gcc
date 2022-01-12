@@ -28,6 +28,7 @@ main()
 /* { dg-final { scan-assembler-times "(?n)call .* __atomic_exchange_1" 1 } } */
 /* { dg-final { scan-assembler-times "(?n)call .* __atomic_exchange_2" 1 } } */
 
-/* { dg-final { scan-assembler-times "atom.exch.b32" 1 } } */
-/* { dg-final { scan-assembler-times "atom.exch.b64" 1 } } */
+/* { dg-final { scan-assembler-times "atom.exch.b32" 2 } } */
+/* { dg-final { scan-assembler-times "atom.exch.b64" 2 } } */
 /* { dg-final { scan-assembler-times "membar.sys" 4 } } */
+/* { dg-final { scan-assembler-times "membar.cta" 4 } } */

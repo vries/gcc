@@ -301,6 +301,11 @@ struct GTY(()) machine_function
 #define ASM_OUTPUT_ALIGNED_DECL_LOCAL(FILE, DECL, NAME, SIZE, ALIGN)	\
   nvptx_output_aligned_decl (FILE, NAME, DECL, SIZE, ALIGN)
 
+extern unsigned int nvptx_indent;
+#define ASM_OUTPUT_OPCODE(stream, ptr) \
+  for (unsigned int __i = 0; __i < nvptx_indent; ++__i) \
+    fprintf (asm_out_file, "  ");
+
 #define CASE_VECTOR_PC_RELATIVE flag_pic
 #define JUMP_TABLES_IN_TEXT_SECTION flag_pic
 

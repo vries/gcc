@@ -65,10 +65,15 @@ unsigned long long int s64 __attribute__((shared));
 int
 main ()
 {
+  unsigned int l32;
+  unsigned long long int l64;
+
   TESTS (&g32);
   TESTS (&g64);
   TESTS (&s32);
   TESTS (&s64);
+  TESTS (&l32);
+  TESTS (&l64);
 
   return 0;
 }

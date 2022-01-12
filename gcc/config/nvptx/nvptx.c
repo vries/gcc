@@ -2457,51 +2457,109 @@ nvptx_output_mov_insn (rtx dst, rtx src)
   return "%.\tcvt%t0%t1\t%0, %1;";
 }
 
-/* Output a pre/post barrier for MEM_OPERAND according to MEMMODEL.  */
+/* Return true if a pre/post barrier for MEMMODEL needs to be emitted.  */
 
-static void
-nvptx_output_barrier (rtx *mem_operand, int memmodel, bool pre_p)
+bool
+nvptx_output_barrier_p (int memmodel, bool pre_p)
 {
   bool post_p = !pre_p;
 
   switch (memmodel)
     {
     case MEMMODEL_RELAXED:
-      return;
+      return false;
     case MEMMODEL_CONSUME:
     case MEMMODEL_ACQUIRE:
     case MEMMODEL_SYNC_ACQUIRE:
       if (post_p)
 	break;
-      return;
+      return false;
     case MEMMODEL_RELEASE:
     case MEMMODEL_SYNC_RELEASE:
       if (pre_p)
 	break;
-      return;
+      return false;
     case MEMMODEL_ACQ_REL:
     case MEMMODEL_SEQ_CST:
     case MEMMODEL_SYNC_SEQ_CST:
       if (pre_p || post_p)
 	break;
-      return;
+      return false;
     default:
       gcc_unreachable ();
     }
 
-  output_asm_insn ("%.\tmembar%B0;", mem_operand);
+  return true;
+}
+
+/* Output a pre/post barrier for MEM_OPERAND according to MEMMODEL.  */
+
+static void
+nvptx_output_barrier (rtx *mem_operand, int memmodel, bool pre_p, bool predicated_p)
+{
+  if (!nvptx_output_barrier_p (memmodel, pre_p))
+    return;
+
+  if (predicated_p)
+    output_asm_insn ("%.\tmembar%B0;", mem_operand);
+  else
+    output_asm_insn ("membar%B0;", mem_operand);
 }
 
 const char *
 nvptx_output_atomic_insn (const char *asm_template, rtx *operands, int mem_pos,
 			  int memmodel_pos)
 {
-  nvptx_output_barrier (&operands[mem_pos], INTVAL (operands[memmodel_pos]),
-			true);
+  int memmodel = INTVAL (operands[memmodel_pos]);
+  rtx *mem_operand = &operands[mem_pos];
+  bool predicated_p = (strlen (asm_template) >= 3
+		       && asm_template[0] == '%'
+		       && asm_template[1] == '.'
+		       && asm_template[2] == '\t');
+
+  nvptx_output_barrier (mem_operand, memmodel, true, predicated_p);
   output_asm_insn (asm_template, operands);
-  nvptx_output_barrier (&operands[mem_pos], INTVAL (operands[memmodel_pos]),
-			false);
+  nvptx_output_barrier (mem_operand, memmodel, false, predicated_p);
+
   return "";
+}
+
+unsigned int nvptx_indent = 0;
+
+void
+nvptx_output_enter_scope (const char *asm_template)
+{
+  output_asm_insn (asm_template, NULL);
+  nvptx_indent++;
+}
+
+void
+nvptx_output_exit_scope (const char *asm_template)
+{
+  gcc_assert (nvptx_indent > 0);
+  nvptx_indent--;
+  output_asm_insn (asm_template, NULL);
+}
+
+/* Output insns for non-atomic exchange, like this:
+     tmp = *MEM;
+     *MEM = INPUT;
+     OUTPUT = tmp;
+   The tmp is used to handle the case that input and output are the same.  */
+
+void
+nvptx_output_exchange (rtx output, rtx mem, rtx input)
+{
+  rtx operands[3];
+  operands[0] = output;
+  operands[1] = mem;
+  operands[2] = input;
+  nvptx_output_enter_scope ("{");
+  output_asm_insn (".reg .b%T0 %%tmp;", operands);
+  output_asm_insn ("ld%A1.b%T0 %%tmp, %1;", operands);
+  output_asm_insn ("st%A1.b%T0 %1, %2;", operands);
+  output_asm_insn ("mov.b%T0 %0, %%tmp;", operands);
+  nvptx_output_exit_scope ("}");
 }
 
 static void nvptx_print_operand (FILE *, rtx, int);
@@ -2679,6 +2737,34 @@ nvptx_print_operand_address (FILE *file, machine_mode mode, rtx addr)
   nvptx_print_address_operand (file, addr, mode);
 }
 
+bool
+nvptx_generic_mem_p (rtx x)
+{
+  return (!SYMBOL_REF_P (XEXP (x, 0))
+	  || SYMBOL_DATA_AREA (XEXP (x, 0)) == DATA_AREA_GENERIC);
+}
+
+bool
+nvptx_local_mem_p (rtx x)
+{
+  return (SYMBOL_REF_P (XEXP (x, 0))
+	  && SYMBOL_DATA_AREA (XEXP (x, 0)) == DATA_AREA_LOCAL);
+}
+
+bool
+nvptx_shared_mem_p (rtx x)
+{
+  return (SYMBOL_REF_P (XEXP (x, 0))
+	  && SYMBOL_DATA_AREA (XEXP (x, 0)) == DATA_AREA_SHARED);
+}
+
+bool
+nvptx_global_mem_p (rtx x)
+{
+  return (SYMBOL_REF_P (XEXP (x, 0))
+	  && SYMBOL_DATA_AREA (XEXP (x, 0)) == DATA_AREA_GLOBAL);
+}
+
 /* Print an operand, X, to FILE, with an optional modifier in CODE.
 
    Meaning of CODE:
@@ -2687,8 +2773,9 @@ nvptx_print_operand_address (FILE *file, machine_mode mode, rtx addr)
    # -- print a rounding mode for the instruction
 
    A -- print a data area for a MEM
-   c -- print an opcode suffix for a comparison operator, including a type code
    D -- print a data area for a MEM operand
+   m -- print address for a MEM
+   c -- print an opcode suffix for a comparison operator, including a type code
    S -- print a shuffle kind specified by CONST_INT
    t -- print a type opcode suffix, promoting QImode to 32 bits
    T -- print a type size in bits
@@ -2720,6 +2807,9 @@ nvptx_print_operand (FILE *file, rtx x, int code)
 
   switch (code)
     {
+    case 'm':
+      nvptx_print_address_operand (file, XEXP (x, 0), mode);
+      return;
     case 'B':
       if (SYMBOL_REF_P (XEXP (x, 0)))
 	switch (SYMBOL_DATA_AREA (XEXP (x, 0)))

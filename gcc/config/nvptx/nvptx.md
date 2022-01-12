@@ -1805,11 +1805,81 @@
 	(match_operand:SDIM 2 "nvptx_nonmemory_operand" "Ri"))]	;; input
   ""
   {
-    const char *t
-      = "%.\tatom%A1.exch.b%T0\t%0, %1, %2;";
-    return nvptx_output_atomic_insn (t, operands, 1, 3);
+    const char *atomic_template
+      = "atom%A1.exch.b%T0\t%0, %1, %2;";
+
+    if (nvptx_local_mem_p (operands[1]))
+      {
+	output_asm_insn ("// Atomic exchange - local", NULL);
+	nvptx_output_exchange (operands[0], operands[1], operands[2]);
+	return "";
+      }
+
+    /* Handle generic case. */
+    if (nvptx_generic_mem_p (operands[1]))
+      {
+	rtx_code_label *l_atomic_exchange_local = gen_label_rtx ();
+	rtx_code_label *l_atomic_exchange_shared = gen_label_rtx ();
+	rtx_code_label *l_atomic_exchange_end = gen_label_rtx ();
+	rtx l_atomic_exchange_local_ref
+	  = gen_rtx_LABEL_REF (Pmode, l_atomic_exchange_local);
+	rtx l_atomic_exchange_shared_ref
+	  = gen_rtx_LABEL_REF (Pmode, l_atomic_exchange_shared);
+	rtx l_atomic_exchange_end_ref
+	  = gen_rtx_LABEL_REF (Pmode, l_atomic_exchange_end);
+
+	nvptx_output_enter_scope ("{ // Atomic exchange - generic - start");
+
+	output_asm_insn (".reg .pred %%local_p;", NULL);
+	output_asm_insn ("isspacep.local %%local_p, %m1;", operands);
+	output_asm_insn ("@%%local_p bra %l0;", &l_atomic_exchange_local_ref);
+
+	output_asm_insn (".reg .pred %%shared_p;", NULL);
+	output_asm_insn ("isspacep.shared %%shared_p, %m1;", operands);
+	output_asm_insn ("@%%local_p bra %l0;", &l_atomic_exchange_shared_ref);
+
+	output_asm_insn ("// Atomic exchange - generic - global", NULL);
+	nvptx_output_atomic_insn (atomic_template, operands, 1, 3);
+	output_asm_insn ("bra %l0;", &l_atomic_exchange_end_ref);
+
+	default_internal_label (asm_out_file, "L",
+				CODE_LABEL_NUMBER (l_atomic_exchange_local));
+	output_asm_insn ("// Atomic exchange - generic - local", NULL);
+	nvptx_output_exchange (operands[0], operands[1], operands[2]);
+	output_asm_insn ("bra %l0;", &l_atomic_exchange_end_ref);
+
+	default_internal_label (asm_out_file, "L",
+				CODE_LABEL_NUMBER (l_atomic_exchange_shared));
+	output_asm_insn ("// Atomic exchange - generic - shared", NULL);
+	int memmodel = INTVAL (operands[3]);
+	if (nvptx_output_barrier_p (memmodel, true))
+	  output_asm_insn ("membar.cta;", NULL);
+	output_asm_insn (atomic_template, operands);
+	if (nvptx_output_barrier_p (memmodel, false))
+	  output_asm_insn ("membar.cta;", NULL);
+
+	default_internal_label (asm_out_file, "L",
+				CODE_LABEL_NUMBER (l_atomic_exchange_end));
+	nvptx_output_exit_scope ("} // Atomic exchange - generic - end");
+
+	return "";
+      }
+
+    if (nvptx_shared_mem_p (operands[1]))
+      nvptx_output_enter_scope ("{ // Atomic exchange - shared");
+    else if (nvptx_global_mem_p (operands[1]))
+      nvptx_output_enter_scope ("{ // Atomic exchange - global");
+    else
+      gcc_unreachable ();
+    nvptx_output_atomic_insn (atomic_template, operands, 1, 3);
+    if (0)
+      nvptx_output_exit_scope ("}");
+    else
+      nvptx_output_exit_scope ("}");
+    return "";
   }
-  [(set_attr "atomic" "true")])
+  [(set_attr "atomic" "true")
+   (set_attr "predicable" "false")])
 
 (define_insn "atomic_fetch_add<mode>"
   [(set (match_operand:SDIM 1 "memory_operand" "+m")

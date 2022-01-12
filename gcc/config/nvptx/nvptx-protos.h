@@ -59,5 +59,13 @@ extern const char *nvptx_output_simt_enter (rtx, rtx, rtx);
 extern const char *nvptx_output_simt_exit (rtx);
 extern const char *nvptx_output_red_partition (rtx, rtx);
 extern const char *nvptx_output_atomic_insn (const char *, rtx *, int, int);
+extern bool nvptx_generic_mem_p (rtx);
+extern bool nvptx_local_mem_p (rtx);
+extern bool nvptx_shared_mem_p (rtx);
+extern bool nvptx_global_mem_p (rtx);
+extern void nvptx_output_exchange (rtx, rtx, rtx);
+extern bool nvptx_output_barrier_p (int, bool);
+extern void nvptx_output_enter_scope (const char *);
+extern void nvptx_output_exit_scope (const char *);
 #endif
 #endif
