@@ -5,3 +5,137 @@ proc libgomp-dg-test { prog do_what extra_tool_flags } {
 proc libgomp-dg-prune { system text } {
     return [gcc-dg-prune $system $text]
 }
+
+proc is_offloading_exec { output_file } {
+    set res [catch {exec nm -C $output_file} output]
+    set lines [split $output "\n"]
+
+    set found 0
+    foreach line $lines {
+	if { [regexp "D __offload_func_table" $line] } {
+	    set found 1
+	    break
+	}
+    }
+
+    return $found
+}
+
+proc libgomp-dg-test-target-env-iter { prog do_what extra_tool_flags } {
+    global saved_comp_output
+    global saved_output_file
+    global saved_do_what
+    global have_saved_compilation
+
+    if { $have_saved_compilation == 1 } {
+	return [list $saved_comp_output $saved_output_file]
+    }
+
+    set results \
+	[uplevel 1 [list libgomp-dg-test-orig $prog $do_what $extra_tool_flags]]
+
+    set comp_output [lindex $results 0]
+    set output_file [lindex $results 1]
+
+    set saved_comp_output $comp_output
+    set saved_output_file $output_file
+    set saved_do_what $do_what
+
+    set have_saved_compilation 1
+    return $results
+}
+
+proc dg-test-target-env-iter { args } {
+    set keep 0
+    if { [lindex args 0] == "-keep-output" } {
+	set keep 1
+	set args [lrange $largs 1 end]
+    }
+    set prog [lindex $args 0]
+    set tool_flags [lindex $args 1]
+    set default_extra_tool_flags [lindex $args 2]
+
+    global have_saved_compilation
+    set have_saved_compilation 0
+
+    set gomp_target_env_iter [split [getenv GOMP_TARGET_ENV_ITER]]
+    set itervar [lindex $gomp_target_env_iter 0]
+    set itervals [lrange $gomp_target_env_iter 1 end]
+
+    set last [expr [llength $itervals] - 1]
+
+    set n 0
+    foreach iterval $itervals {
+	if { $iterval eq "_" } {
+	    if { [info exists ::env($itervar)] } then {
+		unsetenv $itervar
+	    }
+	    set tag ""
+	} else {
+	    setenv $itervar $iterval
+	    set tag "-D$itervar=$iterval"
+	}
+
+	set dg_test_args {}
+	if { $keep || $n != $last } {
+	    lappend dg_test_args -keep-output
+	}
+	lappend dg_test_args "$prog"
+	lappend dg_test_args [concat $tool_flags $tag]
+	lappend dg_test_args $default_extra_tool_flags
+
+	dg-test-orig {*}$dg_test_args
+
+	if { $n == 0 } {
+	    if { $have_saved_compilation == 0 } {
+		return
+	    }
+
+	    global saved_output_file
+	    global saved_do_what
+	    set output_file $saved_output_file
+	    set do_what $saved_do_what
+
+	    set iterate [expr { $do_what eq "run" } \
+			     && [file exists $output_file]]
+
+	    if { $iterate } {
+		switch $itervar {
+		    GOMP_NVPTX_JIT {
+			set iterate [is_offloading_exec $output_file]
+		    }
+		}
+	    }
+
+	    if { $iterate == 0 } {
+		# Clean up output file, if necessary.  Copied from dg-test.
+		global dg-interpreter-batch-mode
+		if { ! ${keep} && ${dg-interpreter-batch-mode} == 0 } {
+		    catch "file delete -force -- $output_file"
+		}
+		return
+	    }
+	}
+
+	incr n
+    }
+}
+
+proc libgomp-dg-init { } {
+    dg-init-orig
+
+    if { [getenv GOMP_TARGET_ENV_ITER] != "" \
+	     && [info procs libgomp-dg-test-target-env-iter] != "" } {
+	rename libgomp-dg-test libgomp-dg-test-orig
+	rename libgomp-dg-test-target-env-iter libgomp-dg-test
+
+	# Note: if we do this to early, dg-test-target-env-iter doesn't become
+	# the toplevel dg-test, and we'll run into trouble with variables not
+	# being reset between runs.
+	rename dg-test dg-test-orig
+	rename dg-test-target-env-iter dg-test
+    }
+}
+
+rename dg-init dg-init-orig
+rename libgomp-dg-init dg-init
