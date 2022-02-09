@@ -32,6 +32,80 @@ set ld_library_path $always_ld_library_path
 append ld_library_path [gcc-set-multilib-library-path $GCC_UNDER_TEST]
 set_ld_library_path_env_vars
 
+proc libgomp_load_nvptx { prog args } {
+    global have_offload_test
+    global offload_test_output_file
+    if { $have_offload_test } {
+	# Already detected offloading, proceed as usual.
+	return [orig_libgomp_load $prog $args]
+    }
+
+    set res [catch {exec nm "$prog" | grep -q "D offload_table" } results options]
+    if { $res == 1 } {
+	# No offloading, proceed as usual.
+	return [orig_libgomp_load $prog $args]
+    }
+
+    # Have offloading.
+    set have_offload_test 1
+    set offload_test_output_file $prog
+
+    # Keep exec.
+    upvar keep keep
+    set keep 1
+
+    # proceed as usual.
+    return [orig_libgomp_load $prog $args]
+}
+
+proc libgomp-dg-test-dummy { prog do_what extra_tool_flags } {
+    global offload_test_output_file
+    return [list "" $offload_test_output_file]
+}
+
+proc libgomp-dg-runtest { testcases options default-extra-options } {
+    global runtests
+    global have_offload_test
+    foreach testcase $testcases {
+	# If we're only testing specific files and this isn't one of them, skip it.
+	if {![runtest_file_p $runtests $testcase]} {
+	    continue
+	}
+	verbose "Testing [file tail [file dirname $testcase]]/[file tail $testcase]"
+
+	set have_offload_test 0
+	unsetenv GOMP_NVPTX_JIT
+	dg-test $testcase $options ${default-extra-options}
+
+	if { $have_offload_test } {
+	    rename libgomp-dg-test libgomp-dg-test-saved
+	    rename libgomp-dg-test-dummy libgomp-dg-test
+	    set opts [getenv GOMP_NVPTX_JIT_ITER]
+	    set last [expr [llength $opts] - 1]
+	    set n 0
+	    foreach opt $opts {
+		setenv GOMP_NVPTX_JIT $opt
+		set tag "-DGOMP_NVPTX_JIT=$opt"
+		if { $n == $last } {
+		    dg-test $testcase "$options $tag" ${default-extra-options}
+		} else {
+		    dg-test -keep-output $testcase "$options $tag" ${default-extra-options}
+		}
+		incr n
+	    }
+	    rename libgomp-dg-test libgomp-dg-test-dummy
+	    rename libgomp-dg-test-saved libgomp-dg-test
+	}
+    }
+}
+
+if { [check_effective_target_offload_device_nvptx]
+     && [getenv GOMP_NVPTX_JIT_ITER] != "" } {
+    rename libgomp_load orig_libgomp_load
+    rename libgomp_load_nvptx libgomp_load
+    rename libgomp-dg-runtest dg-runtest
+}
+
 # Main loop.
 dg-runtest $tests "" $DEFAULT_CFLAGS
 
