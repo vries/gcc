@@ -5381,8 +5381,7 @@ gen_comment (const char *s)
   size_t len = strlen (ASM_COMMENT_START) + strlen (sep) + strlen (s) + 1;
   char *comment = (char *) alloca (len);
   snprintf (comment, len, "%s%s%s", ASM_COMMENT_START, sep, s);
-  return gen_rtx_ASM_INPUT_loc (VOIDmode, ggc_strdup (comment),
-				DECL_SOURCE_LOCATION (cfun->decl));
+  return gen_rtx_ASM_INPUT (VOIDmode, ggc_strdup (comment));
 }
 
 /* Initialize all declared regs at function entry.

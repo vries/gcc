@@ -2642,15 +2642,20 @@ final_scan_insn_1 (rtx_insn *insn, FILE *file, int optimize_p ATTRIBUTE_UNUSED,
 	    if (string[0])
 	      {
 		expanded_location loc;
+		bool unknown_loc_p
+		  = ASM_INPUT_SOURCE_LOCATION (body) == UNKNOWN_LOCATION;
 
-		app_enable ();
-		loc = expand_location (ASM_INPUT_SOURCE_LOCATION (body));
-		if (*loc.file && loc.line)
-		  fprintf (asm_out_file, "%s %i \"%s\" 1\n",
-			   ASM_COMMENT_START, loc.line, loc.file);
+		if (!unknown_loc_p)
+		  {
+		    app_enable ();
+		    loc = expand_location (ASM_INPUT_SOURCE_LOCATION (body));
+		    if (*loc.file && loc.line)
+		      fprintf (asm_out_file, "%s %i \"%s\" 1\n",
+			       ASM_COMMENT_START, loc.line, loc.file);
+		  }
 		fprintf (asm_out_file, "\t%s\n", string);
 #if HAVE_AS_LINE_ZERO
-		if (*loc.file && loc.line)
+		if (!unknown_loc_p && loc.file && *loc.file && loc.line)
 		  fprintf (asm_out_file, "%s 0 \"\" 2\n", ASM_COMMENT_START);
 #endif
 	      }
