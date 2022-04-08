@@ -44,8 +44,8 @@
   "misa=*:-m %*"				\
   /* Separator.	 */				\
   "; "						\
-  /* Implicit misa=sm_80.  */			\
-  ":-m sm_80"					\
+  /* Implicit misa=sm_30.  */			\
+  ":-m sm_35"					\
   "}"
 
 #define TARGET_CPU_CPP_BUILTINS() nvptx_cpu_cpp_builtins ()
